@@ -3,17 +3,24 @@ const Post = require('../models/Post');
 const router = express.Router();
 
 // Create Post
-router.post('/', async (req, res) => {
-    const { userId, role, source, destination, description } = req.body;
-
+router.post('/posts', async (req, res) => {
     try {
-        const post = new Post({ user: userId, role, source, destination, description });
-        await post.save();
-        res.status(201).json(post);
+        const newPost = new Post({
+            userId: req.session.user.id,
+            role: req.body.role,
+            description: req.body.description,
+            source: req.body.source,
+            destination: req.body.destination
+        });
+
+        await newPost.save();
+        res.redirect('/dashboard');
     } catch (err) {
-        res.status(500).json({ message: err.message });
+        console.error(err);
+        res.render('dashboard', { error: 'Failed to create post.' });
     }
 });
+
 
 // Get Posts
 router.get('/', async (req, res) => {

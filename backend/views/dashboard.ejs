@@ -1,17 +1,48 @@
-<!DOCTYPE html>
-<html lang="en">
+<%- include('partials/nav_users') %>
+    <!DOCTYPE html>
+    <html lang="en">
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>User Dashboard</title>
-</head>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Dashboard - Sendmate</title>
+        <script src="https://cdn.tailwindcss.com"></script>
+    </head>
 
-<body>
-    <h1>User Dashboard</h1>
-    <h2>Welcome, <%= username %>!</h2>
-    <a href="/api/posts">View Posts</a>
-    <a href="/logout">Logout</a>
-</body>
+    <body class="bg-gray-100 min-h-screen">
+        <div class="container mx-auto p-6">
+            <div class="bg-white shadow-md rounded-lg p-6">
+                <h2 class="text-2xl font-bold text-gray-800 mb-4">Welcome, <%= user.username %>!</h2>
+                <h3 class="text-xl font-semibold text-gray-700 mb-2">Your Posts</h3>
 
-</html>
+                <% if (posts && posts.length> 0) { %>
+                    <ul class="space-y-4">
+                        <% posts.forEach(function(post) { %>
+                            <li class="bg-gray-50 p-4 rounded-lg shadow">
+                                <h4 class="text-lg font-semibold text-gray-800">
+                                    <%= post.title %>
+                                </h4>
+                                <p class="text-gray-600">
+                                    <%= post.description %>
+                                </p>
+                            </li>
+                            <% }); %>
+                    </ul>
+                    <% } else { %>
+                        <p class="text-gray-600">You haven't created any posts yet.</p>
+                        <% } %>
+
+                            <!-- Add options to create a new post -->
+                            <div class="mt-6">
+                                <a href="/create-post"
+                                    class="inline-block bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg shadow">
+                                    Create New Post
+                                </a>
+                            </div>
+            </div>
+        </div>
+
+        <%- include('partials/footer') %>
+    </body>
+
+    </html>

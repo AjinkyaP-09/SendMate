@@ -1,55 +1,131 @@
 const express = require('express');
 const mongoose = require('mongoose');
-const bodyParser = require('body-parser');
-const cors = require('cors');
 const dotenv = require('dotenv');
-const authRoutes = require('./routes/auth'); // Authentication routes
-const postRoutes = require('./routes/posts'); // Post routes
-const messageRoutes = require('./routes/messages'); // Message routes
 const path = require('path');
-
+const session = require('express-session');
+const Post = require('./models/Post');
+const User = require('./models/User');
+// Initialize the app
 const app = express();
 dotenv.config();
-// Middleware
-app.use(cors());
-app.use(bodyParser.json());
+
+// Connect to the database
+mongoose.connect(process.env.MONGO_URI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+}).then(() => console.log('Connected to MongoDB'))
+  .catch(err => console.log(err));
+
+// Set up middleware
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+app.use(session({
+  secret: 'pame',
+  resave: false,
+  saveUninitialized: true,
+  cookie: { secure: false } // Set to true when using HTTPS
+}));
+
+
+
+// Set view engine to EJS
 app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, 'views'));
 
-// Connect to MongoDB
-mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
-.then(() => console.log('MongoDB connected'))
-.catch(err => console.error('MongoDB connection error:', err));
+// Serve static files from public folder
+app.use(express.static('public'));
+app.use(express.static(path.join(__dirname, 'public')));
 
-// API Routes
-app.use('/api/auth', authRoutes); // User authentication routes
-app.use('/api/posts', postRoutes); // Post management routes
-app.use('/api/messages', messageRoutes); // Message management routes
+// Routes
+const authRoute = require('./routes/auth');
+const postRoute = require('./routes/posts');
+const messageRoute = require('./routes/messages');
 
-// Basic Route
+app.use('/api/auth', authRoute);
+app.use('/api/posts', postRoute);
+app.use('/api/messages', messageRoute);
+
+// Serve the homepage
 app.get('/', (req, res) => {
-    res.render('index');
+  res.render('index');
 });
 
+// Serve the login page
 app.get('/login', (req, res) => {
-    res.render('login');
+  res.render('login');
 });
 
-// Render the user dashboard
-app.get('/dashboard', (req, res) => {
-    // Replace this with actual user information when you have authentication set up
-    const username = 'User'; // Example placeholder, replace with actual logged-in user
-    res.render('dashboard', { username });
+
+
+// Serve the dashboard page (needs authentication middleware in future)
+app.get('/dashboard', async (req, res) => {
+  try {
+      // Check if the user is logged in
+      if (!req.session.user) {
+          return res.redirect('/login'); // Redirect to login if not logged in
+      }
+
+      // Fetch user-specific posts using the logged-in user's ID
+      const posts = await Post.find({ userId: req.session.user.id });
+
+      // Render the dashboard and pass both user and posts data
+      res.render('dashboard', { user: req.session.user, posts });
+  } catch (err) {
+      console.error(err);
+      res.redirect('/login');
+  }
 });
 
-// Render the posts page
-app.get('/posts', async (req, res) => {
-    // Fetch posts from the database (replace with actual data fetching)
-    const posts = await Post.find(); // Assuming you have a Post model defined
-    res.render('posts', { posts });
+// Serve individual post page
+app.get('/posts/:id', (req, res) => {
+  const postId = req.params.id;
+  const mockPostData = { title: 'Post Title', description: 'Detailed description' };  // Replace with real data
+  res.render('post', { post: mockPostData });
 });
 
-// Start Server
+
+app.get('/register', (req, res) => {
+    res.render('register');
+  });
+  
+app.get('/dashboard', async (req, res) => {
+    try {
+        if (!req.session.user) {
+            return res.redirect('/login');
+        }
+
+        // Fetch user-specific posts
+        const posts = await Post.find({ userId: req.session.user.id });
+        res.render('dashboard', { user: req.session.user, posts });
+    } catch (err) {
+        console.error(err);
+        res.redirect('/login');
+    }
+});
+
+app.post('/register', async (req, res) => {
+  try {
+      const { username, email, password, role } = req.body;
+      // Perform validation and database logic
+      const newUser = new User({ username, email, password, role });
+      await newUser.save();
+      res.redirect('/login');  // Redirect to login after successful registration
+  } catch (err) {
+      console.error(err);
+      res.status(500).send("Error registering the user.");
+  }
+});
+
+
+app.use((req, res, next) => {
+  res.locals.user = req.session.user || null;
+  next();
+});
+
+
+// Start the server
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
+  console.log(`Server running on port ${PORT}`);
 });
