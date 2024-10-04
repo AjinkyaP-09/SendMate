@@ -108,6 +108,12 @@ app.post('/register', async (req, res) => {
   try {
       const { username, email, password, role } = req.body;
       // Perform validation and database logic
+
+      let user = await User.findOne({ email });
+      if (user) {
+          return res.render('register', { error: 'User already exists' });
+      }
+
       const newUser = new User({ username, email, password, role });
       await newUser.save();
       res.redirect('/login');  // Redirect to login after successful registration

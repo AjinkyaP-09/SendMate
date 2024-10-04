@@ -17,11 +17,11 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
-    role: {
-        type: String,
-        enum: ['sender', 'traveler'], // Ensure valid roles
-        required: true
-    }
+    // role: {
+    //     type: String,
+    //     enum: ['sender', 'traveler'], // Ensure valid roles
+    //     required: true
+    // }
 }, { timestamps: true });
 
 module.exports = mongoose.model('User', userSchema);

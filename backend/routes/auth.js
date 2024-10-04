@@ -31,7 +31,7 @@ router.post('/register', async (req, res) => {
         // Check if the user already exists
         let user = await User.findOne({ email });
         if (user) {
-            return res.render('register', { error: 'User already exists' });
+            return res.render('/login', { error: 'User already exists' });
         }
 
         if (!passwordValidation(password)) {
@@ -83,7 +83,7 @@ router.post('/login', async (req, res) => {
                 id: user._id,
                 username: user.username,
                 email: user.email,
-                role: user.role,
+                // role: user.role,
             };
             res.redirect('/dashboard'); // Redirect to the dashboard on success
         } else {

@@ -1,11 +1,46 @@
 <nav class="bg-yellow-500 shadow-md">
     <div class="container mx-auto flex justify-between items-center py-4 px-6">
         <a href="/" class="text-2xl font-bold text-blue-600">Sendmate</a>
-        <ul class="flex space-x-6 text-blue-700 font-semibold">
+
+        <!-- Mobile Menu Button -->
+        <div class="block lg:hidden">
+            <button id="mobile-menu-btn" class="text-blue-600 focus:outline-none">
+                <!-- Hamburger Icon -->
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16">
+                    </path>
+                </svg>
+            </button>
+        </div>
+
+        <!-- Links -->
+        <ul id="nav-links" class="hidden lg:flex space-x-6 text-blue-700 font-semibold">
             <li><a href="/" class="hover:text-blue-600">Home</a></li>
             <li><a href="/login" class="hover:text-blue-600">Login</a></li>
             <li><a href="/register" class="hover:text-blue-600">Register</a></li>
             <li><a href="/dashboard" class="hover:text-blue-600">Dashboard</a></li>
         </ul>
     </div>
+
+    <!-- Mobile Menu -->
+    <div id="mobile-menu" class="hidden lg:hidden bg-yellow-500">
+        <ul class="space-y-4 text-blue-700 font-semibold text-center py-4">
+            <li><a href="/" class="block hover:text-blue-600">Home</a></li>
+            <li><a href="/login" class="block hover:text-blue-600">Login</a></li>
+            <li><a href="/register" class="block hover:text-blue-600">Register</a></li>
+            <li><a href="/dashboard" class="block hover:text-blue-600">Dashboard</a></li>
+        </ul>
+    </div>
+
+    <script>
+        // Toggle mobile menu visibility
+        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
+        const navLinks = document.getElementById('nav-links');
+
+        mobileMenuBtn.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
+    </script>
 </nav>
