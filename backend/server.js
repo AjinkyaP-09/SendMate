@@ -154,6 +154,18 @@ app.use((req, res, next) => {
   next();
 });
 
+
+app.get('/logout', (req, res) => {
+  req.session.destroy(err => {
+      if (err) {
+          console.log(err);
+          return res.redirect('/dashboard'); // Redirect to dashboard on error
+      }
+      res.clearCookie('connect.sid'); // Clear cookie
+      res.redirect('/'); // Redirect to homepage after logout
+  });
+});
+
 // Start the server
 const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => {
