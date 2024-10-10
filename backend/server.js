@@ -132,6 +132,10 @@ app.post("/register", async (req, res) => {
   }
 });
 
+app.get("/register-parcel",(req,res)=>{
+  res.render("registerParcel.ejs");
+});
+
 
 app.use((req, res, next) => {
   res.locals.user = req.session.user || null;
