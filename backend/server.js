@@ -42,10 +42,12 @@ app.use(express.static(path.join(__dirname, "public")));
 const authRoute = require("./routes/auth");
 const postRoute = require("./routes/posts");
 const messageRoute = require("./routes/messages");
+const parcelRoute = require("./routes/parcelRoute");
 
 app.use("/api/auth", authRoute);
 app.use("/api/posts", postRoute);
 app.use("/api/messages", messageRoute);
+app.use("/api/parcel", parcelRoute);
 
 // Serve the homepage
 app.get("/", (req, res) => {
@@ -105,7 +107,6 @@ app.get("/dashboard", async (req, res) => {
   }
 });
 
-
 app.post("/register", async (req, res) => {
   try {
     const { username, email, password, role } = req.body;
@@ -132,10 +133,9 @@ app.post("/register", async (req, res) => {
   }
 });
 
-app.get("/register-parcel",(req,res)=>{
-  res.render("registerParcel.ejs");
+app.get("/register-parcel", (req, res) => {
+  res.render("registerParcel.ejs", { error: null });
 });
-
 
 app.use((req, res, next) => {
   res.locals.user = req.session.user || null;
