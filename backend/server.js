@@ -4,7 +4,7 @@ const dotenv = require("dotenv");
 const path = require("path");
 const session = require("express-session");
 const Post = require("./models/Post");
-const bcrypt = require("bcrypt");
+const bcrypt = require("bcryptjs");
 const User = require("./models/User");
 // Initialize the app
 const app = express();
@@ -136,6 +136,18 @@ app.post("/register", async (req, res) => {
 app.get("/register-parcel", (req, res) => {
   res.render("registerParcel.ejs", { error: null });
 });
+
+app.get("/logout", (req, res) => {
+  req.session.destroy((err) => {
+    if (err) {
+      console.log(err);
+      return res.redirect("/dashboard"); // Redirect to dashboard on error
+    }
+    res.clearCookie("connect.sid"); // Clear cookie
+    res.redirect("/"); // Redirect to homepage after logout
+  });
+}); 
+
 
 app.use((req, res, next) => {
   res.locals.user = req.session.user || null;
