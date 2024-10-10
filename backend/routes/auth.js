@@ -1,5 +1,6 @@
 const express = require('express');
 const User = require('../models/User');
+const bcrypt = require('bcrypt');
 
 
 const router = express.Router();
@@ -66,34 +67,37 @@ router.post('/register', async (req, res) => {
     }
 });
 
-router.post('/login', async (req, res) => {
-    try {
-        const { email, password } = req.body;
+//Hashing Of Password is done
 
-        // Find the user by email
-        const user = await User.findOne({ email });
-        if (!user) {
-            return res.render('login', { error: 'Invalid email or password.' });
-        }
+router.post("/login", async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    const user = await User.findOne({ email });
 
-        // Compare the plain text password
-        if (user.password === password) {
-            // Passwords match, store user data in session
-            req.session.user = {
-                id: user._id,
-                username: user.username,
-                email: user.email,
-                // role: user.role,
-            };
-            res.redirect('/dashboard'); // Redirect to the dashboard on success
-        } else {
-            // Passwords do not match
-            return res.render('login', { error: 'Invalid email or password.' });
-        }
-    } catch (err) {
-        console.error("Login Error:", err);
-        res.render('login', { error: 'Something went wrong. Please try again.' });
+    if (!user) {
+      return res.render("login", { error: "Invalid email or password." });
     }
+
+    // Compare the plain-text password with the hashed password from the database
+    const isMatch = await bcrypt.compare(password, user.password);
+
+    if (isMatch) {
+      // Passwords match, store user data in session
+      req.session.user = {
+        id: user._id,
+        username: user.username,
+        email: user.email,
+        // role: user.role,
+      };
+      res.redirect("/dashboard"); // Redirect to the dashboard on success
+    } else {
+      // Passwords do not match
+      return res.render("login", { error: "Invalid email or password." });
+    }
+  } catch (err) {
+    console.error("Login Error:", err);
+    res.render("login", { error: "Something went wrong. Please try again." });
+  }
 });
 
   
