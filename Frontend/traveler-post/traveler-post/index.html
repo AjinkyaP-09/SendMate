@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Travel Post - Sendmate</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-100">
+
+    <!-- Header -->
+    <header class="bg-blue-600 text-white py-4">
+        <div class="container mx-auto text-center">
+            <h1 class="text-3xl font-bold">Create Your Travel Post</h1>
+        </div>
+    </header>
+
+    <!-- Create Post Form -->
+    <section class="py-12">
+        <div class="container mx-auto max-w-3xl bg-white p-8 rounded-lg shadow-lg">
+            <form action="/submit-travel-post" method="POST" class="space-y-6">
+
+                <!-- Mode of Travel -->
+                <div>
+                    <label for="modeOfTravel" class="block font-semibold text-gray-700">Mode of Travel:</label>
+                    <select id="modeOfTravel" name="modeOfTravel" required
+                        class="w-full p-3 border border-gray-300 rounded-lg">
+                        <option value="" disabled selected>Select Mode</option>
+                        <option value="Bus">Bus</option>
+                        <option value="Train">Train</option>
+                        <option value="Flight">Flight</option>
+                        <option value="Car">Car</option>
+                        <option value="Bike">Bike</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+
+                <!-- Source and Destination -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label for="source" class="block font-semibold text-gray-700">Source:</label>
+                        <input type="text" id="source" name="source" required
+                            class="w-full p-3 border border-gray-300 rounded-lg">
+                    </div>
+                    <div>
+                        <label for="destination" class="block font-semibold text-gray-700">Destination:</label>
+                        <input type="text" id="destination" name="destination" required
+                            class="w-full p-3 border border-gray-300 rounded-lg">
+                    </div>
+                </div>
+
+                <!-- Expected Time -->
+                <div>
+                    <label for="expectedTime" class="block font-semibold text-gray-700">Expected Time for
+                        Travel:</label>
+                    <input type="date" id="expectedTime" name="expectedTime" required
+                        class="w-full p-3 border border-gray-300 rounded-lg">
+                </div>
+
+                <!-- Parcel Size -->
+                <div>
+                    <label for="parcelSize" class="block font-semibold text-gray-700">Parcel Size You Can Carry:</label>
+                    <select id="parcelSize" name="parcelSize" required
+                        class="w-full p-3 border border-gray-300 rounded-lg">
+                        <option value="" disabled selected>Select Size</option>
+                        <option value="Small (0-5 kg)">Small (0-5 kg)</option>
+                        <option value="Medium (5-15 kg)">Medium (5-15 kg)</option>
+                        <option value="Large (15-30 kg)">Large (15-30 kg)</option>
+                        <option value="Extra Large (30+ kg)">Extra Large (30+ kg)</option>
+                    </select>
+                </div>
+
+
+                <!-- Additional Details Based on Travel Mode -->
+                <div class="space-y-6">
+                    <!-- Bus Route Details -->
+                    <div>
+                        <label for="busRouteDetails" class="block font-semibold text-gray-700">Bus Route
+                            Details:</label>
+                        <input type="text" id="busRouteDetails" name="busRouteDetails"
+                            class="w-full p-3 border border-gray-300 rounded-lg"
+                            placeholder="E.g., Bus name, route number, etc.">
+                    </div>
+
+                    <!-- Train Ticket Details -->
+                    <div>
+                        <label for="trainTicketDetails" class="block font-semibold text-gray-700">Train Ticket
+                            Details:</label>
+                        <input type="text" id="trainTicketDetails" name="trainTicketDetails"
+                            class="w-full p-3 border border-gray-300 rounded-lg"
+                            placeholder="E.g., Train name, PNR, etc.">
+                    </div>
+                </div>
+
+                <!-- Expected Amount -->
+                <div>
+                    <label for="expectedAmount" class="block font-semibold text-gray-700">Expected Amount ($):</label>
+                    <input type="number" id="expectedAmount" name="expectedAmount" required
+                        class="w-full p-3 border border-gray-300 rounded-lg" placeholder="Enter your expected amount">
+                </div>
+
+                <!-- Agree to Terms and Conditions -->
+                <div>
+                    <label class="flex items-center">
+                        <input type="checkbox" name="agreeTerms" required class="mr-2"><a href="#"
+                            class="text-blue-600 underline"> I agree to the terms and conditions</a>.
+                    </label>
+                </div>
+
+                <!-- Additional Details -->
+                <div>
+                    <label for="additionalDetails" class="block font-semibold text-gray-700">Additional Details:</label>
+                    <textarea id="additionalDetails" name="additionalDetails" rows="4"
+                        class="w-full p-3 border border-gray-300 rounded-lg"
+                        placeholder="Any other details..."></textarea>
+                </div>
+
+                <!-- Submit Button -->
+                <div class="text-center">
+                    <button type="submit"
+                        class="bg-blue-600 text-white font-semibold py-2 px-6 rounded-lg hover:bg-blue-700 transition duration-200">Create
+                        Post</button>
+                </div>
+
+            </form>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white py-4">
+        <div class="container mx-auto text-center">
+            <p>&copy; 2024 Sendmate. All Rights Reserved.</p>
+        </div>
+    </footer>
+
+</body>
+
+</html>

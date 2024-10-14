@@ -1,40 +1,67 @@
-<nav class="bg-yellow-500 shadow-md fixed top-0 left-0 w-full z-50">
-    <div class="container mx-auto flex justify-between items-center py-2 px-6">
-        <a href="/" class="text-2xl font-bold text-blue-600">Sendmate</a>
+<!DOCTYPE html>
+<html lang="en">
 
-        <!-- Mobile Menu Toggle Button -->
-        <button class="text-blue-600 md:hidden" id="mobile-menu-toggle">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
-                stroke="currentColor" class="w-6 h-6">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16m-7 6h7" />
-            </svg>
-        </button>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="/styles.css">
+</head>
 
-        <!-- Menu Links -->
-        <ul class="hidden md:flex space-x-6 text-blue-700 font-semibold" id="navbar-links">
-            <li><a href="/" class="hover:text-blue-600">Home</a></li>
-            <li><a href="/dashboard" class="hover:text-blue-600">Dashboard</a></li>
-            <li><a href="/logout" class="hover:text-blue-600">Logout</a></li>
+<body>
+
+    <nav style="background-color: #A6C1FA;" class="shadow-md fixed top-0 left-0 w-full z-50">
+        <div class="container mx-auto flex justify-between items-center py-2 px-6">
+            <a href="/" class="home-logo text-2xl font-bold"><img src="/images/sendmate-logo.png" class="logo-img-nav"
+                    alt="">Sendmate</a>
+
+            <!-- Mobile Menu Toggle Button -->
+            <button class="text-blue-600 md:hidden" id="mobile-menu-toggle">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
+                    stroke="currentColor" class="w-6 h-6">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16m-7 6h7" />
+                </svg>
+            </button>
+
+            <!-- Menu Links -->
+            <ul class="hidden md:flex space-x-6 text-blue-700 font-semibold" id="navbar-links">
+                <li><a href="/" class="secondary-color">Home</a></li>
+                <li><a href="/information" class="secondary-color">How it works</a></li>
+                <li>
+                    <a href="/dashboard" class="secondary-color">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" class="w-5 h-5 fill-current b-rounded-1">
+                            <path
+                                d="M224 256A128 128 0 1 0 224 0a128 128 0 1 0 0 256zm-45.7 48C79.8 304 0 383.8 0 482.3C0 498.7 13.3 512 29.7 512l388.6 0c16.4 0 29.7-13.3 29.7-29.7C448 383.8 368.2 304 269.7 304l-91.4 0z" />
+                        </svg>
+                    </a>
+                </li>
+                
+
+            </ul>
+        </div>
+
+        <!-- Mobile Dropdown Menu -->
+        <ul class="flex-col space-y-4 mt-4 hidden md:hidden" id="mobile-dropdown">
+            <li><a href="/" class="text-blue-700 font-semibold block text-center hover:text-blue-600">Home</a></li>
+            <li><a href="/dashboard"
+                    class="text-blue-700 font-semibold block text-center hover:text-blue-600">Dashboard</a>
+            </li>
+            <li><a href="/logout" class="text-blue-700 font-semibold block text-center hover:text-blue-600">Logout</a>
+            </li>
 
         </ul>
-    </div>
+    </nav>
 
-    <!-- Mobile Dropdown Menu -->
-    <ul class="flex-col space-y-4 mt-4 hidden md:hidden" id="mobile-dropdown">
-        <li><a href="/" class="text-blue-700 font-semibold block text-center hover:text-blue-600">Home</a></li>
-        <li><a href="/dashboard" class="text-blue-700 font-semibold block text-center hover:text-blue-600">Dashboard</a>
-        </li>
-        <li><a href="/logout" class="text-blue-700 font-semibold block text-center hover:text-blue-600">Logout</a></li>
+    <script>
+        const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
+        const navbarLinks = document.getElementById('navbar-links');
+        const mobileDropdown = document.getElementById('mobile-dropdown');
 
-    </ul>
-</nav>
+        mobileMenuToggle.addEventListener('click', () => {
+            mobileDropdown.classList.toggle('hidden');
+        });
+    </script>
 
-<script>
-    const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
-    const navbarLinks = document.getElementById('navbar-links');
-    const mobileDropdown = document.getElementById('mobile-dropdown');
+</body>
 
-    mobileMenuToggle.addEventListener('click', () => {
-        mobileDropdown.classList.toggle('hidden');
-    });
-</script>
+</html>

@@ -59,6 +59,10 @@ app.get("/login", (req, res) => {
   res.render("login");
 });
 
+app.get("/information", (req, res) => {
+  res.render("information.ejs");
+});
+
 // Serve the dashboard page (needs authentication middleware in future)
 app.get("/dashboard", async (req, res) => {
   try {
@@ -146,28 +150,26 @@ app.get("/logout", (req, res) => {
     res.clearCookie("connect.sid"); // Clear cookie
     res.redirect("/"); // Redirect to homepage after logout
   });
-}); 
-
+});
 
 app.use((req, res, next) => {
   res.locals.user = req.session.user || null;
   next();
 });
 
-
-app.get('/logout', (req, res) => {
-  req.session.destroy(err => {
-      if (err) {
-          console.log(err);
-          return res.redirect('/dashboard'); // Redirect to dashboard on error
-      }
-      res.clearCookie('connect.sid'); // Clear cookie
-      res.redirect('/'); // Redirect to homepage after logout
+app.get("/logout", (req, res) => {
+  req.session.destroy((err) => {
+    if (err) {
+      console.log(err);
+      return res.redirect("/dashboard"); // Redirect to dashboard on error
+    }
+    res.clearCookie("connect.sid"); // Clear cookie
+    res.redirect("/"); // Redirect to homepage after logout
   });
 });
 
 // Start the server
-const PORT = process.env.PORT || 8080;
+const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
