@@ -58,8 +58,3 @@ window.addEventListener("click", (event) => {
 });
 
 //show password
-
-document.getElementById("showPassword").addEventListener("change", function () {
-  const passwordInput = document.getElementById("password");
-  passwordInput.type = this.checked ? "text" : "password";
-});
