@@ -119,30 +119,30 @@ app.get("/register", (req, res) => {
   res.render("register");
 });
 
-app.post("/register", async (req, res) => {
-  try {
-    const { username, email, password } = req.body;
-    let user = await User.findOne({ email });
-    if (user) {
-      return res.render("register", { error: "User already exists" });
-    }
+// app.post("/register", async (req, res) => {
+//   try {
+//     const { username, email, password } = req.body;
+//     let user = await User.findOne({ email });
+//     if (user) {
+//       return res.render("register", { error: "User already exists" });
+//     }
 
-    // Hash the password before saving it
-    const hashedPassword = await bcrypt.hash(password, saltRounds);
+//     // Hash the password before saving it
+//     const hashedPassword = await bcrypt.hash(password, saltRounds);
 
-    const newUser = new User({
-      username,
-      email,
-      password: hashedPassword, // Store the hashed password
-    });
+//     const newUser = new User({
+//       username,
+//       email,
+//       password: hashedPassword, // Store the hashed password
+//     });
 
-    await newUser.save();
-    res.redirect("/login"); // Redirect to login after successful registration
-  } catch (err) {
-    console.error(err);
-    res.status(500).send("Error registering the user.");
-  }
-});
+//     await newUser.save();
+//     res.redirect("/login"); // Redirect to login after successful registration
+//   } catch (err) {
+//     console.error(err);
+//     res.status(500).send("Error registering the user.");
+//   }
+// });
 
 app.get("/register-parcel", (req, res) => {
   const user = req.session.user;
@@ -181,6 +181,9 @@ app.post("/sender-post", async (req, res) => {
   const {
     productName,
     productWeight,
+    length,
+    breadth,
+    height,
     isFragile,
     source,
     destination,
@@ -200,6 +203,9 @@ app.post("/sender-post", async (req, res) => {
     const newPost = new DeliveryPost({
       productName,
       productWeight,
+      length,
+      breadth,
+      height,
       isFragile,
       source,
       destination,
@@ -215,7 +221,7 @@ app.post("/sender-post", async (req, res) => {
     });
 
     await newPost.save();
-    res.status(200).render("/dashboard.ejs");
+    res.status(200).redirect("/dashboard");
   } catch (error) {
     res.status(500).send("Error creating post: " + error.message);
   }

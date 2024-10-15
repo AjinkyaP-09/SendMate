@@ -3,6 +3,9 @@ const mongoose = require("mongoose");
 const deliveryPostSchema = new mongoose.Schema({
   productName: { type: String, required: true },
   productWeight: { type: Number, required: true },
+  length : { type: Number, required: true },
+  breadth :  { type: Number, required: true },
+  height: { type: Number, required: true },
   isFragile: { type: String, required: true },
   source: { type: String, required: true },
   destination: { type: String, required: true },

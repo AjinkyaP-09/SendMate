@@ -23,7 +23,7 @@
                 <% } %>
 
                     <!-- Registration Form -->
-                    <form action="/register" method="POST" class="space-y-4">
+                    <form action="/api/auth/register" method="POST" class="space-y-4">
                         <div>
                             <label for="username" class="block text-gray-700 font-semibold mb-2">Username:</label>
                             <input type="text" id="username" name="username" required
@@ -67,7 +67,7 @@
     </div>
 
     <%- include('partials/footer') %> <!-- Ensure this path is correct -->
-        <script>
+        <!-- <script>
             // JavaScript to validate password and confirm password fields
             const password = document.getElementById('password');
             const confirmPassword = document.getElementById('confirmPassword');
@@ -79,7 +79,7 @@
                     confirmPassword.setCustomValidity("");
                 }
             });
-        </script>
+        </script> -->
         <script src="/javascript/script.js"></script>
 
 </body>

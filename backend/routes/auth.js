@@ -41,14 +41,13 @@ router.post('/register', async (req, res) => {
             });
         }
 
-        // Create a new user without hashing the password
-        user = new User({
-            username,
-            email,
-            password, // Store the password in plain text (not recommended)
-            role,
-        });
+        const hashedPassword = await bcrypt.hash(password, saltRounds);
 
+        user = new User({
+          username,
+          email,
+          password: hashedPassword, // Store the hashed password
+        });
         // Save user to the database
         await user.save();
 
@@ -57,7 +56,6 @@ router.post('/register', async (req, res) => {
             id: user._id,
             username: user.username,
             email: user.email,
-            role: user.role,
         };
 
         res.redirect('/login'); // Redirect to login after successful registration
