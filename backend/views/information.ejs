@@ -1,12 +1,37 @@
-<%- include('partials/header') %>
-    <%- include('partials/nav') %>
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>
+        Information - Sendmate
+    </title>
+    <link rel="stylesheet" href="/style.css">
+    <link rel="stylesheet" href="/styles.css">
+</head>
+
+<body>
+    <div class="wrapper">
+
+        <% if (!user) { %>
+            <%- include('partials/nav') %> <!-- Nav for logged-in users -->
+                <% } else { %>
+                    <%- include('partials/nav_users') %><!-- Nav for guests -->
+                        <% } %>
 
 
+                            <main>
+                                <div
+                                    class="information-div container mx-auto flex justify-between items-center py-2 px-8">
+                                    <h1>Help</h1>
+                                </div>
 
-        <div class="information-div container mx-auto flex justify-between items-center py-2 px-8">
-            <h1>Help</h1>
-        </div>
 
+                            </main>
+                            <%- include('partials/footer') %>
+    </div>
 
+</body>
 
-        <%- include('partials/footer') %>
+</html>

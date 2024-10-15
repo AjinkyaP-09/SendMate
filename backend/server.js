@@ -3,8 +3,9 @@ const mongoose = require("mongoose");
 const dotenv = require("dotenv");
 const path = require("path");
 const session = require("express-session");
-const Post = require("./models/Post");
+const DeliveryPost = require("./models/Parcel.js");
 const bcrypt = require("bcryptjs");
+const methodOverride = require("method-override");
 const User = require("./models/User");
 // Initialize the app
 const app = express();
@@ -20,7 +21,7 @@ mongoose
 // Set up middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
+app.use(methodOverride("_method"));
 app.use(
   session({
     secret: "pame",
@@ -57,6 +58,15 @@ app.use("/api/posts", postRoute);
 app.use("/api/messages", messageRoute);
 app.use("/api/parcel", parcelRoute);
 
+app.use((req, res, next) => {
+  if (req.session.user) {
+    res.locals.user = req.session.user;
+  } else {
+    res.locals.user = null;
+  }
+  next();
+});
+
 // Serve the homepage
 app.get("/", (req, res) => {
   const user = req.session.user;
@@ -69,7 +79,8 @@ app.get("/login", (req, res) => {
 });
 
 app.get("/information", (req, res) => {
-  res.render("information.ejs");
+  const user = req.session.user;
+  res.render("information.ejs", { user });
 });
 
 app.get("/dashboard", async (req, res) => {
@@ -79,8 +90,7 @@ app.get("/dashboard", async (req, res) => {
       return res.redirect("/login"); // Redirect to login if not logged in
     }
 
-    // Fetch user-specific posts using the logged-in user's ID
-    const posts = await Post.find({ userId: req.session.user.id });
+    const posts = await DeliveryPost.find({ userId: req.session.user.id });
 
     // Render the dashboard and pass both user and posts data
     res.render("dashboard", { user: req.session.user, posts });
@@ -109,24 +119,9 @@ app.get("/register", (req, res) => {
   res.render("register");
 });
 
-app.get("/dashboard", async (req, res) => {
-  try {
-    if (!req.session.user) {
-      return res.redirect("/login");
-    }
-
-    // Fetch user-specific posts
-    const posts = await Post.find({ userId: req.session.user.id });
-    res.render("dashboard", { user: req.session.user, posts });
-  } catch (err) {
-    console.error(err);
-    res.redirect("/login");
-  }
-});
-
 app.post("/register", async (req, res) => {
   try {
-    const { username, email, password, role } = req.body;
+    const { username, email, password } = req.body;
     let user = await User.findOne({ email });
     if (user) {
       return res.render("register", { error: "User already exists" });
@@ -151,7 +146,9 @@ app.post("/register", async (req, res) => {
 });
 
 app.get("/register-parcel", (req, res) => {
-  res.render("registerParcel.ejs", { error: null });
+  const user = req.session.user;
+  // console.log(user);
+  res.render("registerParcel.ejs", { user, error: null });
 });
 
 app.get("/logout", (req, res) => {
@@ -179,6 +176,147 @@ app.get("/logout", (req, res) => {
     res.clearCookie("connect.sid"); // Clear cookie
     res.redirect("/"); // Redirect to homepage after logout
   });
+});
+
+app.post("/sender-post", async (req, res) => {
+  const {
+    productName,
+    productWeight,
+    isFragile,
+    source,
+    destination,
+    receiverDetails,
+    expectedTime,
+    paymentMin,
+    paymentMax,
+    category,
+    additionalDetails,
+    userId,
+    username,
+    email,
+  } = req.body;
+  // console.log(userId, username, email);
+
+  try {
+    const newPost = new DeliveryPost({
+      productName,
+      productWeight,
+      isFragile,
+      source,
+      destination,
+      receiverDetails,
+      expectedTime,
+      paymentMin,
+      paymentMax,
+      category,
+      additionalDetails,
+      userId,
+      username,
+      email,
+    });
+
+    await newPost.save();
+    res.status(200).render("/dashboard.ejs");
+  } catch (error) {
+    res.status(500).send("Error creating post: " + error.message);
+  }
+});
+
+// Route to get all delivery posts
+app.get("/MyPosts", (req, res) => {
+  DeliveryPost.find()
+    .then((posts) => {
+      res.render("/MyPosts", { posts }); // Render a view called 'posts' and pass the posts data
+    })
+    .catch((err) => {
+      console.error(err);
+      res.status(500).send("Error retrieving posts");
+    });
+});
+
+app.delete("/post/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const userId = req.session.user.id; // Ensure that user ID is available in session
+
+    // Find the post with the matching user ID and post ID
+    const post = await DeliveryPost.findOne({ _id: id, userId: userId });
+
+    if (!post) {
+      console.log(`No post found with ID: ${id} for user ID: ${userId}`);
+      return res
+        .status(404)
+        .send(
+          "Post not found or you do not have permission to delete this post."
+        );
+    }
+
+    // Delete the post
+    await DeliveryPost.deleteOne({ _id: id });
+    console.log(`Post with ID: ${id} has been deleted successfully.`);
+
+    res.redirect("/dashboard");
+  } catch (error) {
+    console.error(`Error deleting post: ${error.message}`);
+    res.status(500).send("An error occurred while trying to delete the post.");
+  }
+});
+
+app.get("/post/:id/editForm", async (req, res) => {
+  const { id } = req.params;
+console.log(id);
+
+  try {
+    // Retrieve the post from the database by its ID and make sure it belongs to the logged-in user
+    const post = await DeliveryPost.findOne({
+      _id: id,
+      userId: req.session.user.id,
+    });
+
+    if (!post) {
+      return res
+        .status(404)
+        .send(
+          "Post not found or you do not have permission to edit this post."
+        );
+    }
+    
+    // Render the edit form with the post data
+    res.render("editForm", { post });
+  } catch (error) {
+    console.error(`Error retrieving post for edit: ${error.message}`);
+    res
+      .status(500)
+      .send("An error occurred while fetching the post for editing.");
+  }
+});
+
+
+app.patch("/post/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const updatedData = req.body; // Data from the form
+
+    // Find and update the post
+    const post = await DeliveryPost.findOneAndUpdate(
+      { _id: id, userId: req.session.user.id }, // Ensure the post belongs to the logged-in user
+      { $set: updatedData }, // Update the fields with form data
+      { new: true } // Return the updated document
+    );
+
+    if (!post) {
+      return res
+        .status(404)
+        .send(
+          "Post not found or you do not have permission to update this post."
+        );
+    }
+
+    res.redirect("/dashboard"); // Redirect to the dashboard or a confirmation page
+  } catch (error) {
+    console.error(`Error updating post: ${error.message}`);
+    res.status(500).send("An error occurred while updating the post.");
+  }
 });
 
 // Start the server

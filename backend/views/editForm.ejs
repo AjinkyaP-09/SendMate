@@ -24,7 +24,7 @@
                                 <!-- Page Title Section -->
                                 <section class="bg-blue-600 text-white py-4 mt-14">
                                     <div class="container mx-auto text-center">
-                                        <h1 class="text-3xl font-bold">Create Your Delivery Post</h1>
+                                        <h1 class="text-3xl font-bold">Edit Your Delivery Post</h1>
                                     </div>
                                 </section>
         </header>
@@ -32,12 +32,14 @@
         <!-- Main Content -->
         <main class="flex-1 pt-6 pb-12">
             <section class="register-parcel-container mx-auto max-w-3xl bg-white p-8 rounded-lg shadow-lg">
-                <form action="/sender-post" method="POST" class="space-y-6" onsubmit="return validatePaymentRange(event)">
+                <form action="/post/<%= post.id %>?_method=PATCH" method="POST" class="space-y-6"
+                    onsubmit="return validatePaymentRange(event)">
                     <!-- Product Name -->
                     <div>
                         <label for="productName" class="block font-semibold text-gray-700">Product Name:</label>
                         <input type="text" id="productName" name="productName" required
-                            class="w-full px-2 border border-gray-300 rounded-lg">
+                            class="w-full px-2 border border-gray-300 rounded-lg" value="<%= post.productName %>"
+                            disabled>
                     </div>
 
                     <!-- Product Weight -->
@@ -45,7 +47,7 @@
                         <label for="productWeight" class="block font-semibold text-gray-700">Product Weight
                             (kg):</label>
                         <input type="number" id="productWeight" name="productWeight" step="0.01" required
-                            class="w-full px-2 border border-gray-300 rounded-lg">
+                            class="w-full px-2 border border-gray-300 rounded-lg" value="<%= post.productWeight %>">
                     </div>
 
                     <!-- Is It Fragile? -->
@@ -53,10 +55,12 @@
                         <label class="block font-semibold text-gray-700">Is it Fragile?</label>
                         <div class="flex items-center space-x-4">
                             <label class="flex items-center">
-                                <input type="radio" name="isFragile" value="Yes" required class="mr-2"> Yes
+                                <input type="radio" name="isFragile" value="Yes" required class="mr-2"
+                                    <%=post.isFragile==='Yes' ? 'checked' : '' %> disabled> Yes
                             </label>
                             <label class="flex items-center">
-                                <input type="radio" name="isFragile" value="No" required class="mr-2"> No
+                                <input type="radio" name="isFragile" value="No" required class="mr-2"
+                                    <%=post.isFragile==='Yes' ? 'checked' : '' %> disabled> No
                             </label>
                         </div>
                     </div>
@@ -65,13 +69,13 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
                             <label for="source" class="block font-semibold text-gray-700">Source:</label>
-                            <input type="text" id="source" name="source" required
+                            <input type="text" id="source" name="source" required value="<%= post.source %>"
                                 class="w-full px-2 border border-gray-300 rounded-lg">
                         </div>
                         <div>
                             <label for="destination" class="block font-semibold text-gray-700">Destination:</label>
                             <input type="text" id="destination" name="destination" required
-                                class="w-full px-2 border border-gray-300 rounded-lg">
+                                value="<%= post.destination %>" class="w-full px-2 border border-gray-300 rounded-lg">
                         </div>
                     </div>
 
@@ -80,7 +84,7 @@
                         <label for="receiverDetails" class="block font-semibold text-gray-700">Receiver Details:</label>
                         <textarea id="receiverDetails" name="receiverDetails" rows="3" required
                             class="w-full px-2 border border-gray-300 rounded-lg"
-                            placeholder="Name, Contact Number, Address"></textarea>
+                            placeholder="Name, Contact Number, Address"><%= post.receiverDetails %></textarea>
                     </div>
 
                     <!-- Expected Time for Delivery -->
@@ -88,7 +92,9 @@
                         <label for="expectedTime" class="block font-semibold text-gray-700">Expected Time for
                             Delivery:</label>
                         <input type="date" id="expectedTime" name="expectedTime" required
+                            value="<%= post.expectedTime ? post.expectedTime.toISOString().split('T')[0] : '' %>"
                             class="w-full px-2 border border-gray-300 rounded-lg" min="">
+
                     </div>
 
                     <!-- Payment Range and Flexibility -->
@@ -96,25 +102,28 @@
                         <label for="paymentRange" class="block font-semibold text-gray-700">Payment Range ($):</label>
                         <div class="flex items-center space-x-4">
                             <input type="number" id="paymentMin" name="paymentMin" placeholder="Min" required
-                                class="w-full px-2 border border-gray-300 rounded-lg">
+                                value="<%= post.paymentMin %>" class="w-full px-2 border border-gray-300 rounded-lg">
                             <span class="text-gray-500">to</span>
                             <input type="number" id="paymentMax" name="paymentMax" placeholder="Max" required
-                                class="w-full px-2 border border-gray-300 rounded-lg">
+                                value="<%= post.paymentMax %>" class="w-full px-2 border border-gray-300 rounded-lg">
                         </div>
                     </div>
 
                     <!-- Category of the Product -->
                     <div>
                         <label for="category" class="block font-semibold px-2 text-gray-700">Category:</label>
-                        <select id="category" name="category" required
+                        <select id="category" name="category" required value="<%= post.category %>"
                             class="w-full p-2 border border-gray-300 rounded-lg">
                             <option value="" disabled selected>Select Category</option>
-                            <option value="Electronics">Electronics</option>
-                            <option value="Documents">Documents</option>
-                            <option value="Clothing">Clothing</option>
-                            <option value="Food">Food</option>
-                            <option value="Gifts">Gifts</option>
-                            <option value="Other">Other</option>
+                            <option value="Electronics" <%=post.category==='Electronics' ? 'selected' : '' %>
+                                >Electronics</option>
+                            <option value="Documents" <%=post.category==='Documents' ? 'selected' : '' %>>Documents
+                            </option>
+                            <option value="Clothing" <%=post.category==='Clothing' ? 'selected' : '' %>>Clothing
+                            </option>
+                            <option value="Food" <%=post.category==='Food' ? 'selected' : '' %>>Food</option>
+                            <option value="Gifts" <%=post.category==='Gifts' ? 'selected' : '' %>>Gifts</option>
+                            <option value="Other" <%=post.category==='Other' ? 'selected' : '' %>>Other</option>
                         </select>
                     </div>
 
@@ -123,8 +132,8 @@
                         <label for="additionalDetails" class="block font-semibold text-gray-700">Additional
                             Details:</label>
                         <textarea id="additionalDetails" name="additionalDetails" rows="4"
-                            class="w-full px-2 border border-gray-300 rounded-lg"
-                            placeholder="Any other details..."></textarea>
+                            value="<%= post.additionalDetails %>" class="w-full px-2 border border-gray-300 rounded-lg"
+                            placeholder="Any other details..."><%= post.additionalDetails %></textarea>
                     </div>
                     <input type="hidden" name="userId" value="<%= user.id %>">
                     <input type="hidden" name="username" value="<%= user.username %>">
@@ -133,10 +142,7 @@
 
                     <!-- Submit Button -->
                     <div class="text-center">
-                        <!-- <button type="submit"
-                            class="bg-blue-600 text-white font-semibold py-2 px-6 rounded-lg hover:bg-blue-700 transition duration-200">Create
-                            Post</button> -->
-                        <button type="submit" class="tertiary-button"> Create Post</button>
+                        <button type="submit" class="tertiary-button"> Edit Post</button>
                     </div>
                 </form>
             </section>

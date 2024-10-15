@@ -1,32 +1,51 @@
-<%- include('partials/header') %>
+<!DOCTYPE html>
+<html lang="en">
 
-    
-    <% if (!user) { %>
-        <%- include('partials/nav') %> <!-- Nav for logged-in users -->
-            <% } else { %>
-                <%- include('partials/nav_users') %><!-- Nav for guests -->
-                    <% } %>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact-Us | Sendmate</title>
+    <link rel="stylesheet" href="/style.css">
+    <link rel="stylesheet" href="/styles.css">
+</head>
 
-                        <div style="margin-top: 90px;" class="container mx-auto text-center contact-section">
-                            <h2 class="text-3xl font-bold mb-6">Get in Touch</h2>
-                            <p class="text-lg text-gray-700 mb-4">Have questions? We're here to help!</p>
-                            <form action="/contact" method="POST" class="contact-us-form max-w-lg mx-auto">
-                                <div class="mb-4">
-                                    <input type="text" name="name" placeholder="Your Name" required
-                                        class="w-full p-3 border border-gray-300 rounded-lg">
-                                </div>
-                                <div class="mb-4">
-                                    <input type="email" name="email" placeholder="Your Email" required
-                                        class="w-full p-3 border border-gray-300 rounded-lg">
-                                </div>
-                                <div class="mb-4">
-                                    <textarea name="message" rows="4" placeholder="Your Message" required
-                                        class="w-full p-3 border border-gray-300 rounded-lg"></textarea>
-                                </div>
-                                <button type="submit"
-                                    class="bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-blue-700 transition duration-200">Send
-                                    Message</button>
-                            </form>
-                        </div>
+<body>
 
-                        <%- include('partials/footer') %>
+
+    <div class="wrapper">
+        <header>
+            <% if (!user) { %>
+                <%- include('partials/nav') %> <!-- Nav for logged-in users -->
+                    <% } else { %>
+                        <%- include('partials/nav_users') %><!-- Nav for guests -->
+                            <% } %>
+        </header>
+        <main>
+            <div style="margin-top: 90px;" class="container mx-auto text-center contact-section">
+                <h2 class="text-3xl font-bold mb-6">Get in Touch</h2>
+                <p class="text-lg text-gray-700 mb-4">Have questions? We're here to help!</p>
+                <form action="/contact" method="POST" class="contact-us-form max-w-lg mx-auto">
+                    <div class="mb-4">
+                        <input type="text" name="name" placeholder="Your Name" required
+                            class="w-full p-3 border border-gray-300 rounded-lg">
+                    </div>
+                    <div class="mb-4">
+                        <input type="email" name="email" placeholder="Your Email" required
+                            class="w-full p-3 border border-gray-300 rounded-lg">
+                    </div>
+                    <div class="mb-4">
+                        <textarea name="message" rows="4" placeholder="Your Message" required
+                            class="w-full p-3 border border-gray-300 rounded-lg"></textarea>
+                    </div>
+                    <button type="submit"
+                        class="bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-blue-700 transition duration-200">Send
+                        Message</button>
+                </form>
+            </div>
+        </main>
+
+        <%- include('partials/footer') %>
+    </div>
+</body>
+
+</html>

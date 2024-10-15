@@ -30,8 +30,11 @@
                         <input type="email" id="email" name="email" placeholder="Email" required class="input-field">
                         <input type="password" id="password" name="password" placeholder="Password" required
                             class="input-field">
-                        <input type="checkbox" id="showPassword" class="mb-4" style="align-self: left;"> <label
-                            for="showPassword">Show Password</label>
+                        <div class="flex checkbox-show">
+                            <input type="checkbox" id="showPassword" class="mb-4"
+                                style="align-self: left; font-size: 0.5rem;"> <label for="showPassword">Show
+                                Password</label>
+                        </div>
                         <button type="submit" class="login-button">Log in</button>
                     </form>
                     <p class="signup-text login-links">Don't have an account? <a href="/register">Sign up</a></p>
