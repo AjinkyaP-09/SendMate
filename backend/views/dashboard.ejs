@@ -24,35 +24,35 @@
                             <% posts.forEach(function(post) { const
                                 formattedDate=post.expectedTime.toLocaleDateString('en-US', { weekday: 'long' ,
                                 year: 'numeric' , month: 'long' , day: 'numeric' , }); %>
-                                    <li class="bg-gray-50 p-4 rounded-lg shadow post-display">
-                                        <div class="left-side">
-                                            <h4 class="text-lg font-semibold text-gray-800">
-                                                <b>Name: </b>
-                                                <%= post.productName %>
-                                            </h4>
-                                            <p class="text-gray-600">
-                                                <b>From: </b>
-                                                <%= post.source %>
-                                            </p>
-                                            <p class="text-gray-600">
-                                                <b>To: </b>
-                                                <%= post.destination %>
-                                            </p>
-                                            <p class="text-gray-600">
-                                                <b>Expected Date</b>
-                                                <%= formattedDate %> 
-                                            </p>
-                                        </div>
-                                        <div class="right-side">
-                                            <form action="/post/<%= post.id %>?_method=DELETE" method="post">
-                                                <button class="delete-btn">DELETE</button>
-                                            </form>
-                                            <form action="/post/<%= post.id %>/editForm" method="get">
-                                                <button class="edit-btn">EDIT</button>
-                                            </form>
-                                        </div>
-                                    </li>
-                                    <% }); %>
+                                <li class="bg-gray-50 p-4 rounded-lg shadow post-display">
+                                    <div class="left-side">
+                                        <h4 class="text-lg font-semibold text-gray-800">
+                                            <b>Name: </b>
+                                            <%= post.productName %>
+                                        </h4>
+                                        <p class="text-gray-600">
+                                            <b>From: </b>
+                                            <%= post.source %>
+                                        </p>
+                                        <p class="text-gray-600">
+                                            <b>To: </b>
+                                            <%= post.destination %>
+                                        </p>
+                                        <p class="text-gray-600">
+                                            <b>Expected Date: </b>
+                                            <%= formattedDate %>
+                                        </p>
+                                    </div>
+                                    <div class="right-side">
+                                        <form action="/post/<%= post.id %>?_method=DELETE" method="post">
+                                            <button class="delete-btn">DELETE</button>
+                                        </form>
+                                        <form action="/post/<%= post.id %>/editForm" method="get">
+                                            <button class="edit-btn">EDIT</button>
+                                        </form>
+                                    </div>
+                                </li>
+                                <% }); %>
                         </ul>
                         <% } else { %>
                             <p class="text-gray-600">You haven't created any posts yet.</p>
