@@ -7,6 +7,7 @@ const DeliveryPost = require("./models/Parcel.js");
 const bcrypt = require("bcryptjs");
 const methodOverride = require("method-override");
 const User = require("./models/User");
+const ContactMail = require("./models/contact-mail");
 // Initialize the app
 const app = express();
 dotenv.config();
@@ -103,6 +104,18 @@ app.get("/dashboard", async (req, res) => {
 app.get("/contact", (req, res) => {
   const user = req.session.user;
   res.render("contactUs.ejs", { user });
+});
+
+app.post("/contact", async (req, res) => {
+  const { name, email, message } = req.body;
+
+  try {
+    const newContact = new ContactMail({ name, email, message });
+    await newContact.save();
+    res.redirect("/?message=success");
+  } catch (error) {
+    res.redirect("/?message=error");
+  }
 });
 
 // Serve individual post page
@@ -269,7 +282,7 @@ app.delete("/post/:id", async (req, res) => {
 
 app.get("/post/:id/editForm", async (req, res) => {
   const { id } = req.params;
-console.log(id);
+  console.log(id);
 
   try {
     // Retrieve the post from the database by its ID and make sure it belongs to the logged-in user
@@ -285,7 +298,7 @@ console.log(id);
           "Post not found or you do not have permission to edit this post."
         );
     }
-    
+
     // Render the edit form with the post data
     res.render("editForm", { post });
   } catch (error) {
@@ -295,7 +308,6 @@ console.log(id);
       .send("An error occurred while fetching the post for editing.");
   }
 });
-
 
 app.patch("/post/:id", async (req, res) => {
   try {

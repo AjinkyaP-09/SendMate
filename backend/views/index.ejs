@@ -187,8 +187,25 @@
             </section>
         </main>
         <!-- Footer Section -->
-        <%- include('partials/footer') %>
-    </div>
+        <footer class="bg-gray-800 text-white py-4">
+            <div class="container mx-auto text-center">
+                <p>&copy; 2024 Sendmate. All Rights Reserved.</p>
+            </div>
+        </footer>
+
+        <script>
+            // Check if the URL contains the message parameter
+            const urlParams = new URLSearchParams(window.location.search);
+            const message = urlParams.get('message');
+
+            if (message === 'success') {
+                alert('Your message has been sent successfully!');
+            } else if (message === 'error') {
+                alert('An error occurred while sending your message. Please try again.');
+            }
+        </script>
+
+
 </body>
 
 </html>

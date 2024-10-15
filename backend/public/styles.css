@@ -302,6 +302,14 @@ footer {
     padding-inline: 30px;
 }
 
+.contact-section{
+    background-color: #fff;
+    width: 600px;
+    border-radius: 15px;
+    padding: 40px;
+
+}
+
 .register-parcel-container {
     max-width: 825px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
