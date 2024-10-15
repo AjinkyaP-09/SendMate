@@ -37,6 +37,14 @@ app.set("views", path.join(__dirname, "views"));
 // Serve static files from public folder
 app.use(express.static("public"));
 app.use(express.static(path.join(__dirname, "public")));
+app.use(
+  "/fonts",
+  express.static(path.join(__dirname, "node_modules/font-awesome/fonts"))
+);
+app.use(
+  "/css",
+  express.static(path.join(__dirname, "node_modules/font-awesome/css"))
+);
 
 // Routes
 const authRoute = require("./routes/auth");
@@ -51,7 +59,8 @@ app.use("/api/parcel", parcelRoute);
 
 // Serve the homepage
 app.get("/", (req, res) => {
-  res.render("index");
+  const user = req.session.user;
+  res.render("index", { user });
 });
 
 // Serve the login page
@@ -63,7 +72,6 @@ app.get("/information", (req, res) => {
   res.render("information.ejs");
 });
 
-// Serve the dashboard page (needs authentication middleware in future)
 app.get("/dashboard", async (req, res) => {
   try {
     // Check if the user is logged in
@@ -80,6 +88,11 @@ app.get("/dashboard", async (req, res) => {
     console.error(err);
     res.redirect("/login");
   }
+});
+
+app.get("/contact", (req, res) => {
+  const user = req.session.user;
+  res.render("contactUs.ejs", { user });
 });
 
 // Serve individual post page

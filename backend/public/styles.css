@@ -5,13 +5,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Asul:wght@400;700&family=Averia+Libre:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&display=swap');
 
 
-:root {
-    primary-color: #A6C1FA;
-    secondary-color: #272D34;
-    primary-font: "Averia Libre", sans-serif;
-    secondary-font: "Asul", sans-serif;
-}
-
 body,
 html {
     margin: 0;
@@ -60,9 +53,21 @@ html {
 }
 
 li{
-    font-size: 0.9rem;
+    font-size: 0.75rem;
 }
 
+.user-icon{
+    width: 20px;
+    height: 20px;
+}
+
+.dropdownMenu{
+    width: 192px;
+    margin-top: 8px;
+    border-radius: 0.375rem;
+    position: absolute;
+    right: 0;
+}
 
 nav {
     background-color: #A6C1FA;
@@ -80,10 +85,12 @@ nav {
     padding: 50px 30px;
     width: 350px;
     margin-top: 50px;
-    /* height: 400px; */
     border-radius: 15px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
 }
 
 .b-rounded-1{
@@ -138,32 +145,36 @@ nav {
     display: flex;
     align-items: center;
     margin: 15px 0;
+    margin-bottom: 30px;
+    flex-direction: row;
+    /* Adjust margin as needed */
 }
 
 .separator span {
     font-size: 12px;
-    color: #999;
+    color: #ccc;
+    margin: 0 10px;
+    
+    /* Horizontal spacing for the text */
 }
 
 .separator::before,
 .separator::after {
-    content: "";
+    color: white;
+    content: "______________________";
     flex: 1;
+    /* Allow lines to grow */
     border-bottom: 1px solid #ccc;
+    /* Line color */
+    height: 1px;
+    /* Ensure height is set */
+    opacity: 1;
+    /* Ensure visibility */
 }
-
-.separator::before {
-    margin-right: 10px;
-}
-
-.separator::after {
-    margin-left: 10px;
-}
-
 form {
     width: 100%;
-    padding-right: 40px;
-    line-height: 4vh;
+    padding-inline: 40px;
+    line-height: 6vh;
 }
 
 .input-field {
@@ -197,6 +208,7 @@ form {
     padding: 10px;
     background-color: #4a73f3;
     color: #fff;
+    margin-top: 2vh;
     border: none;
     border-radius: 5px;
     font-size: 14px;
@@ -227,4 +239,8 @@ footer{
     position: absolute;
     bottom: 0;
     width: 100%;
+}
+
+.contact-us-form{
+    padding-inline: 30px;
 }

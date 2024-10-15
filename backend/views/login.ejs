@@ -29,12 +29,14 @@
             <form action="/api/auth/login" method="POST">
                 <input type="email" id="email" name="email" placeholder="Email" required class="input-field">
                 <input type="password" id="password" name="password" placeholder="Password" required class="input-field">
-                <a href="#" class="forgot-password login-links">Forgot Password ?</a>
+                <input type="checkbox" id="showPassword" class="mb-4" style="align-self: left;"> Show Password
                 <button type="submit" class="login-button">Log in</button>
             </form>
             <p class="signup-text login-links">Don't have an account? <a href="/register">Sign up</a></p>
         </div>
     </div>
+    <script src="/javascript/script.js"></script>
 </body>
+
 
 </html>
