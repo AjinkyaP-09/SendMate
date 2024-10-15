@@ -1,66 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
 
-    <!DOCTYPE html>
-    <html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - Sendmate</title>
+    <script src="https://cdn.tailwindcss.com"></script>
 
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Register - Sendmate</title>
-        <script src="https://cdn.tailwindcss.com"></script>
+</head>
 
-    </head>
+<body class="bg-gray-500 min-h-screen">
 
-    <body class="bg-gray-500 min-h-screen">
+    <!-- Main Content -->
+    <div class="flex items-center justify-center h-screen">
+        <div class="bg-white shadow-lg rounded-lg p-8 max-w-md w-full">
+            <h2 class="text-2xl font-bold text-center text-blue-600 mb-6">Register for Sendmate</h2>
 
-        <!-- Main Content -->
-        <div class="flex items-center justify-center h-screen">
-            <div class="bg-white shadow-lg rounded-lg p-8 max-w-md w-full">
-                <h2 class="text-2xl font-bold text-center text-blue-600 mb-6">Register for Sendmate</h2>
+            <% if (typeof error !=='undefined' && error) { %>
+                <p class="text-red-500 text-center mb-4">
+                    <%= error %>
+                </p>
+                <% } %>
 
-                <% if (typeof error !=='undefined' && error) { %>
-                    <p class="text-red-500 text-center mb-4">
-                        <%= error %>
-                    </p>
-                    <% } %>
+                    <!-- Registration Form -->
+                    <form action="/register" method="POST" class="space-y-4">
+                        <div>
+                            <label for="username" class="block text-gray-700 font-semibold mb-2">Username:</label>
+                            <input type="text" id="username" name="username" required
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring focus:ring-blue-200"
+                                placeholder="Enter your Full Name">
+                        </div>
 
-                        <!-- Registration Form -->
-                        <form action="/register" method="POST" class="space-y-4">
-                            <div>
-                                <label for="username" class="block text-gray-700 font-semibold mb-2">Username:</label>
-                                <input type="text" id="username" name="username" required
-                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring focus:ring-blue-200"
-                                    placeholder="Enter your Full Name">
-                            </div>
+                        <div>
+                            <label for="email" class="block text-gray-700 font-semibold mb-2">Email:</label>
+                            <input type="email" id="email" name="email" required
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring focus:ring-blue-200"
+                                placeholder="Enter your email">
+                        </div>
 
-                            <div>
-                                <label for="email" class="block text-gray-700 font-semibold mb-2">Email:</label>
-                                <input type="email" id="email" name="email" required
-                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring focus:ring-blue-200"
-                                    placeholder="Enter your email">
-                            </div>
+                        <div>
+                            <label for="password" class="block text-gray-700 font-semibold mb-2">Password:</label>
+                            <input type="password" id="password" name="password" required minlength="8"
+                                pattern="(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}"
+                                title="Must contain at least 8 characters, one uppercase letter, one lowercase letter, one number, and one special character."
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring focus:ring-blue-200"
+                                placeholder="Enter your password">
+                        </div>
 
-                            <div>
-                                <label for="password" class="block text-gray-700 font-semibold mb-2">Password:</label>
-                                <input type="password" id="password" name="password" required minlength="8"
-                                    pattern="(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}"
-                                    title="Must contain at least 8 characters, one uppercase letter, one lowercase letter, one number, and one special character."
-                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring focus:ring-blue-200"
-                                    placeholder="Enter your password">
-                            </div>
+                        <div>
+                            <label for="confirmPassword" class="block text-gray-700 font-semibold mb-2">Confirm
+                                Password:</label>
+                            <input type="password" id="confirmPassword" name="confirmPassword" required minlength="8"
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring focus:ring-blue-200"
+                                placeholder="Confirm your password">
+                        </div>
 
-                            <button type="submit"
-                                class="w-full bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-blue-700 transition duration-200">
-                                Register
-                            </button>
-                        </form>
+                        <button type="submit"
+                            class="w-full bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-blue-700 transition duration-200">
+                            Register
+                        </button>
+                    </form>
 
-                        <p class="mt-4 text-center text-gray-600">Already have an account? <a href="/login"
-                                class="text-blue-600 hover:underline">Login here</a>.</p>
-            </div>
+                    <p class="mt-4 text-center text-gray-600">Already have an account? <a href="/login"
+                            class="text-blue-600 hover:underline">Login here</a>.</p>
         </div>
+    </div>
 
-        <%- include('partials/footer') %> <!-- Ensure this path is correct -->
+    <%- include('partials/footer') %> <!-- Ensure this path is correct -->
+        <script>
+            // JavaScript to validate password and confirm password fields
+            const password = document.getElementById('password');
+            const confirmPassword = document.getElementById('confirmPassword');
+
+            confirmPassword.addEventListener('input', function () {
+                if (password.value !== confirmPassword.value) {
+                    confirmPassword.setCustomValidity("Passwords do not match.");
+                } else {
+                    confirmPassword.setCustomValidity("");
+                }
+            });
+        </script>
         <script src="/javascript/script.js"></script>
-    </body>
 
-    </html>
+</body>
+
+</html>
