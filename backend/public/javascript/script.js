@@ -12,6 +12,11 @@ const dropdownMenu = document.getElementById("dropdownMenu");
 const helpDropdownToggle = document.getElementById("helpDropdownToggle");
 const helpDropdownMenu = document.getElementById("helpDropdownMenu");
 
+//add-post-dropdown
+
+const addDropdownToggle = document.getElementById("addDropdownToggle");
+const addDropdownMenu = document.getElementById("addDropdownMenu");
+
 //mobile-section
 
 mobileMenuToggle.addEventListener("click", () => {
@@ -57,4 +62,21 @@ window.addEventListener("click", (event) => {
   }
 });
 
-//show password
+//add-post-dropdown
+
+addDropdownToggle.addEventListener("click", (event) => {
+  event.preventDefault(); // Prevent default anchor action
+  addDropdownMenu.classList.toggle("hidden");
+});
+
+// Close dropdown menu if clicked outside of it
+window.addEventListener("click", (event) => {
+  if (
+    !addDropdownToggle.contains(event.target) &&
+    !addDropdownMenu.contains(event.target)
+  ) {
+    addDropdownMenu.classList.add("hidden");
+  }
+});
+
+
