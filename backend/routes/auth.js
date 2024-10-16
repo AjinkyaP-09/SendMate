@@ -71,6 +71,7 @@ router.post("/login", async (req, res) => {
   try {
     const { email, password } = req.body;
     const user = await User.findOne({ email });
+    req.session.userId = user._id;
 
     if (!user) {
       return res.render("login", { error: "Invalid email or password." });

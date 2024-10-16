@@ -2,75 +2,155 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Dashboard - Sendmate</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 
 <body>
     <div class="wrapper">
-        <header>
-            <%- include('partials/nav_users') %>
-        </header>
+        <header><%- include('partials/nav_users') %></header>
         <main>
             <div class="container mx-auto my-10 p-6">
                 <div class="bg-white shadow-md rounded-lg p-6">
                     <h2 class="text-2xl font-bold text-gray-800 mb-4">Welcome, <%= user.username %>!</h2>
-                    <h3 class="text-xl font-semibold text-gray-700 mb-2">Your Posts</h3>
 
-                    <% if (posts && posts.length> 0) { %>
-                        <ul class="space-y-4">
-                            <% posts.forEach(function(post) { const
-                                formattedDate=post.expectedTime.toLocaleDateString('en-US', { weekday: 'long' ,
-                                year: 'numeric' , month: 'long' , day: 'numeric' , }); %>
-                                <li class="bg-gray-50 p-4 rounded-lg shadow post-display">
-                                    <div class="left-side">
-                                        <h4 class="text-lg font-semibold text-gray-800">
-                                            <b>Name: </b>
-                                            <%= post.productName %>
-                                        </h4>
-                                        <p class="text-gray-600">
-                                            <b>From: </b>
-                                            <%= post.source %>
-                                        </p>
-                                        <p class="text-gray-600">
-                                            <b>To: </b>
-                                            <%= post.destination %>
-                                        </p>
-                                        <p class="text-gray-600">
-                                            <b>Expected Date: </b>
-                                            <%= formattedDate %>
-                                        </p>
-                                    </div>
-                                    <div class="right-side">
-                                        <form action="/post/<%= post.id %>?_method=DELETE" method="post">
-                                            <button class="delete-btn">DELETE</button>
-                                        </form>
-                                        <form action="/post/<%= post.id %>/editForm" method="get">
-                                            <button class="edit-btn">EDIT</button>
-                                        </form>
-                                    </div>
-                                </li>
-                                <% }); %>
-                        </ul>
-                        <% } else { %>
-                            <p class="text-gray-600">You haven't created any posts yet.</p>
-                            <% } %>
+                    <!-- Dropdown for Post Type Selection -->
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-xl font-semibold text-gray-700 mb-2">Your Posts</h3>
+                        <div class="w-auto">
+                            <label for="postType" class="sr-only">Select Post Type:</label>
+                            <select id="postType" class="border rounded px-4 py-1" style="cursor: pointer">
+                                <option value="senderPost">Sender Post</option>
+                                <option value="travellerPost">Traveller Post</option>
+                            </select>
+                        </div>
+                    </div>
 
-                                <!-- Add options to create a new post -->
-                                <div class="mt-6">
-                                    <a href="/register-parcel"
-                                        class="inline-block bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg shadow">
-                                        Create New Post
-                                    </a>
-                                </div>
+                    <!-- Dynamic Posts Container -->
+                    <div id="postsContainer" class="space-y-4">
+
+                    </div>
                 </div>
             </div>
         </main>
 
         <%- include('partials/footer') %>
     </div>
+
+    <script>
+        function initialLoad() {
+            const postTypeSelect = document.getElementById("postType");
+            const defaultPostType = postTypeSelect.value; // Get the default selected post type
+
+            loadPosts(defaultPostType); // Load posts based on the default selection
+        }
+
+        // Load Sender Posts and Traveller Posts on page load
+        window.onload = initialLoad;
+
+        // Function to load posts based on type
+        function loadPosts(postType) {
+            fetch(`/posts/${postType}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok ' + response.statusText);
+                    }
+                    return response.json(); // Parse the response as JSON
+                })
+                .then(posts => {
+                    console.log(posts); // This will log the posts fetched from the server
+                    displayPosts(posts, postType); // Call the function to display posts
+                })
+                .catch(error => console.error('Error loading posts:', error));
+
+        }
+
+        // Load both Sender Posts and Traveller Posts on page load
+        window.onload = () => {
+            loadPosts("senderPost");
+            loadPosts("travellerPost");
+        };
+
+        // Event listener for dropdown
+        document.getElementById("postType").addEventListener("change", function () {
+            const selectedType = this.value;
+
+            // Send a request to the server to get the selected post type data
+            loadPosts(selectedType); // Call the loadPosts function with selected type
+        });
+
+        // Function to display posts
+        function displayPosts(posts, postType) {
+            const postsContainer = document.getElementById('postsContainer');
+            postsContainer.innerHTML = ''; // Clear existing posts
+
+            if (posts && posts.length > 0) {
+                const postList = document.createElement('ul');
+                postList.classList.add('space-y-4');
+
+                posts.forEach(post => {
+                    const formattedDate = new Date(post.expectedTime).toLocaleDateString('en-US', {
+                        weekday: 'long',
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric',
+                    });
+
+                    const postItem = document.createElement('li');
+                    postItem.classList.add('bg-gray-50', 'p-6', 'rounded-lg', 'shadow', 'flex', 'justify-between', 'items-center');
+
+                    postItem.innerHTML = `
+                <div class="left-side">
+                    <h4 class="text-lg font-semibold text-gray-800 mb-2"><b>Name: </b>${post.productName || post.modeOfTravel}</h4>
+                    <p class="text-gray-600"><b>From: </b>${post.source || post.startLocation}</p>
+                    <p class="text-gray-600"><b>To: </b>${post.destination || post.endLocation}</p>
+                    <p class="text-gray-600"><b>Expected Date: </b>${formattedDate || 'Not Available'}</p>
+                </div>
+                <div class="right-side flex flex-col space-y-2">
+                    <form action="/post/${post._id}?_method=DELETE" method="post">
+                        <button class="delete-btn bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded">DELETE</button>
+                    </form>
+                    <form action="/post/${post._id}/editForm" method="get">
+                        <button class="edit-btn bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded">EDIT</button>
+                    </form>
+                </div>
+            `;
+                    postList.appendChild(postItem);
+                });
+
+                postsContainer.appendChild(postList);
+            } else {
+                postsContainer.innerHTML = `<p class="text-gray-600">You haven't created any posts yet.</p>`;
+            }
+
+            // Add "Create New Post" button based on post type
+            const createPostDiv = document.createElement('div');
+            createPostDiv.classList.add('mt-6');
+
+            if (postType === "senderPost") {
+                createPostDiv.innerHTML = `
+            <a href="/register-parcel" class="inline-block bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg shadow">
+                Create Sender Post
+            </a>
+        `;
+            } else if (postType === "travellerPost") {
+                createPostDiv.innerHTML = `
+            <a href="/travellerPost" class="inline-block bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded-lg shadow">
+                Create Traveller Post
+            </a>
+        `;
+            }
+
+            postsContainer.appendChild(createPostDiv);
+        }
+
+        // Trigger initial load based on dropdown
+        document.getElementById("postType").dispatchEvent(new Event('change'));
+
+
+    </script>
 </body>
 
 </html>

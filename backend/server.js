@@ -3,6 +3,7 @@ const mongoose = require("mongoose");
 const dotenv = require("dotenv");
 const path = require("path");
 const session = require("express-session");
+const TravellerPost = require("./models/travellerPost");
 const DeliveryPost = require("./models/Parcel.js");
 const bcrypt = require("bcryptjs");
 const methodOverride = require("method-override");
@@ -68,6 +69,13 @@ app.use((req, res, next) => {
   next();
 });
 
+function ensureAuthenticated(req, res, next) {
+  if (req.session && req.session.user) {
+    return next();
+  }
+  res.redirect("/login"); // Redirect to login if not authenticated
+}
+
 // Serve the homepage
 app.get("/", (req, res) => {
   const user = req.session.user;
@@ -101,6 +109,108 @@ app.get("/dashboard", async (req, res) => {
   }
 });
 
+// Example: Fetch posts by type
+app.get("/posts/:type", async (req, res) => {
+  try {
+    const postType = req.params.type;
+    const userId = req.session.userId;
+    console.log(userId);
+    
+
+    let posts;
+
+    if (postType === "senderPost") {
+      posts = await DeliveryPost.find({ userId });
+      console.log(posts);
+      
+    } else if (postType === "travellerPost") {
+      posts = await TravellerPost.find({ userId });
+      console.log(posts);
+    } else {
+      return res.status(400).send("Invalid post type");
+    }
+
+    res.json(posts);
+  } catch (error) {
+    console.error("Error fetching posts:", error);
+    res.status(500).send("Server error");
+  }
+});
+
+app.post("/submit-travel-post", async (req, res) => {
+  try {
+    // Destructure the data from the request body
+    const {
+      modeOfTravel,
+      source,
+      destination,
+      expectedTime,
+      parcelSizeCanCarry,
+      expectedAmount,
+      additionalDetails,
+      busRouteDetails,
+      trainTicketDetails,
+      flightDetails,
+      carDetails,
+      bikeDetails,
+      userId,
+      username,
+      email,
+      agreeTerms, // Get the checkbox value here
+    } = req.body;
+
+    // Input validation
+    if (
+      !modeOfTravel ||
+      !source ||
+      !destination ||
+      !expectedTime ||
+      !parcelSizeCanCarry ||
+      !expectedAmount
+    ) {
+      return res
+        .status(400)
+        .render({
+          error: "All fields except additional details are required.",
+        });
+    }
+
+    // Convert agreeTerms to boolean (true if checked, false otherwise)
+    const termsAgreed = agreeTerms === "on"; // 'on' means the checkbox is checked
+
+    // Create a new travel post
+    const newPost = new TravellerPost({
+      modeOfTravel,
+      source,
+      destination,
+      expectedTime,
+      parcelSize: parcelSizeCanCarry,
+      expectedAmount,
+      additionalDetails,
+      agreeTerms: termsAgreed, // Use the boolean value here
+      busRouteDetails,
+      trainTicketDetails,
+      flightDetails,
+      carDetails,
+      bikeDetails,
+      userId,
+      username,
+      email,
+    });
+
+    // Save the new post to the database
+    await newPost.save();
+
+    // Respond with success
+    res.status(201).redirect("/dashboard");
+  } catch (error) {
+    console.error("Error creating travel post:", error);
+    res.status(500).send({ error: "Internal server error." });
+  }
+});
+
+// -----------------------------------------------------------------------------------
+
 app.get("/contact", (req, res) => {
   const user = req.session.user;
   res.render("contactUs.ejs", { user });
@@ -132,35 +242,16 @@ app.get("/register", (req, res) => {
   res.render("register");
 });
 
-// app.post("/register", async (req, res) => {
-//   try {
-//     const { username, email, password } = req.body;
-//     let user = await User.findOne({ email });
-//     if (user) {
-//       return res.render("register", { error: "User already exists" });
-//     }
-
-//     // Hash the password before saving it
-//     const hashedPassword = await bcrypt.hash(password, saltRounds);
-
-//     const newUser = new User({
-//       username,
-//       email,
-//       password: hashedPassword, // Store the hashed password
-//     });
-
-//     await newUser.save();
-//     res.redirect("/login"); // Redirect to login after successful registration
-//   } catch (err) {
-//     console.error(err);
-//     res.status(500).send("Error registering the user.");
-//   }
-// });
-
 app.get("/register-parcel", (req, res) => {
   const user = req.session.user;
   // console.log(user);
   res.render("registerParcel.ejs", { user, error: null });
+});
+
+app.get("/travellerPost", (req, res) => {
+  const user = req.session.user;
+  // console.log(user);
+  res.render("travellerPostForm.ejs", { user, error: null });
 });
 
 app.get("/logout", (req, res) => {

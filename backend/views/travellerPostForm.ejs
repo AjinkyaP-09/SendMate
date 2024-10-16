@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Travel Post - Sendmate</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="/style.css">
+    <link rel="stylesheet" href="/styles.css">
+</head>
+
+<body>
+    <div class="wrapper">
+        <!-- Header -->
+        <header class="bg-blue-600 text-white py-4">
+            <% if (!user) { %>
+                <%- include('partials/nav') %> <!-- Nav for logged-in users -->
+                    <% } else { %>
+                        <%- include('partials/nav_users') %> <!-- Nav for guests -->
+                            <% } %>
+                                <div class="container mx-auto text-center">
+                                    <h1 class="text-3xl font-bold">Create Your Travel Post</h1>
+                                </div>
+        </header>
+        <main>
+            <!-- Create Post Form -->
+            <section class="py-12">
+                <div class="container mx-auto max-w-2xl bg-white p-8 rounded-lg shadow-lg" style="max-width: 758px;">
+                    <form id="travelPostForm" action="/submit-travel-post" method="POST" class="space-y-6">
+
+                        <label for="modeOfTravel" class="block font-semibold text-gray-700">Mode of Travel</label>
+                        <select id="modeOfTravel" name="modeOfTravel" required
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg" onchange="showTravelDetails()"
+                            style="margin-top: 0.7rem">
+                            <option value="" disabled selected>Select Mode</option>
+                            <option value="Bus">Bus</option>
+                            <option value="Train">Train</option>
+                            <option value="Airplane">Airplane</option>
+                            <option value="Car">Car</option>
+                            <option value="Bike">Bike</option>
+                            <option value="Other">Other</option>
+                        </select>
+                        <div id="modeError" class="hidden">Please select a mode of travel.</div>
+
+                        <!-- Travel Mode Specific Details -->
+                        <div id="busDetails" class="hidden space-y-4">
+                            <label for="busRouteDetails" class="block font-semibold text-gray-700">Bus Route
+                                Details:</label>
+                            <input type="text" id="busRouteDetails" name="busRouteDetails"
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg"
+                                placeholder="E.g., Bus name, route number, etc.">
+                        </div>
+
+                        <div id="trainDetails" class="hidden space-y-4">
+                            <label for="trainTicketDetails" class="block font-semibold text-gray-700">Train Ticket
+                                Details:</label>
+                            <input type="text" id="trainTicketDetails" name="trainTicketDetails"
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg"
+                                placeholder="E.g., Train name, PNR, etc.">
+                        </div>
+
+                        <div id="flightDetails" class="hidden space-y-4">
+                            <label for="flightDetailsInput" class="block font-semibold text-gray-700">Flight
+                                Details:</label>
+                            <input type="text" id="flightDetailsInput" name="flightDetails"
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg"
+                                placeholder="E.g., Flight number, seat details, etc.">
+                        </div>
+
+                        <div id="carDetails" class="hidden space-y-4">
+                            <label for="carDetailsInput" class="block font-semibold text-gray-700">Car Details:</label>
+                            <input type="text" id="carDetailsInput" name="carDetails"
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg"
+                                placeholder="E.g., Car model, registration number, etc.">
+                        </div>
+
+                        <div id="bikeDetails" class="hidden space-y-4">
+                            <label for="bikeDetailsInput" class="block font-semibold text-gray-700">Bike
+                                Details:</label>
+                            <input type="text" id="bikeDetailsInput" name="bikeDetails"
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg"
+                                placeholder="E.g., Bike model, registration number, etc.">
+                        </div>
+
+                        <!-- Source and Destination -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label for="source" class="block font-semibold text-gray-700">Source:</label>
+                                <input type="text" id="source" name="source" required
+                                    class="w-full px-4  border border-gray-300 rounded-lg">
+                                <p id="sourceError" class="text-red-600 hidden">Please enter a source location.</p>
+                            </div>
+                            <div>
+                                <label for="destination" class="block font-semibold text-gray-700">Destination:</label>
+                                <input type="text" id="destination" name="destination" required
+                                    class="w-full px-4 border border-gray-300 rounded-lg">
+                                <p id="destinationError" class="text-red-600 hidden">Please enter a destination
+                                    location.</p>
+                            </div>
+                        </div>
+
+                        <!-- Expected Time -->
+                        <div>
+                            <label for="expectedTime" class="block font-semibold text-gray-700">Expected Time for
+                                Travel:</label>
+                            <input type="date" id="expectedTime" name="expectedTime" required
+                                class="w-full px-4  border border-gray-300 rounded-lg">
+                            <p id="expectedTimeError" class="text-red-600 hidden">Please select a valid date.</p>
+                        </div>
+
+                        <!-- Parcel Size -->
+                        <div>
+                            <label for="parcelSizeCanCarry" class="block font-semibold text-gray-700">Parcel Size You
+                                Can
+                                Carry:</label>
+                            <select id="parcelSizeCanCarry" name="parcelSizeCanCarry" required
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg">
+                                <option value="" disabled selected>Select Size</option>
+                                <option value="Small (0-5 kg)">Small (0-5 kg)</option>
+                                <option value="Medium (5-15 kg)">Medium (5-15 kg)</option>
+                                <option value="Large (15-30 kg)">Large (15-30 kg)</option>
+                                <option value="Extra Large (30+ kg)">Extra Large (30+ kg)</option>
+                            </select>
+                            <p id="parcelSizeError" class="text-red-600 hidden">Please select a parcel size.</p>
+                        </div>
+
+                        <!-- Expected Amount -->
+                        <div>
+                            <label for="expectedAmount" class="block font-semibold text-gray-700">Expected Amount
+                                ($):</label>
+                            <input type="number" id="expectedAmount" name="expectedAmount" required
+                                class="w-full px-4  border border-gray-300 rounded-lg"
+                                placeholder="Enter your expected amount">
+                            <p id="expectedAmountError" class="text-red-600 hidden">Please enter an expected amount.</p>
+                        </div>
+
+                        <!-- Agree to Terms and Conditions -->
+                        <div>
+                            <label class="flex items-center">
+                                <input type="checkbox" id="agreeTerms" name="agreeTerms" required class="mr-2">
+                                <a href="#" class="text-blue-600 underline"> I agree to the terms and conditions</a>.
+                            </label>
+                            <p id="termsError" class="text-red-600 hidden">You must agree to the terms and conditions.
+                            </p>
+                        </div>
+
+                        <!-- Additional Details -->
+                        <div>
+                            <label for="additionalDetails" class="block font-semibold text-gray-700">Additional
+                                Details:</label>
+                            <textarea id="additionalDetails" name="additionalDetails" rows="4"
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg"
+                                placeholder="Any other details..."></textarea>
+                        </div>
+                        <input type="hidden" name="userId" value="<%= user.id %>">
+                        <input type="hidden" name="username" value="<%= user.username %>">
+                        <input type="hidden" name="email" value="<%= user.email %>">
+
+                        <!-- Submit Button -->
+                        <div class="text-center">
+                            <button type="submit"
+                                class="bg-blue-600 text-white font-semibold py-2 px-6 rounded-lg hover:bg-blue-700 transition duration-200">Create
+                                Post</button>
+                        </div>
+
+                    </form>
+                </div>
+            </section>
+        </main>
+
+        <!-- Footer -->
+        <footer class="bg-gray-800 text-white py-4">
+            <div class="container mx-auto text-center">
+                <p>&copy; 2024 Sendmate. All Rights Reserved.</p>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // Show travel details fields based on travel mode
+        // Show travel details fields based on travel mode
+        function showTravelDetails() {
+            // Hide all travel details by default
+            document.getElementById('busDetails').classList.add('hidden');
+            document.getElementById('trainDetails').classList.add('hidden');
+            document.getElementById('flightDetails').classList.add('hidden');
+            document.getElementById('carDetails').classList.add('hidden');
+            document.getElementById('bikeDetails').classList.add('hidden');
+
+            // Get the selected travel mode
+            const selectedMode = document.getElementById('modeOfTravel').value;
+
+            // Show the relevant details based on the selected mode
+            if (selectedMode === 'bus') {
+                document.getElementById('busDetails').classList.remove('hidden');
+            } else if (selectedMode === 'train') {
+                document.getElementById('trainDetails').classList.remove('hidden');
+            } else if (selectedMode === 'airplane') {  // Make sure this matches the option value
+                document.getElementById('flightDetails').classList.remove('hidden');
+            } else if (selectedMode === 'Car') {
+                document.getElementById('carDetails').classList.remove('hidden');
+            } else if (selectedMode === 'Bike') {
+                document.getElementById('bikeDetails').classList.remove('hidden');
+            }
+        }
+
+
+        // Set min date to today for expected time input
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('expectedTime').setAttribute('min', today);
+
+        // Form validation on submit
+        document.getElementById('travelPostForm').addEventListener('submit', function (e) {
+            let isValid = true;
+            const fieldsToValidate = [
+                { id: 'modeOfTravel', errorId: 'modeError' },
+                { id: 'source', errorId: 'sourceError' },
+                { id: 'destination', errorId: 'destinationError' },
+                { id: 'expectedTime', errorId: 'expectedTimeError' },
+                { id: 'parcelSizeCanCarry', errorId: 'parcelSizeError' },
+                { id: 'expectedAmount', errorId: 'expectedAmountError' },
+            ];
+
+            // Loop through each field to validate
+            fieldsToValidate.forEach(field => {
+                const inputValue = document.getElementById(field.id).value;
+                if (!inputValue) {
+                    document.getElementById(field.errorId).classList.remove('hidden');
+                    isValid = false;
+                } else {
+                    document.getElementById(field.errorId).classList.add('hidden');
+                }
+            });
+
+            // Validate Terms Agreement
+            if (!document.getElementById('agreeTerms').checked) {
+                document.getElementById('termsError').classList.remove('hidden');
+                isValid = false;
+            } else {
+                document.getElementById('termsError').classList.add('hidden');
+            }
+
+            // Prevent form submission if not valid
+            if (!isValid) {
+                e.preventDefault();
+            }
+        });
+
+    </script>
+</body>
+
+</html>

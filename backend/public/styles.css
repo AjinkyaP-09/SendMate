@@ -123,6 +123,57 @@ nav {
     align-items: center;
 }
 
+.eye-icon {
+    position: absolute;
+    top: 30%;
+    right: 10px;
+    transform: translateY(-50%);
+    cursor: pointer;
+}
+
+.password-eye{
+    width: 15px;
+}
+
+.password-container {
+    position: relative;
+    margin-bottom: 1rem;
+    /* Adjust the margin as needed */
+}
+
+.input-field {
+    width: 100%;
+    /* Make it full width or adjust as necessary */
+    padding: 10px;
+    /* Adjust padding */
+    font-size: 1rem;
+    /* Font size */
+}
+
+.toggle-password {
+    position: absolute;
+    right: 15px;
+    /* Adjust to position the icon */
+    top: 45%;
+    transform: translateY(-50%);
+    /* Center the icon vertically */
+    cursor: pointer;
+    /* Show pointer on hover */
+    color: #aaa;
+    opacity:0.75;
+    /* Change the icon color if needed */
+}
+
+.toggle-password:hover {
+    color: #333;
+    /* Change the icon color on hover */
+}
+
+
+
+
+
+
 label {
     font-size: 0.85rem;
     color: #666;

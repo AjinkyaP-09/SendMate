@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login Page</title>
+    <!-- <link rel="stylesheet" href="/style.css"> -->
     <link rel="stylesheet" href="/styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
 </head>
@@ -28,22 +29,32 @@
                     </div>
                     <form action="/api/auth/login" method="POST">
                         <input type="email" id="email" name="email" placeholder="Email" required class="input-field">
-                        <input type="password" id="password" name="password" placeholder="Password" required
-                            class="input-field">
-                        <div class="flex checkbox-show">
-                            <input type="checkbox" id="showPassword" class="mb-4"
-                                style="align-self: left; font-size: 0.5rem;"> <label for="showPassword">Show
-                                Password</label>
+                        <div class="password-container">
+                            <input type="password" id="password" name="password" placeholder="Password" required
+                                class="input-field">
+                            <span id="togglePassword" class="toggle-password">
+                                <img src="/images/eye-slash-solid.svg" class="password-eye" alt="Show Password">
+                            </span>
                         </div>
                         <button type="submit" class="login-button">Log in</button>
                     </form>
                     <p class="signup-text login-links">Don't have an account? <a href="/register">Sign up</a></p>
         </div>
     </div>
+
     <script>
-        document.getElementById("showPassword").addEventListener("change", function () {
-            const passwordInput = document.getElementById("password");
-            passwordInput.type = this.checked ? "text" : "password";
+        const togglePassword = document.getElementById('togglePassword');
+        const passwordInput = document.getElementById('password');
+
+        togglePassword.addEventListener('click', () => {
+            // Toggle the input type
+            const type = passwordInput.type === 'password' ? 'text' : 'password';
+            passwordInput.type = type;
+
+            // Toggle the eye icon
+            togglePassword.innerHTML = type === 'password' ?
+                '<img src="/images/eye-slash-solid.svg" class="password-eye" alt="Show Password">' :
+                '<img src="/images/eye-solid.svg" class="password-eye" alt="Show Password">';
         });
     </script>
 </body>
