@@ -1,7 +1,7 @@
 const express = require('express');
 const User = require('../models/User');
 const bcrypt = require('bcryptjs');
-
+const saltRounds = 10;
 
 const router = express.Router();
 
