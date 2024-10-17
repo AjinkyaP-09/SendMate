@@ -27,12 +27,12 @@ const passwordValidation = (password) => {
 // Register User Route
 router.post('/register', async (req, res) => {
     try {
-        const { username, email, password, role } = req.body;
+        const { username, email, password } = req.body;
 
         // Check if the user already exists
         let user = await User.findOne({ email });
         if (user) {
-            return res.render('/login', { error: 'User already exists' });
+            return res.redirect('/login', { error: 'User already exists' });
         }
 
         if (!passwordValidation(password)) {
