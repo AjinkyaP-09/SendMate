@@ -4,6 +4,7 @@
 
 
 🌟 **About**
+
 SendMate is a platform that facilitates parcel delivery by connecting senders with travelers. Utilizing existing travel routes, it provides a sustainable, cost-effective solution for last-mile delivery challenges.
 
 🔧 **Tech Stack**
