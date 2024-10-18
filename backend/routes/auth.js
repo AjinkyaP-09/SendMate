@@ -2,7 +2,7 @@ const express = require('express');
 const User = require('../models/User');
 const bcrypt = require('bcryptjs');
 const saltRounds = 10;
-
+const passport = require('passport');
 const router = express.Router();
 
 const passwordValidation = (password) => {
@@ -100,6 +100,62 @@ router.post("/login", async (req, res) => {
 });
 
   
+router.get('/auth/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
+
+router.get('/auth/google/callback', 
+  passport.authenticate('google', { failureRedirect: '/login' }),
+  async (req, res) => {
+      try {
+          console.log(req.user); // Log user info for debugging
+
+          // Directly access the email property instead of the array
+          const displayName = req.user.displayName;
+          const email = req.user.email; // Change this line to access the email directly
+
+          if (!email) {
+              return res.status(400).send("No email found.");
+          }
+
+          // Check if user exists by email
+          let existingUser = await User.findOne({ email });
+
+          if (!existingUser) {
+              // Create a new user if not found
+              existingUser = new User({
+                  googleId: req.user.id,
+                  username: displayName,
+                  email: email,
+              });
+              await existingUser.save();
+          }
+
+          // Store user data in session
+          req.session.user = {
+              id: existingUser._id,
+              username: existingUser.username,
+              email: existingUser.email,
+          };
+
+          // Redirect to dashboard
+          res.redirect('/dashboard');
+      } catch (error) {
+          console.error("Error during Google login callback:", error);
+          res.redirect('/login'); // Redirect to login in case of error
+      }
+  }
+);
+
+
+
+router.get('/logout', (req, res) => {
+  req.session.destroy(err => {
+      if (err) {
+          console.error("Logout error:", err);
+          return res.redirect('/dashboard'); // Redirect to dashboard if logout fails
+      }
+      res.redirect('/'); // Redirect to homepage after successful logout
+  });
+});
 
 
 module.exports = router;

@@ -5,32 +5,25 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Register - Sendmate</title>
-
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         .toggle-password {
             position: absolute;
             right: 15px;
-            /* Adjust to position the icon */
             top: 45%;
             transform: translateY(-50%);
-            /* Center the icon vertically */
             cursor: pointer;
-            /* Show pointer on hover */
             color: #aaa;
             opacity: 0.75;
-            /* Change the icon color if needed */
         }
 
         .toggle-password:hover {
             color: #333;
-            /* Change the icon color on hover */
         }
 
         .password-container {
             position: relative;
             margin-bottom: 1rem;
-            /* Adjust the margin as needed */
         }
 
         .password-eye {
@@ -41,7 +34,6 @@
 
 <body class="bg-gray-500 min-h-screen">
 
-    <!-- Main Content -->
     <div class="flex items-center justify-center h-screen">
         <div class="bg-white shadow-lg rounded-lg p-8 max-w-md w-full">
             <h2 class="text-2xl font-bold text-center text-blue-600 mb-6">Register for Sendmate</h2>
@@ -83,7 +75,8 @@
                             <label for="confirmPassword" class="block text-gray-700 font-semibold mb-2">Confirm
                                 Password:</label>
                             <div class="password-container">
-                                <input type="confirmPassword" id="confirmPassword" name="confirmPassword" placeholder="Password" required
+                                <input type="password" id="confirmPassword" name="confirmPassword"
+                                    placeholder="Password" required
                                     class="input-field w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring focus:ring-blue-200">
                                 <span id="togglePassword2" class="toggle-password">
                                     <img src="/images/eye-slash-solid.svg" class="password-eye" alt="Show Password">
@@ -99,52 +92,41 @@
 
                     <p class="mt-4 text-center text-gray-600">Already have an account? <a href="/login"
                             class="text-blue-600 hover:underline">Login here</a>.</p>
+
+                    <!-- Google OAuth Registration Button -->
+                    <div class="text-center mt-4">
+                        <a href="/auth/google"
+                            class="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 transition duration-200">Register
+                            with Google</a>
+                    </div>
         </div>
     </div>
 
-    <%- include('partials/footer') %> <!-- Ensure this path is correct -->
-        <!-- <script>
-            // JavaScript to validate password and confirm password fields
-            const password = document.getElementById('password');
-            const confirmPassword = document.getElementById('confirmPassword');
+    <%- include('partials/footer') %>
 
-            confirmPassword.addEventListener('input', function () {
-                if (password.value !== confirmPassword.value) {
-                    confirmPassword.setCustomValidity("Passwords do not match.");
-                } else {
-                    confirmPassword.setCustomValidity("");
-                }
-            });
-        </script> -->
         <script src="/javascript/script.js"></script>
         <script>
             const togglePassword = document.getElementById('togglePassword');
-            const togglePassword2 = document.getElementById('togglePassword2')
-                const passwordInput = document.getElementById('password');
-                const confirmPassword = document.getElementById('confirmPassword');
+            const togglePassword2 = document.getElementById('togglePassword2');
+            const passwordInput = document.getElementById('password');
+            const confirmPassword = document.getElementById('confirmPassword');
 
-                togglePassword.addEventListener('click', () => {
-                    // Toggle the input type
-                    const type = passwordInput.type === 'password' ? 'text' : 'password';
-                    passwordInput.type = type;
+            togglePassword.addEventListener('click', () => {
+                const type = passwordInput.type === 'password' ? 'text' : 'password';
+                passwordInput.type = type;
+                togglePassword.innerHTML = type === 'password' ?
+                    '<img src="/images/eye-slash-solid.svg" class="password-eye" alt="Show Password">' :
+                    '<img src="/images/eye-solid.svg" class="password-eye" alt="Show Password">';
+            });
 
-                    // Toggle the eye icon
-                    togglePassword.innerHTML = type === 'password' ?
-                        '<img src="/images/eye-slash-solid.svg" class="password-eye" alt="Show Password">' :
-                        '<img src="/images/eye-solid.svg" class="password-eye" alt="Show Password">';
-                });
-                togglePassword2.addEventListener('click', () => {
-                        // Toggle the input type
-                        const type = confirmPassword.type === 'password' ? 'text' : 'password';
-                        confirmPassword.type = type;
-
-                        // Toggle the eye icon
-                        togglePassword2.innerHTML = type === 'password' ?
-                            '<img src="/images/eye-slash-solid.svg" class="password-eye" alt="Show Password">' :
-                            '<img src="/images/eye-solid.svg" class="password-eye" alt="Show Password">';
-                    });
+            togglePassword2.addEventListener('click', () => {
+                const type = confirmPassword.type === 'password' ? 'text' : 'password';
+                confirmPassword.type = type;
+                togglePassword2.innerHTML = type === 'password' ?
+                    '<img src="/images/eye-slash-solid.svg" class="password-eye" alt="Show Password">' :
+                    '<img src="/images/eye-solid.svg" class="password-eye" alt="Show Password">';
+            });
         </script>
-
 </body>
 
 </html>

@@ -9,10 +9,13 @@ const bcrypt = require("bcryptjs");
 const methodOverride = require("method-override");
 const User = require("./models/User");
 const ContactMail = require("./models/contact-mail");
+const passport = require('passport');
 // Initialize the app
 const app = express();
 dotenv.config();
 const saltRounds = 10;
+
+require('./config/passport');
 
 // Connect to the database
 mongoose
@@ -59,6 +62,10 @@ app.use("/api/auth", authRoute);
 app.use("/api/posts", postRoute);
 app.use("/api/messages", messageRoute);
 app.use("/api/parcel", parcelRoute);
+app.use(authRoute);
+
+app.use(passport.initialize());
+app.use(passport.session());
 
 app.use((req, res, next) => {
   if (req.session.user) {
