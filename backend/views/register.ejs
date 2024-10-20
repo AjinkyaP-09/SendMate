@@ -126,6 +126,14 @@
                     '<img src="/images/eye-slash-solid.svg" class="password-eye" alt="Show Password">' :
                     '<img src="/images/eye-solid.svg" class="password-eye" alt="Show Password">';
             });
+            // Function to display the error alert if error message is present in the URL
+            window.onload = function () {
+                const urlParams = new URLSearchParams(window.location.search);
+                const errorMessage = urlParams.get("error");
+                if (errorMessage) {
+                    alert(errorMessage); // Display the error message in an alert box
+                }
+            };
         </script>
 </body>
 

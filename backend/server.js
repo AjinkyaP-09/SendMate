@@ -9,13 +9,13 @@ const bcrypt = require("bcryptjs");
 const methodOverride = require("method-override");
 const User = require("./models/User");
 const ContactMail = require("./models/contact-mail");
-const passport = require('passport');
+const passport = require("passport");
 // Initialize the app
 const app = express();
 dotenv.config();
 const saltRounds = 10;
 
-require('./config/passport');
+require("./config/passport");
 
 // Connect to the database
 mongoose
@@ -107,6 +107,7 @@ app.get("/dashboard", async (req, res) => {
     }
 
     const posts = await DeliveryPost.find({ userId: req.session.user.id });
+    console.log(posts);
 
     // Render the dashboard and pass both user and posts data
     res.render("dashboard", { user: req.session.user, posts });
@@ -121,18 +122,17 @@ app.get("/posts/:type", async (req, res) => {
   try {
     const postType = req.params.type;
     const userId = req.session.userId;
-    console.log(userId);
-    
+    // console.log(req.session);
 
+    const username = req.session.user.username;
     let posts;
 
     if (postType === "senderPost") {
-      posts = await DeliveryPost.find({ userId });
-      console.log(posts);
-      
+      posts = await DeliveryPost.find({ username });
+      // console.log(userId);
+      // console.log(posts);
     } else if (postType === "travellerPost") {
-      posts = await TravellerPost.find({ userId });
-      console.log(posts);
+      posts = await TravellerPost.find({ username });
     } else {
       return res.status(400).send("Invalid post type");
     }
@@ -175,11 +175,9 @@ app.post("/submit-travel-post", async (req, res) => {
       !parcelSizeCanCarry ||
       !expectedAmount
     ) {
-      return res
-        .status(400)
-        .render({
-          error: "All fields except additional details are required.",
-        });
+      return res.status(400).render({
+        error: "All fields except additional details are required.",
+      });
     }
 
     // Convert agreeTerms to boolean (true if checked, false otherwise)
@@ -359,28 +357,25 @@ app.delete("/post/:id", async (req, res) => {
     const post = await DeliveryPost.findOne({ _id: id, userId: userId });
 
     if (!post) {
-      console.log(`No post found with ID: ${id} for user ID: ${userId}`);
       return res
         .status(404)
-        .send(
-          "Post not found or you do not have permission to delete this post."
-        );
+        .json({ error: "No post found or permission denied." });
     }
 
     // Delete the post
     await DeliveryPost.deleteOne({ _id: id });
-    console.log(`Post with ID: ${id} has been deleted successfully.`);
-
-    res.redirect("/dashboard");
+    return res.status(200).json({ message: "Post deleted successfully" });
   } catch (error) {
     console.error(`Error deleting post: ${error.message}`);
-    res.status(500).send("An error occurred while trying to delete the post.");
+    res
+      .status(500)
+      .json({ error: "An error occurred while trying to delete the post." });
   }
 });
 
 app.get("/post/:id/editForm", async (req, res) => {
   const { id } = req.params;
-  console.log(id);
+  // console.log(id);
 
   try {
     // Retrieve the post from the database by its ID and make sure it belongs to the logged-in user

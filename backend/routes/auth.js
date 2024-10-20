@@ -25,45 +25,47 @@ const passwordValidation = (password) => {
 
 
 // Register User Route
-router.post('/register', async (req, res) => {
-    try {
-        const { username, email, password } = req.body;
+// Register User Route
+router.post("/register", async (req, res) => {
+  try {
+    const { username, email, password, role } = req.body;
 
-        // Check if the user already exists
-        let user = await User.findOne({ email });
-        if (user) {
-            return res.redirect('/login', { error: 'User already exists' });
-        }
-
-        if (!passwordValidation(password)) {
-            return res.render('register', {
-                error: 'Password must be between 8 and 20 characters and include at least one uppercase letter, one lowercase letter, one digit, and one special character.',
-            });
-        }
-
-        const hashedPassword = await bcrypt.hash(password, saltRounds);
-
-        user = new User({
-          username,
-          email,
-          password: hashedPassword, // Store the hashed password
-        });
-        // Save user to the database
-        await user.save();
-
-        // Store user data in session
-        req.session.user = {
-            id: user._id,
-            username: user.username,
-            email: user.email,
-        };
-
-        res.redirect('/login'); // Redirect to login after successful registration
-    } catch (err) {
-        console.error("Registration Error:", err);
-        res.render('register', { error: 'Something went wrong. Please try again.' });
+    // Check if the user already exists
+    let user = await User.findOne({ email });
+    if (user) {
+      return res.redirect("/register?error=User already exists");
     }
+
+    if (!passwordValidation(password)) {
+      return res.redirect(
+        "/register?error=Password must be between 8 and 20 characters and include at least one uppercase letter, one lowercase letter, one digit, and one special character."
+      );
+    }
+
+    const hashedPassword = await bcrypt.hash(password, saltRounds);
+
+    user = new User({
+      username,
+      email,
+      password: hashedPassword, // Store the hashed password
+    });
+    // Save user to the database
+    await user.save();
+
+    // Store user data in session
+    req.session.user = {
+      id: user._id,
+      username: user.username,
+      email: user.email,
+    };
+
+    res.redirect("/login"); // Redirect to login after successful registration
+  } catch (err) {
+    console.error("Registration Error:", err);
+    res.redirect("/register?error=Something went wrong. Please try again.");
+  }
 });
+
 
 //Hashing Of Password is done
 
