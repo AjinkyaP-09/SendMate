@@ -4,183 +4,134 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>
-        Information - Sendmate
-    </title>
-    <link rel="stylesheet" href="/style.css">
-    <link rel="stylesheet" href="/styles.css">
-    <style>
-        main div ul li {
-            list-style: disc;
-        }
-
-        main div ol {
-            padding-left: 5rem !important;
-        }
-
-        main div ol li {
-            list-style: square;
-        }
-
-        main div li ul li{
-            margin-left: 5rem !important;
-            list-style: circle;
-        }
-
-        main div h2 {
-            font-size: 1.5rem !important;
-            margin-top: 3rem !important;
-            margin-bottom: 1rem !important;
-        }
-    </style>
+    <title>Information - Sendmate</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
 </head>
 
-<body>
+<body class="bg-gray-100">
     <div class="wrapper">
-
         <% if (!user) { %>
             <%- include('partials/nav') %> <!-- Nav for logged-in users -->
                 <% } else { %>
-                    <%- include('partials/nav_users') %><!-- Nav for guests -->
+                    <%- include('partials/nav_users') %> <!-- Nav for guests -->
                         <% } %>
-                            <main>
-                                <div class="information-div container mx-auto flex justify-between py-2 px-8"
-                                    style="flex-direction: column;">
-                                    <ul>
-                                        <li>
-                                            <h2 style="margin-top: 0 !important;"><b>Step 1: Registration</b></h2>
-                                        </li>
-                                    </ul>
-                                    <ol>
-                                        <li> <b>Visit Homepage:</b> Click on the "Sign Up" button.</li>
-                                        <br>
-                                        <li> <b>Fill in Your Details:</b> Enter your Username, Email and Password.</li>
-                                        <br>
-                                        <li> <b>Confirm Registration: </b> Check your email for a confirmation link and
-                                            click it to activate your account.
-                                        </li>
-                                    </ol>
 
-                                    <ul>
-                                        <li>
-                                            <h2><b>Step 2: Login</b></h2>
-                                        </li>
-                                    </ul>
-                                    <ol>
-                                        <li><b>Go to the Login Page:</b> Click on the "Login" button on the homepage.
-                                        </li>
-                                        <br>
-                                        <li><b>Enter Your Credentials:</b> Input your registered email and password.
-                                        </li>
-                                        <br>
-                                        <li><b>Access Your Dashboard:</b> Once logged in, you'll be directed to your
-                                            user dashboard.</li>
-                                    </ol>
+                            <main class="py-10">
+                                <div class="container mx-auto px-6 sm:px-8 lg:px-10 flex flex-col space-y-8">
 
-                                    <ul>
-                                        <li>
-                                            <h2><b>Step 3: Creating a Post (Sender)</b></h2>
-                                        </li>
-                                    </ul>
-                                    <ol>
-                                        <li><b>Navigate to Create Post:</b> Click on the "Create Post" button in your
-                                            dashboard.</li>
-                                        <br>
-                                        <li><b>Fill in the Parcel Details:</b> Provide information such as:</li>
-                                        <ul>
-                                            <li>Parcel Description</li>
-                                            <li>Size and Weight</li>
-                                            <li>Pickup Location</li>
-                                            <li>Delivery Location</li>
-                                            <li>Preffered Delivery Time</li>
-                                        </ul>
-                                        <br>
-                                        <li><b>Set Payment Terms:</b> Indicate how much you are willing to pay the
-                                            traveler.</li>
-                                        <br>
-                                        <li><b>Publish Your Post:</b> Review the details and click "Post" to make it
-                                            visible to travelers.</li>
-                                    </ol>
+                                    <!-- Step 1: Registration -->
+                                    <div>
+                                        <h2 class="text-xl sm:text-2xl font-bold mb-4">Step 1: Registration</h2>
+                                        <ol class="list-decimal pl-5 space-y-3 text-gray-800">
+                                            <li><b>Visit Homepage:</b> Click on the "Sign Up" button.</li>
+                                            <li><b>Fill in Your Details:</b> Enter your Username, Email, and Password.
+                                            </li>
+                                            <li><b>Confirm Registration:</b> Check your email for a confirmation link
+                                                and click it to activate your account.</li>
+                                        </ol>
+                                    </div>
 
-                                    <ul>
-                                        <li>
-                                            <h2><b>Step 4: Browsing and Approaching (Traveler)</b></h2>
-                                        </li>
-                                    </ul>
-                                    <ol>
-                                        <li><b>View Available Posts:</b> Go to the "Available Posts" section in your
-                                            dashboard.</li>
-                                        <br>
-                                        <li><b>Select a Parcel:</b> Browse through the listed parcels and click on one
-                                            that interests you.</li>
-                                        <br>
-                                        <li><b>Contact the Sender:</b> Use the "Contact" option to send a message or
-                                            request more details.</li>
-                                    </ol>
+                                    <!-- Step 2: Login -->
+                                    <div>
+                                        <h2 class="text-xl sm:text-2xl font-bold mb-4">Step 2: Login</h2>
+                                        <ol class="list-decimal pl-5 space-y-3 text-gray-800">
+                                            <li><b>Go to the Login Page:</b> Click on the "Login" button on the
+                                                homepage.</li>
+                                            <li><b>Enter Your Credentials:</b> Input your registered email and password.
+                                            </li>
+                                            <li><b>Access Your Dashboard:</b> Once logged in, you'll be directed to your
+                                                user dashboard.</li>
+                                        </ol>
+                                    </div>
 
-                                    <ul>
-                                        <li>
-                                            <h2><b>Step 5: Agreement and Consent Form</b></h2>
-                                        </li>
-                                    </ul>
-                                    <ol>
-                                        <li><b>Negotiate Terms:</b> Discuss the details, such as delivery time and
-                                            payment, with the sender.</li>
-                                        <br>
-                                        <li><b>Confirm Agreement:</b> Once both parties are satisfied, agree on the
-                                            terms verbally or through the platform's
-                                            messaging feature.</li>
-                                        <br>
-                                        <li><b>Fill Out the Consent Form:</b> Complete a digital consent form that
-                                            outlines:
-                                            <ul>
-                                                <li>Delivery Details</li>
-                                                <li>Payment Agreement</li>
-                                                <li>Responsibilities of both parties</li>
+                                    <!-- Step 3: Creating a Post (Sender) -->
+                                    <div>
+                                        <h2 class="text-xl sm:text-2xl font-bold mb-4">Step 3: Creating a Post (Sender)
+                                        </h2>
+                                        <ol class="list-decimal pl-5 space-y-3 text-gray-800">
+                                            <li><b>Navigate to Create Post:</b> Click on the "Create Post" button in
+                                                your dashboard.</li>
+                                            <li><b>Fill in the Parcel Details:</b> Provide information such as:</li>
+                                            <ul class="list-disc pl-8 space-y-2 text-gray-700">
+                                                <li>Parcel Description</li>
+                                                <li>Size and Weight</li>
+                                                <li>Pickup Location</li>
+                                                <li>Delivery Location</li>
+                                                <li>Preferred Delivery Time</li>
                                             </ul>
-                                        </li>
+                                            <li><b>Set Payment Terms:</b> Indicate how much you are willing to pay the
+                                                traveler.</li>
+                                            <li><b>Publish Your Post:</b> Review the details and click "Post" to make it
+                                                visible to travelers.</li>
+                                        </ol>
+                                    </div>
 
-                                        <br>
-                                        <li><b>Submit the Form:</b> Ensure both parties sign and submit the consent form
-                                            through the platform.</li>
-                                    </ol>
+                                    <!-- Step 4: Browsing and Approaching (Traveler) -->
+                                    <div>
+                                        <h2 class="text-xl sm:text-2xl font-bold mb-4">Step 4: Browsing and Approaching
+                                            (Traveler)</h2>
+                                        <ol class="list-decimal pl-5 space-y-3 text-gray-800">
+                                            <li><b>View Available Posts:</b> Go to the "Available Posts" section in your
+                                                dashboard.</li>
+                                            <li><b>Select a Parcel:</b> Browse through the listed parcels and click on
+                                                one that interests you.</li>
+                                            <li><b>Contact the Sender:</b> Use the "Contact" option to send a message or
+                                                request more details.</li>
+                                        </ol>
+                                    </div>
 
-                                    <ul>
-                                        <li>
-                                            <h2><b>Step 6: Delivery Process</b></h2>
-                                        </li>
-                                    </ul>
-                                    <ol>
-                                        <li><b>Pickup the Parcel:</b> The traveler picks up the parcel from the sender's
-                                            specified location.</li>
-                                        <br>
-                                        <li><b>Delivery:</b> The traveler delivers the parcel to the agreed destination.
-                                        </li>
-                                        <br>
-                                        <li><b>Complete Transaction:</b> After successful delivery, the sender confirms
-                                            receipt, and the payment is
-                                            processed.</li>
-                                    </ol>
+                                    <!-- Step 5: Agreement and Consent Form -->
+                                    <div>
+                                        <h2 class="text-xl sm:text-2xl font-bold mb-4">Step 5: Agreement and Consent
+                                            Form</h2>
+                                        <ol class="list-decimal pl-5 space-y-3 text-gray-800">
+                                            <li><b>Negotiate Terms:</b> Discuss the details, such as delivery time and
+                                                payment, with the sender.</li>
+                                            <li><b>Confirm Agreement:</b> Once both parties are satisfied, agree on the
+                                                terms verbally or through the platform's messaging feature.</li>
+                                            <li>
+                                                <b>Fill Out the Consent Form:</b> Complete a digital consent form that
+                                                outlines:
+                                                <ul class="list-disc pl-8 space-y-2 text-gray-700">
+                                                    <li>Delivery Details</li>
+                                                    <li>Payment Agreement</li>
+                                                    <li>Responsibilities of both parties</li>
+                                                </ul>
+                                            </li>
+                                            <li><b>Submit the Form:</b> Ensure both parties sign and submit the consent
+                                                form through the platform.</li>
+                                        </ol>
+                                    </div>
 
-                                    <ul>
-                                        <li>
-                                            <h2><b>Step 7: Feedback and Rating</b></h2>
-                                        </li>
-                                    </ul>
-                                    <ol>
-                                        <li><b>Rate Your Experience:</b> After the transaction, both parties can rate
-                                            each other and leave feedback.</li>
-                                        <br>
-                                        <li><b>Improve the Community:</b> Use the feedback to enhance future
-                                            interactions on the platform.</li>
-                                    </ol>
+                                    <!-- Step 6: Delivery Process -->
+                                    <div>
+                                        <h2 class="text-xl sm:text-2xl font-bold mb-4">Step 6: Delivery Process</h2>
+                                        <ol class="list-decimal pl-5 space-y-3 text-gray-800">
+                                            <li><b>Pickup the Parcel:</b> The traveler picks up the parcel from the
+                                                sender's specified location.</li>
+                                            <li><b>Delivery:</b> The traveler delivers the parcel to the agreed
+                                                destination.</li>
+                                            <li><b>Complete Transaction:</b> After successful delivery, the sender
+                                                confirms receipt, and the payment is processed.</li>
+                                        </ol>
+                                    </div>
+
+                                    <!-- Step 7: Feedback and Rating -->
+                                    <div>
+                                        <h2 class="text-xl sm:text-2xl font-bold mb-4">Step 7: Feedback and Rating</h2>
+                                        <ol class="list-decimal pl-5 space-y-3 text-gray-800">
+                                            <li><b>Rate Your Experience:</b> After the transaction, both parties can
+                                                rate each other and leave feedback.</li>
+                                            <li><b>Improve the Community:</b> Use the feedback to enhance future
+                                                interactions on the platform.</li>
+                                        </ol>
+                                    </div>
+
                                 </div>
-
-
                             </main>
+
                             <%- include('partials/footer') %>
     </div>
-
 </body>
 
 </html>

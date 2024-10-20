@@ -6,19 +6,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Create Post - Sendmate</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="/style.css">
-    <link rel="stylesheet" href="/styles.css">
-
 </head>
 
-<body class="min-h-screen flex flex-col">
+<body class="min-h-screen flex flex-col bg-gray-100">
     <div class="flex flex-col flex-1">
         <!-- Header -->
         <header>
             <% if (!user) { %>
-                <%- include('partials/nav') %> <!-- Nav for logged-in users -->
+                <%- include('partials/nav') %> <!-- Nav for guests -->
                     <% } else { %>
-                        <%- include('partials/nav_users') %> <!-- Nav for guests -->
+                        <%- include('partials/nav_users') %> <!-- Nav for logged-in users -->
                             <% } %>
 
                                 <!-- Page Title Section -->
@@ -38,7 +35,8 @@
                     <div>
                         <label for="productName" class="block font-semibold text-gray-700">Product Name:</label>
                         <input type="text" id="productName" name="productName" required
-                            class="w-full px-2 border border-gray-300 rounded-lg">
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring focus:ring-blue-200"
+                            placeholder="Enter product name">
                     </div>
 
                     <!-- Product Weight -->
@@ -46,32 +44,34 @@
                         <label for="productWeight" class="block font-semibold text-gray-700">Product Weight
                             (kg):</label>
                         <input type="number" id="productWeight" name="productWeight" step="0.001" min="0.001" required
-                            class="w-full px-2 border border-gray-300 rounded-lg">
-
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring focus:ring-blue-200"
+                            placeholder="Enter product weight">
                     </div>
-                <div>
-                    <label for="dimensions" class="block font-semibold text-gray-700">Product Dimensions (cm):</label>
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <div>
-                            <label for="length" class="block text-gray-700 font-semibold">Length (cm):</label>
-                            <input type="number" id="length" name="length" step="0.01" min="0.01" required
-                                class="w-full px-2 border border-gray-300 rounded-lg">
-                        </div>
-                        <div>
-                            <label for="breadth" class="block text-gray-700 font-semibold">Breadth (cm):</label>
-                            <input type="number" id="breadth" name="breadth" step="0.01" min="0.01" required
-                                class="w-full px-2 border border-gray-300 rounded-lg">
-                        </div>
-                        <div>
-                            <label for="height" class="block text-gray-700 font-semibold">Height (cm):</label>
-                            <input type="number" id="height" name="height" step="0.01" min="0.01" required
-                                class="w-full px-2 border border-gray-300 rounded-lg">
+
+                    <!-- Product Dimensions -->
+                    <div>
+                        <label for="dimensions" class="block font-semibold text-gray-700">Product Dimensions
+                            (cm):</label>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div>
+                                <label for="length" class="block text-gray-700 font-semibold">Length (cm):</label>
+                                <input type="number" id="length" name="length" step="0.01" min="0.01" required
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring focus:ring-blue-200">
+                            </div>
+                            <div>
+                                <label for="breadth" class="block text-gray-700 font-semibold">Breadth (cm):</label>
+                                <input type="number" id="breadth" name="breadth" step="0.01" min="0.01" required
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring focus:ring-blue-200">
+                            </div>
+                            <div>
+                                <label for="height" class="block text-gray-700 font-semibold">Height (cm):</label>
+                                <input type="number" id="height" name="height" step="0.01" min="0.01" required
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring focus:ring-blue-200">
+                            </div>
                         </div>
                     </div>
-                </div>
 
-
-                    <!-- Is It Fragile? -->
+                    <!-- Fragility -->
                     <div>
                         <label class="block font-semibold text-gray-700">Is it Fragile?</label>
                         <div class="flex items-center space-x-4">
@@ -89,12 +89,12 @@
                         <div>
                             <label for="source" class="block font-semibold text-gray-700">Source:</label>
                             <input type="text" id="source" name="source" required
-                                class="w-full px-2 border border-gray-300 rounded-lg">
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring focus:ring-blue-200">
                         </div>
                         <div>
                             <label for="destination" class="block font-semibold text-gray-700">Destination:</label>
                             <input type="text" id="destination" name="destination" required
-                                class="w-full px-2 border border-gray-300 rounded-lg">
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring focus:ring-blue-200">
                         </div>
                     </div>
 
@@ -102,35 +102,36 @@
                     <div>
                         <label for="receiverDetails" class="block font-semibold text-gray-700">Receiver Details:</label>
                         <textarea id="receiverDetails" name="receiverDetails" rows="3" required
-                            class="w-full px-2 border border-gray-300 rounded-lg"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring focus:ring-blue-200"
                             placeholder="Name, Contact Number, Address"></textarea>
                     </div>
 
-                    <!-- Expected Time for Delivery -->
+                    <!-- Expected Delivery Time -->
                     <div>
                         <label for="expectedTime" class="block font-semibold text-gray-700">Expected Time for
                             Delivery:</label>
                         <input type="date" id="expectedTime" name="expectedTime" required
-                            class="w-full px-2 border border-gray-300 rounded-lg" min="">
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring focus:ring-blue-200"
+                            min="">
                     </div>
 
-                    <!-- Payment Range and Flexibility -->
+                    <!-- Payment Range -->
                     <div>
                         <label for="paymentRange" class="block font-semibold text-gray-700">Payment Range (₹):</label>
                         <div class="flex items-center space-x-4">
                             <input type="number" id="paymentMin" name="paymentMin" placeholder="Min" required
-                                class="w-full px-2 border border-gray-300 rounded-lg">
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring focus:ring-blue-200">
                             <span class="text-gray-500">to</span>
                             <input type="number" id="paymentMax" name="paymentMax" placeholder="Max" required
-                                class="w-full px-2 border border-gray-300 rounded-lg">
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring focus:ring-blue-200">
                         </div>
                     </div>
 
-                    <!-- Category of the Product -->
+                    <!-- Product Category -->
                     <div>
                         <label for="category" class="block font-semibold px-2 text-gray-700">Category:</label>
                         <select id="category" name="category" required
-                            class="w-full p-2 border border-gray-300 rounded-lg">
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring focus:ring-blue-200">
                             <option value="" disabled selected>Select Category</option>
                             <option value="Electronics">Electronics</option>
                             <option value="Documents">Documents</option>
@@ -146,20 +147,20 @@
                         <label for="additionalDetails" class="block font-semibold text-gray-700">Additional
                             Details:</label>
                         <textarea id="additionalDetails" name="additionalDetails" rows="4"
-                            class="w-full px-2 border border-gray-300 rounded-lg"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring focus:ring-blue-200"
                             placeholder="Any other details..."></textarea>
                     </div>
+
                     <input type="hidden" name="userId" value="<%= user.id %>">
                     <input type="hidden" name="username" value="<%= user.username %>">
                     <input type="hidden" name="email" value="<%= user.email %>">
 
-
                     <!-- Submit Button -->
                     <div class="text-center">
-                        <!-- <button type="submit"
-                            class="bg-blue-600 text-white font-semibold py-2 px-6 rounded-lg hover:bg-blue-700 transition duration-200">Create
-                            Post</button> -->
-                        <button type="submit" class="tertiary-button"> Create Post</button>
+                        <button type="submit"
+                            class="bg-blue-600 text-white font-semibold py-2 px-6 rounded-lg hover:bg-blue-700 transition duration-200">
+                            Create Post
+                        </button>
                     </div>
                 </form>
             </section>
@@ -172,6 +173,7 @@
             </div>
         </footer>
     </div>
+
     <script>
         function validatePaymentRange(event) {
             const paymentMin = parseFloat(document.getElementById('paymentMin').value);
@@ -182,12 +184,9 @@
                 alert('Minimum payment must be less than the maximum payment.');
             }
         }
-        // Get today's date in the format 'YYYY-MM-DD'
-        const today = new Date().toISOString().split('T')[0];
+
         // Set the 'min' attribute of the input field to today's date
-        document.getElementById('expectedTime').setAttribute('min', today);
-
-
+        document.getElementById('expectedTime').setAttribute('min', new Date().toISOString().split('T')[0]);
     </script>
 </body>
 

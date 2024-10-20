@@ -5,14 +5,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Contact-Us | Sendmate</title>
-    <link rel="stylesheet" href="/style.css">
-    <link rel="stylesheet" href="/styles.css">
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
 
-<body>
+<body class="bg-gray-100">
 
-
-    <div class="wrapper">
+    <div class="wrapper min-h-screen flex flex-col">
         <header>
             <% if (!user) { %>
                 <%- include('partials/nav') %> <!-- Nav for logged-in users -->
@@ -20,26 +18,28 @@
                         <%- include('partials/nav_users') %><!-- Nav for guests -->
                             <% } %>
         </header>
-        <main>
-            <div style="margin-top: 90px;" class="container mx-auto text-center contact-section max-w-md w-full">
+
+        <main class="flex-grow flex items-center justify-center py-8 px-4">
+            <div class="container mx-auto text-center bg-white p-8 rounded-lg shadow-lg max-w-md w-full">
                 <h2 class="text-3xl font-bold mb-6">Get in Touch</h2>
                 <p class="text-lg text-gray-700 mb-4">Have questions? We're here to help!</p>
-                <form action="/contact" method="POST" class="contact-us-form max-w-lg mx-auto">
-                    <div class="mb-4">
+                <form action="/contact" method="POST" class="space-y-4">
+                    <div>
                         <input type="text" name="name" placeholder="Your Name" required
-                            class="w-full p-3 border border-gray-300 rounded-lg">
+                            class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring focus:ring-blue-200">
                     </div>
-                    <div class="mb-4">
+                    <div>
                         <input type="email" name="email" placeholder="Your Email" required
-                            class="w-full p-3 border border-gray-300 rounded-lg">
+                            class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring focus:ring-blue-200">
                     </div>
-                    <div class="mb-4">
+                    <div>
                         <textarea name="message" rows="4" placeholder="Your Message" required
-                            class="w-full p-3 border border-gray-300 rounded-lg"></textarea>
+                            class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring focus:ring-blue-200"></textarea>
                     </div>
                     <button type="submit"
-                        class="bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-blue-700 transition duration-200">Send
-                        Message</button>
+                        class="bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-blue-700 transition duration-200 w-full sm:w-auto">
+                        Send Message
+                    </button>
                 </form>
             </div>
         </main>

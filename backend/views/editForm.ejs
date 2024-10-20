@@ -8,17 +8,16 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="/style.css">
     <link rel="stylesheet" href="/styles.css">
-
 </head>
 
-<body class="min-h-screen flex flex-col">
+<body class="min-h-screen flex flex-col bg-gray-100">
     <div class="flex flex-col flex-1">
         <!-- Header -->
         <header>
             <% if (!user) { %>
-                <%- include('partials/nav') %> <!-- Nav for logged-in users -->
+                <%- include('partials/nav') %> <!-- Nav for guests -->
                     <% } else { %>
-                        <%- include('partials/nav_users') %> <!-- Nav for guests -->
+                        <%- include('partials/nav_users') %> <!-- Nav for logged-in users -->
                             <% } %>
 
                                 <!-- Page Title Section -->
@@ -31,14 +30,14 @@
 
         <!-- Main Content -->
         <main class="flex-1 pt-6 pb-12">
-            <section class="register-parcel-container mx-auto max-w-3xl bg-white p-8 rounded-lg shadow-lg">
+            <section class="register-parcel-container mx-auto max-w-4xl bg-white p-8 rounded-lg shadow-lg">
                 <form action="/post/<%= post.id %>?_method=PATCH" method="POST" class="space-y-6"
                     onsubmit="return validatePaymentRange(event)">
                     <!-- Product Name -->
                     <div>
                         <label for="productName" class="block font-semibold text-gray-700">Product Name:</label>
                         <input type="text" id="productName" name="productName" required
-                            class="w-full px-2 border border-gray-300 rounded-lg" value="<%= post.productName %>"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg" value="<%= post.productName %>"
                             disabled>
                     </div>
 
@@ -47,32 +46,35 @@
                         <label for="productWeight" class="block font-semibold text-gray-700">Product Weight
                             (kg):</label>
                         <input type="number" id="productWeight" name="productWeight" step="0.01" required
-                            class="w-full px-2 border border-gray-300 rounded-lg" value="<%= post.productWeight %>">
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg"
+                            value="<%= post.productWeight %>">
                     </div>
 
-                    <!-- Dimension -->
-
+                    <!-- Dimensions -->
                     <div>
-                        <label for="dimensions" class="block font-semibold text-gray-700">Product Dimensions (cm):</label>
+                        <label for="dimensions" class="block font-semibold text-gray-700">Product Dimensions
+                            (cm):</label>
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                             <div>
                                 <label for="length" class="block text-gray-700 font-semibold">Length (cm):</label>
-                                <input type="number" id="length" name="length" step="0.01" min="0.01" required value="<%=post.length%>"
-                                    class="w-full px-2 border border-gray-300 rounded-lg">
+                                <input type="number" id="length" name="length" step="0.01" min="0.01" required
+                                    value="<%= post.length %>"
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg">
                             </div>
                             <div>
                                 <label for="breadth" class="block text-gray-700 font-semibold">Breadth (cm):</label>
-                                <input type="number" id="breadth" name="breadth" step="0.01" min="0.01" required value="<%=post.breadth%>"
-                                    class="w-full px-2 border border-gray-300 rounded-lg">
+                                <input type="number" id="breadth" name="breadth" step="0.01" min="0.01" required
+                                    value="<%= post.breadth %>"
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg">
                             </div>
                             <div>
                                 <label for="height" class="block text-gray-700 font-semibold">Height (cm):</label>
-                                <input type="number" id="height" name="height" step="0.01" min="0.01" required value="<%=post.height%>"
-                                    class="w-full px-2 border border-gray-300 rounded-lg">
+                                <input type="number" id="height" name="height" step="0.01" min="0.01" required
+                                    value="<%= post.height %>"
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg">
                             </div>
                         </div>
                     </div>
-
 
                     <!-- Is It Fragile? -->
                     <div>
@@ -84,7 +86,7 @@
                             </label>
                             <label class="flex items-center">
                                 <input type="radio" name="isFragile" value="No" required class="mr-2"
-                                    <%=post.isFragile==='Yes' ? 'checked' : '' %> disabled> No
+                                    <%=post.isFragile==='No' ? 'checked' : '' %> disabled> No
                             </label>
                         </div>
                     </div>
@@ -94,12 +96,13 @@
                         <div>
                             <label for="source" class="block font-semibold text-gray-700">Source:</label>
                             <input type="text" id="source" name="source" required value="<%= post.source %>"
-                                class="w-full px-2 border border-gray-300 rounded-lg">
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg">
                         </div>
                         <div>
                             <label for="destination" class="block font-semibold text-gray-700">Destination:</label>
                             <input type="text" id="destination" name="destination" required
-                                value="<%= post.destination %>" class="w-full px-2 border border-gray-300 rounded-lg">
+                                value="<%= post.destination %>"
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg">
                         </div>
                     </div>
 
@@ -107,7 +110,7 @@
                     <div>
                         <label for="receiverDetails" class="block font-semibold text-gray-700">Receiver Details:</label>
                         <textarea id="receiverDetails" name="receiverDetails" rows="3" required
-                            class="w-full px-2 border border-gray-300 rounded-lg"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg"
                             placeholder="Name, Contact Number, Address"><%= post.receiverDetails %></textarea>
                     </div>
 
@@ -117,8 +120,7 @@
                             Delivery:</label>
                         <input type="date" id="expectedTime" name="expectedTime" required
                             value="<%= post.expectedTime ? post.expectedTime.toISOString().split('T')[0] : '' %>"
-                            class="w-full px-2 border border-gray-300 rounded-lg" min="">
-
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg" min="">
                     </div>
 
                     <!-- Payment Range and Flexibility -->
@@ -126,17 +128,19 @@
                         <label for="paymentRange" class="block font-semibold text-gray-700">Payment Range (₹):</label>
                         <div class="flex items-center space-x-4">
                             <input type="number" id="paymentMin" name="paymentMin" placeholder="Min" required
-                                value="<%= post.paymentMin %>" class="w-full px-2 border border-gray-300 rounded-lg">
+                                value="<%= post.paymentMin %>"
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg">
                             <span class="text-gray-500">to</span>
                             <input type="number" id="paymentMax" name="paymentMax" placeholder="Max" required
-                                value="<%= post.paymentMax %>" class="w-full px-2 border border-gray-300 rounded-lg">
+                                value="<%= post.paymentMax %>"
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg">
                         </div>
                     </div>
 
                     <!-- Category of the Product -->
                     <div>
-                        <label for="category" class="block font-semibold px-2 text-gray-700">Category:</label>
-                        <select id="category" name="category" required value="<%= post.category %>"
+                        <label for="category" class="block font-semibold text-gray-700">Category:</label>
+                        <select id="category" name="category" required
                             class="w-full p-2 border border-gray-300 rounded-lg">
                             <option value="" disabled selected>Select Category</option>
                             <option value="Electronics" <%=post.category==='Electronics' ? 'selected' : '' %>
@@ -156,17 +160,20 @@
                         <label for="additionalDetails" class="block font-semibold text-gray-700">Additional
                             Details:</label>
                         <textarea id="additionalDetails" name="additionalDetails" rows="4"
-                            value="<%= post.additionalDetails %>" class="w-full px-2 border border-gray-300 rounded-lg"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg"
                             placeholder="Any other details..."><%= post.additionalDetails %></textarea>
                     </div>
+
+                    <!-- Hidden Inputs -->
                     <input type="hidden" name="userId" value="<%= user.id %>">
                     <input type="hidden" name="username" value="<%= user.username %>">
                     <input type="hidden" name="email" value="<%= user.email %>">
 
-
                     <!-- Submit Button -->
                     <div class="text-center">
-                        <button type="submit" class="tertiary-button"> Edit Post</button>
+                        <button type="submit"
+                            class="w-full bg-blue-600 text-white font-semibold py-2 rounded-lg hover:bg-blue-700 transition duration-200">Edit
+                            Post</button>
                     </div>
                 </form>
             </section>
@@ -179,22 +186,19 @@
             </div>
         </footer>
     </div>
+
     <script>
         function validatePaymentRange(event) {
-            const paymentMin = parseFloat(document.getElementById('paymentMin').value);
-            const paymentMax = parseFloat(document.getElementById('paymentMax').value);
+            const paymentMin = document.getElementById('paymentMin').value;
+            const paymentMax = document.getElementById('paymentMax').value;
 
-            if (paymentMin >= paymentMax) {
-                event.preventDefault(); // Prevent form submission
-                alert('Minimum payment must be less than the maximum payment.');
+            if (parseFloat(paymentMin) > parseFloat(paymentMax)) {
+                alert('Minimum payment cannot be greater than maximum payment.');
+                event.preventDefault();
+                return false;
             }
+            return true;
         }
-        // Get today's date in the format 'YYYY-MM-DD'
-        const today = new Date().toISOString().split('T')[0];
-        // Set the 'min' attribute of the input field to today's date
-        document.getElementById('expectedTime').setAttribute('min', today);
-
-
     </script>
 </body>
 
