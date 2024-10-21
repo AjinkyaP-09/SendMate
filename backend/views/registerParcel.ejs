@@ -8,7 +8,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 
-<body class="min-h-screen flex flex-col bg-gray-100">
+<body class="min-h-screen flex flex-col">
     <div class="flex flex-col flex-1">
         <!-- Header -->
         <header>
@@ -29,7 +29,7 @@
         <!-- Main Content -->
         <main class="flex-1 pt-6 pb-12">
             <section class="register-parcel-container mx-auto max-w-3xl bg-white p-8 rounded-lg shadow-lg">
-                <form action="/sender-post" method="POST" class="space-y-6"
+                <form id="deliveryPostForm" action="/sender-post" method="POST" class="space-y-6" novalidate
                     onsubmit="return validatePaymentRange(event)">
                     <!-- Product Name -->
                     <div>
@@ -37,15 +37,17 @@
                         <input type="text" id="productName" name="productName" required
                             class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring focus:ring-blue-200"
                             placeholder="Enter product name">
+                        <p id="productNameError" class="text-red-600 hidden">Please enter a product name.</p>
                     </div>
 
                     <!-- Product Weight -->
                     <div>
                         <label for="productWeight" class="block font-semibold text-gray-700">Product Weight
                             (kg):</label>
-                        <input type="number" id="productWeight" name="productWeight" step="0.001" min="0.001" required
+                        <input type="number" id="productWeight" name="productWeight" step="0.5" min="0.5" required
                             class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring focus:ring-blue-200"
                             placeholder="Enter product weight">
+                        <p id="productWeightError" class="text-red-600 hidden">Please enter a valid weight.</p>
                     </div>
 
                     <!-- Product Dimensions -->
@@ -55,18 +57,21 @@
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                             <div>
                                 <label for="length" class="block text-gray-700 font-semibold">Length (cm):</label>
-                                <input type="number" id="length" name="length" step="0.01" min="0.01" required
+                                <input type="number" id="length" name="length" step="1" min="1" required
                                     class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring focus:ring-blue-200">
+                                <p id="lengthError" class="text-red-600 hidden">Please enter a valid length.</p>
                             </div>
                             <div>
                                 <label for="breadth" class="block text-gray-700 font-semibold">Breadth (cm):</label>
-                                <input type="number" id="breadth" name="breadth" step="0.01" min="0.01" required
+                                <input type="number" id="breadth" name="breadth" step="1" min="1" required
                                     class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring focus:ring-blue-200">
+                                <p id="breadthError" class="text-red-600 hidden">Please enter a valid breadth.</p>
                             </div>
                             <div>
                                 <label for="height" class="block text-gray-700 font-semibold">Height (cm):</label>
-                                <input type="number" id="height" name="height" step="0.01" min="0.01" required
+                                <input type="number" id="height" name="height" step="1" min="1" required
                                     class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring focus:ring-blue-200">
+                                <p id="heightError" class="text-red-600 hidden">Please enter a valid height.</p>
                             </div>
                         </div>
                     </div>
@@ -90,11 +95,14 @@
                             <label for="source" class="block font-semibold text-gray-700">Source:</label>
                             <input type="text" id="source" name="source" required
                                 class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring focus:ring-blue-200">
+                            <p id="sourceError" class="text-red-600 hidden">Please enter a source location.</p>
                         </div>
                         <div>
                             <label for="destination" class="block font-semibold text-gray-700">Destination:</label>
                             <input type="text" id="destination" name="destination" required
                                 class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring focus:ring-blue-200">
+                            <p id="destinationError" class="text-red-600 hidden">Please enter a destination location.
+                            </p>
                         </div>
                     </div>
 
@@ -104,6 +112,7 @@
                         <textarea id="receiverDetails" name="receiverDetails" rows="3" required
                             class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring focus:ring-blue-200"
                             placeholder="Name, Contact Number, Address"></textarea>
+                        <p id="receiverDetailsError" class="text-red-600 hidden">Please enter receiver details.</p>
                     </div>
 
                     <!-- Expected Delivery Time -->
@@ -111,8 +120,8 @@
                         <label for="expectedTime" class="block font-semibold text-gray-700">Expected Time for
                             Delivery:</label>
                         <input type="date" id="expectedTime" name="expectedTime" required
-                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring focus:ring-blue-200"
-                            min="">
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring focus:ring-blue-200">
+                        <p id="expectedTimeError" class="text-red-600 hidden">Please select a valid delivery date.</p>
                     </div>
 
                     <!-- Payment Range -->
@@ -124,6 +133,8 @@
                             <span class="text-gray-500">to</span>
                             <input type="number" id="paymentMax" name="paymentMax" placeholder="Max" required
                                 class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring focus:ring-blue-200">
+                            <p id="paymentRangeError" class="text-red-600 hidden">Minimum payment must be less than
+                                maximum payment.</p>
                         </div>
                     </div>
 
@@ -140,6 +151,7 @@
                             <option value="Gifts">Gifts</option>
                             <option value="Other">Other</option>
                         </select>
+                        <p id="categoryError" class="text-red-600 hidden">Please select a category.</p>
                     </div>
 
                     <!-- Additional Details -->
@@ -179,14 +191,64 @@
             const paymentMin = parseFloat(document.getElementById('paymentMin').value);
             const paymentMax = parseFloat(document.getElementById('paymentMax').value);
 
+            let isValid = true;
+
+            // Clear previous error messages
+            document.getElementById('paymentRangeError').classList.add('hidden');
+
             if (paymentMin >= paymentMax) {
                 event.preventDefault(); // Prevent form submission
-                alert('Minimum payment must be less than the maximum payment.');
+                document.getElementById('paymentRangeError').classList.remove('hidden');
+                isValid = false;
             }
+
+            // Validate other fields
+            const fieldsToValidate = [
+                { id: 'productName', errorId: 'productNameError' },
+                { id: 'productWeight', errorId: 'productWeightError' },
+                { id: 'length', errorId: 'lengthError' },
+                { id: 'breadth', errorId: 'breadthError' },
+                { id: 'height', errorId: 'heightError' },
+                { id: 'source', errorId: 'sourceError' },
+                { id: 'destination', errorId: 'destinationError' },
+                { id: 'receiverDetails', errorId: 'receiverDetailsError' },
+                { id: 'expectedTime', errorId: 'expectedTimeError' },
+                { id: 'category', errorId: 'categoryError' },
+            ];
+
+            fieldsToValidate.forEach(field => {
+                const inputValue = document.getElementById(field.id).value;
+                if (!inputValue) {
+                    document.getElementById(field.errorId).classList.remove('hidden');
+                    isValid = false;
+                } else {
+                    document.getElementById(field.errorId).classList.add('hidden');
+                }
+            });
+
+            return isValid; // Prevent form submission if invalid
         }
 
-        // Set the 'min' attribute of the input field to today's date
+        // Set the 'min' attribute of the expected time input field to today's date
         document.getElementById('expectedTime').setAttribute('min', new Date().toISOString().split('T')[0]);
+
+        // Real-time validation for input fields
+        const fieldsToMonitor = [
+            'productName', 'productWeight', 'length', 'breadth', 'height',
+            'source', 'destination', 'receiverDetails', 'expectedTime', 'category'
+        ];
+
+        fieldsToMonitor.forEach(id => {
+            const inputElement = document.getElementById(id);
+            inputElement.addEventListener('input', () => {
+                const errorElement = document.getElementById(`${id}Error`);
+                if (inputElement.value) {
+                    errorElement.classList.add('hidden');
+                } else {
+                    errorElement.classList.remove('hidden');
+                }
+            });
+        });
     </script>
 </body>
 

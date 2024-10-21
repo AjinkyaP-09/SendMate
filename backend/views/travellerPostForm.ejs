@@ -10,29 +10,24 @@
     <link rel="stylesheet" href="/styles.css">
 </head>
 
-<body class="min-h-screen flex flex-col bg-gray-100">
+<body class="min-h-screen flex flex-col">
     <div class="flex flex-col flex-1">
         <!-- Header -->
         <header>
-            <% if (!user) { %>
-                <%- include('partials/nav') %> <!-- Nav for guests -->
-                    <% } else { %>
-                        <%- include('partials/nav_users') %> <!-- Nav for logged-in users -->
-                            <% } %>
-
-                                <!-- Page Title Section -->
-                                <section class="bg-blue-600 text-white py-4 mt-14">
-                                    <div class="container mx-auto text-center">
-                                        <h1 class="text-3xl font-bold">Create Your Sender Post</h1>
-                                    </div>
-                                </section>
+            <%- include('partials/nav_users') %> <!-- Nav for logged-in users -->
+                <!-- Page Title Section -->
+                <section class="bg-blue-600 text-white py-4 mt-14">
+                    <div class="container mx-auto text-center">
+                        <h1 class="text-3xl font-bold">Create Your Travel Post</h1>
+                    </div>
+                </section>
         </header>
         <main class="flex-1 mt-4 pb-12">
             <!-- Create Post Form -->
             <section class="py-12">
                 <div class="container mx-auto max-w-2xl bg-white p-8 rounded-lg shadow-lg"
                     style="max-width: 825px; box-shadow: 0 0 10 rgba(0, 0, 0, 0.1);">
-                    <form id="travelPostForm" action="/submit-travel-post" method="POST" class="space-y-6">
+                    <form id="travelPostForm" action="/submit-travel-post" method="POST" class="space-y-6" novalidate>
 
                         <label for="modeOfTravel" class="block font-semibold text-gray-700">Mode of Travel</label>
                         <select id="modeOfTravel" name="modeOfTravel" required
@@ -46,7 +41,7 @@
                             <option value="Bike">Bike</option>
                             <option value="Other">Other</option>
                         </select>
-                        <div id="modeError" class="hidden">Please select a mode of travel.</div>
+                        <div id="modeError" class="text-red-600 hidden">Please select a mode of travel.</div>
 
                         <!-- Travel Mode Specific Details -->
                         <div id="busDetails" class="hidden space-y-4">
@@ -55,6 +50,7 @@
                             <input type="text" id="busRouteDetails" name="busRouteDetails"
                                 class="w-full px-4 py-2 border border-gray-300 rounded-lg"
                                 placeholder="E.g., Bus name, route number, etc.">
+                            <p id="busRouteError" class="text-red-600 hidden">Please enter bus route details.</p>
                         </div>
 
                         <div id="trainDetails" class="hidden space-y-4">
@@ -63,6 +59,7 @@
                             <input type="text" id="trainTicketDetails" name="trainTicketDetails"
                                 class="w-full px-4 py-2 border border-gray-300 rounded-lg"
                                 placeholder="E.g., Train name, PNR, etc.">
+                            <p id="trainTicketError" class="text-red-600 hidden">Please enter train ticket details.</p>
                         </div>
 
                         <div id="flightDetails" class="hidden space-y-4">
@@ -71,6 +68,7 @@
                             <input type="text" id="flightDetailsInput" name="flightDetails"
                                 class="w-full px-4 py-2 border border-gray-300 rounded-lg"
                                 placeholder="E.g., Flight number, seat details, etc.">
+                            <p id="flightDetailsError" class="text-red-600 hidden">Please enter flight details.</p>
                         </div>
 
                         <div id="carDetails" class="hidden space-y-4">
@@ -78,6 +76,7 @@
                             <input type="text" id="carDetailsInput" name="carDetails"
                                 class="w-full px-4 py-2 border border-gray-300 rounded-lg"
                                 placeholder="E.g., Car model, registration number, etc.">
+                            <p id="carDetailsError" class="text-red-600 hidden">Please enter car details.</p>
                         </div>
 
                         <div id="bikeDetails" class="hidden space-y-4">
@@ -86,6 +85,7 @@
                             <input type="text" id="bikeDetailsInput" name="bikeDetails"
                                 class="w-full px-4 py-2 border border-gray-300 rounded-lg"
                                 placeholder="E.g., Bike model, registration number, etc.">
+                            <p id="bikeDetailsError" class="text-red-600 hidden">Please enter bike details.</p>
                         </div>
 
                         <!-- Source and Destination -->
@@ -93,7 +93,7 @@
                             <div>
                                 <label for="source" class="block font-semibold text-gray-700">Source:</label>
                                 <input type="text" id="source" name="source" required
-                                    class="w-full px-4  border border-gray-300 rounded-lg">
+                                    class="w-full px-4 border border-gray-300 rounded-lg">
                                 <p id="sourceError" class="text-red-600 hidden">Please enter a source location.</p>
                             </div>
                             <div>
@@ -110,15 +110,14 @@
                             <label for="expectedTime" class="block font-semibold text-gray-700">Expected Time for
                                 Travel:</label>
                             <input type="date" id="expectedTime" name="expectedTime" required
-                                class="w-full px-4  border border-gray-300 rounded-lg">
+                                class="w-full px-4 border border-gray-300 rounded-lg">
                             <p id="expectedTimeError" class="text-red-600 hidden">Please select a valid date.</p>
                         </div>
 
                         <!-- Parcel Size -->
                         <div>
                             <label for="parcelSizeCanCarry" class="block font-semibold text-gray-700">Parcel Size You
-                                Can
-                                Carry:</label>
+                                Can Carry:</label>
                             <select id="parcelSizeCanCarry" name="parcelSizeCanCarry" required
                                 class="w-full px-4 py-2 border border-gray-300 rounded-lg">
                                 <option value="" disabled selected>Select Size</option>
@@ -133,9 +132,9 @@
                         <!-- Expected Amount -->
                         <div>
                             <label for="expectedAmount" class="block font-semibold text-gray-700">Expected Amount
-                                ($):</label>
+                                (₹):</label>
                             <input type="number" id="expectedAmount" name="expectedAmount" required
-                                class="w-full px-4  border border-gray-300 rounded-lg"
+                                class="w-full px-4 border border-gray-300 rounded-lg"
                                 placeholder="Enter your expected amount">
                             <p id="expectedAmountError" class="text-red-600 hidden">Please enter an expected amount.</p>
                         </div>
@@ -184,7 +183,6 @@
 
     <script>
         // Show travel details fields based on travel mode
-        // Show travel details fields based on travel mode
         function showTravelDetails() {
             // Hide all travel details by default
             document.getElementById('busDetails').classList.add('hidden');
@@ -197,11 +195,11 @@
             const selectedMode = document.getElementById('modeOfTravel').value;
 
             // Show the relevant details based on the selected mode
-            if (selectedMode === 'bus') {
+            if (selectedMode === 'Bus') {
                 document.getElementById('busDetails').classList.remove('hidden');
-            } else if (selectedMode === 'train') {
+            } else if (selectedMode === 'Train') {
                 document.getElementById('trainDetails').classList.remove('hidden');
-            } else if (selectedMode === 'airplane') {  // Make sure this matches the option value
+            } else if (selectedMode === 'Airplane') {
                 document.getElementById('flightDetails').classList.remove('hidden');
             } else if (selectedMode === 'Car') {
                 document.getElementById('carDetails').classList.remove('hidden');
@@ -210,27 +208,51 @@
             }
         }
 
-
         // Set min date to today for expected time input
         const today = new Date().toISOString().split('T')[0];
         document.getElementById('expectedTime').setAttribute('min', today);
 
+        // Real-time validation
+        const fieldsToValidate = [
+            { id: 'modeOfTravel', errorId: 'modeError' },
+            { id: 'source', errorId: 'sourceError' },
+            { id: 'destination', errorId: 'destinationError' },
+            { id: 'expectedTime', errorId: 'expectedTimeError' },
+            { id: 'parcelSizeCanCarry', errorId: 'parcelSizeError' },
+            { id: 'expectedAmount', errorId: 'expectedAmountError' },
+            { id: 'agreeTerms', errorId: 'termsError' }
+        ];
+
+        fieldsToValidate.forEach(field => {
+            const inputElement = document.getElementById(field.id);
+            inputElement.addEventListener('input', () => {
+                if (inputElement.type === 'checkbox') {
+                    document.getElementById(field.errorId).classList.toggle('hidden', inputElement.checked);
+                } else {
+                    document.getElementById(field.errorId).classList.toggle('hidden', inputElement.value);
+                }
+            });
+
+            // Also validate on focusout
+            inputElement.addEventListener('focusout', () => {
+                if (inputElement.type === 'checkbox') {
+                    document.getElementById(field.errorId).classList.toggle('hidden', inputElement.checked);
+                } else {
+                    document.getElementById(field.errorId).classList.toggle('hidden', inputElement.value);
+                }
+            });
+        });
+
         // Form validation on submit
         document.getElementById('travelPostForm').addEventListener('submit', function (e) {
             let isValid = true;
-            const fieldsToValidate = [
-                { id: 'modeOfTravel', errorId: 'modeError' },
-                { id: 'source', errorId: 'sourceError' },
-                { id: 'destination', errorId: 'destinationError' },
-                { id: 'expectedTime', errorId: 'expectedTimeError' },
-                { id: 'parcelSizeCanCarry', errorId: 'parcelSizeError' },
-                { id: 'expectedAmount', errorId: 'expectedAmountError' },
-            ];
 
-            // Loop through each field to validate
             fieldsToValidate.forEach(field => {
                 const inputValue = document.getElementById(field.id).value;
-                if (!inputValue) {
+                if (field.id === 'agreeTerms' && !document.getElementById(field.id).checked) {
+                    document.getElementById(field.errorId).classList.remove('hidden');
+                    isValid = false;
+                } else if (!inputValue) {
                     document.getElementById(field.errorId).classList.remove('hidden');
                     isValid = false;
                 } else {
@@ -238,12 +260,41 @@
                 }
             });
 
-            // Validate Terms Agreement
-            if (!document.getElementById('agreeTerms').checked) {
-                document.getElementById('termsError').classList.remove('hidden');
+            // Validate mode-specific fields
+            const selectedMode = document.getElementById('modeOfTravel').value;
+            if (selectedMode === 'Bus' && !document.getElementById('busRouteDetails').value) {
+                document.getElementById('busRouteError').classList.remove('hidden');
                 isValid = false;
             } else {
-                document.getElementById('termsError').classList.add('hidden');
+                document.getElementById('busRouteError').classList.add('hidden');
+            }
+
+            if (selectedMode === 'Train' && !document.getElementById('trainTicketDetails').value) {
+                document.getElementById('trainTicketError').classList.remove('hidden');
+                isValid = false;
+            } else {
+                document.getElementById('trainTicketError').classList.add('hidden');
+            }
+
+            if (selectedMode === 'Airplane' && !document.getElementById('flightDetailsInput').value) {
+                document.getElementById('flightDetailsError').classList.remove('hidden');
+                isValid = false;
+            } else {
+                document.getElementById('flightDetailsError').classList.add('hidden');
+            }
+
+            if (selectedMode === 'Car' && !document.getElementById('carDetailsInput').value) {
+                document.getElementById('carDetailsError').classList.remove('hidden');
+                isValid = false;
+            } else {
+                document.getElementById('carDetailsError').classList.add('hidden');
+            }
+
+            if (selectedMode === 'Bike' && !document.getElementById('bikeDetailsInput').value) {
+                document.getElementById('bikeDetailsError').classList.remove('hidden');
+                isValid = false;
+            } else {
+                document.getElementById('bikeDetailsError').classList.add('hidden');
             }
 
             // Prevent form submission if not valid
@@ -251,7 +302,6 @@
                 e.preventDefault();
             }
         });
-
     </script>
 </body>
 
