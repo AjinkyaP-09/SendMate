@@ -10,60 +10,69 @@
 
 <body>
 
-    <nav class="bg-blue-600 text-white shadow-md fixed top-0 left-0 w-full z-50">
+    <nav class="bg-teal-50 text-emerald-700 shadow-md fixed top-0 left-0 w-full z-50">
         <div class="container mx-auto flex justify-between items-center py-3 px-6">
-            <a href="/" class="text-2xl font-bold flex items-center">
+            <a href="/" class="text-2xl font-bold flex items-center text-gray-800">
                 <img src="/images/sendmate-logo.png" alt="Sendmate Logo" class="h-8 w-8 mr-2">Sendmate
             </a>
 
             <!-- Mobile Menu Toggle Button -->
-            <button class="md:hidden text-white focus:outline-none" id="mobile-menu-toggle">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
-                    stroke="currentColor" class="w-6 h-6">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16m-7 6h7" />
-                </svg>
-            </button>
+            <div class="md:hidden">
+                <button id="mobile-menu-btn" class="text-gray-800 focus:outline-none">
+                    <!-- Hamburger Icon -->
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M4 6h16M4 12h16M4 18h16">
+                        </path>
+                    </svg>
+                </button>
+            </div>
 
             <!-- Menu Links -->
-            <ul class="hidden md:flex space-x-6 text-white font-semibold items-center" id="navbar-links">
-                <li><a href="/" class="hover:text-gray-200">Home</a></li>
+            <ul class="hidden md:flex space-x-10 text-gray-800 font-bold items-center" id="navbar-links">
+                <li><a href="/" class="hover:text-blue-800 transition duration-200">Home</a></li>
                 <li>
-                    <a href="#" class="relative flex items-center justify-center hover:text-gray-200"
+                    <a href="#"
+                        class="relative flex text-gray-800 items-center justify-center hover:text-blue-800 transition duration-200"
                         id="helpDropdownToggle">
                         <img src="/images/question-solid.svg" class="h-5 w-5" alt="Help Icon">
                     </a>
                     <div id="helpDropdownMenu"
-                        class="hidden absolute bg-white text-gray-700 border border-gray-200 rounded-md shadow-lg mt-2 w-48 max-w-xs right-0 z-50">
+                        class="hidden absolute bg-white text-gray-800 border border-gray-200 rounded-md shadow-lg mt-2 w-48 max-w-xs top-11 right-0 z-50">
                         <ul class="py-1">
-                            <li><a href="/information" class="block px-4 py-2 hover:bg-gray-100">How-it-works</a></li>
-                            <li><a href="/contact" class="block px-4 py-2 hover:bg-gray-100">Contact</a></li>
+                            <li><a href="/information" class="block px-4 py-2 hover:text-blue-800">How-it-works</a></li>
+                            <li><a href="/contact" class="block px-4 py-2 hover:text-blue-800">Contact</a></li>
                         </ul>
                     </div>
                 </li>
                 <li>
-                    <a href="#" class="relative flex items-center justify-center hover:text-gray-200"
+                    <a href="#"
+                        class="relative flex items-center justify-center hover:text-blue-800 transition duration-200"
                         id="addDropdownToggle">
                         <img src="/images/plus-solid.svg" class="h-5 w-5" alt="Add Post Icon">
                     </a>
                     <div id="addDropdownMenu"
-                        class="hidden absolute bg-white text-gray-700 border border-gray-200 rounded-md shadow-lg mt-2 w-48 max-w-xs right-0 z-50">
+                        class="hidden absolute bg-white text-gray-800 border border-gray-200 rounded-md shadow-lg mt-2 w-48 max-w-xs top-11 right-0 z-50">
                         <ul class="py-1">
-                            <li><a href="/register-parcel" class="block px-4 py-2 hover:bg-gray-100">Register a
+                            <li><a href="/register-parcel" class="block px-4 py-2 hover:text-blue-800">Register a
                                     Parcel</a></li>
-                            <li><a href="/travellerPost" class="block px-4 py-2 hover:bg-gray-100">Travel Plan</a></li>
+                            <li><a href="/travellerPost" class="block px-4 py-2 hover:text-blue-800">Travel Plan</a>
+                            </li>
                         </ul>
                     </div>
                 </li>
                 <li>
-                    <a href="#" class="relative flex items-center justify-center hover:text-gray-200"
+                    <a href="#"
+                        class="relative flex items-center justify-center hover:text-blue-800 transition duration-200"
                         id="dropdownToggle">
                         <img src="/images/user-solid.svg" class="h-5 w-5" alt="User Icon">
                     </a>
                     <div id="dropdownMenu"
-                        class="hidden absolute bg-white text-gray-700 border border-gray-200 rounded-md shadow-lg mt-2 w-48 max-w-xs right-0 z-50">
+                        class="hidden absolute bg-white text-gray-800 border border-gray-200 rounded-md shadow-lg mt-2 w-48 max-w-xs top-11 right-0 z-50">
                         <ul class="py-1">
-                            <li><a href="/dashboard" class="block px-4 py-2 hover:bg-gray-100">Profile</a></li>
-                            <li><a href="/logout" class="block px-4 py-2 hover:bg-gray-100">Logout</a></li>
+                            <li><a href="/dashboard" class="block px-4 py-2 hover:text-blue-800">Profile</a></li>
+                            <li><a href="/logout" class="block px-4 py-2 hover:text-blue-800">Logout</a></li>
                         </ul>
                     </div>
                 </li>
@@ -71,17 +80,19 @@
         </div>
 
         <!-- Mobile Dropdown Menu -->
-        <ul class="flex-col space-y-4 bg-blue-600 text-white text-center py-4 hidden md:hidden" id="mobile-dropdown">
-            <li><a href="/" class="block py-2 hover:bg-blue-500">Home</a></li>
-            <li><a href="/information" class="block py-2 hover:bg-blue-500">How it works</a></li>
-            <li><a href="/dashboard" class="block py-2 hover:bg-blue-500">Profile</a></li>
-            <li><a href="/logout" class="block py-2 hover:bg-blue-500">Logout</a></li>
+        <ul class="flex-col space-y-4 bg-teal-50 text-gray-800 text-center font-semibold py-4 hidden md:hidden"
+            id="mobile-dropdown">
+            <li><a href="/" class="block py-2 hover:text-blue-800 transition duration-200">Home</a></li>
+            <li><a href="/information" class="block py-2 hover:text-blue-800 transition duration-200">How it works</a>
+            </li>
+            <li><a href="/dashboard" class="block py-2 hover:text-blue-800 transition duration-200">Profile</a></li>
+            <li><a href="/logout" class="block py-2 hover:text-blue-800 transition duration-200">Logout</a></li>
         </ul>
     </nav>
 
     <script>
         // Mobile Menu Toggle
-        document.getElementById('mobile-menu-toggle').addEventListener('click', function () {
+        document.getElementById('mobile-menu-btn').addEventListener('click', function () {
             const mobileDropdown = document.getElementById('mobile-dropdown');
             mobileDropdown.classList.toggle('hidden');
         });

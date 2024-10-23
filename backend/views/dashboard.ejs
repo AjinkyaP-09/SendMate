@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Dashboard - Sendmate</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="icon" href="/images/favicon.ico" type="image/x-icon">
     <style>
         .notification {
             position: fixed;
@@ -36,9 +37,11 @@
                         <h3 class="text-xl font-semibold text-gray-700 mb-2 md:mb-0">Your Posts</h3>
                         <div class="w-full md:w-auto">
                             <label for="postType" class="sr-only">Select Post Type:</label>
-                            <select id="postType" class="border rounded px-4 py-1 w-full md:w-auto cursor-pointer">
-                                <option value="senderPost">Sender Post</option>
-                                <option value="travellerPost">Traveller Post</option>
+                            <select id="postType" class="border rounded px-4 py-1 w-full md:w-auto cursor-pointer ">
+                                <option class="bg-white text-gray-700 cursor-pointer " value="senderPost">Sender
+                                    Post</option>
+                                <option class="bg-white text-gray-700 cursor-pointer " value="travellerPost">Traveller
+                                    Post</option>
                             </select>
                         </div>
                     </div>
@@ -137,7 +140,7 @@
                 `;
             } else if (postType === "travellerPost") {
                 createPostDiv.innerHTML = `
-                    <a href="/travellerPost" class="inline-block bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded-lg shadow">
+                    <a href="/travellerPost" class="inline-block bg-blue-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded-lg shadow">
                         Create Traveller Post
                     </a>
                 `;

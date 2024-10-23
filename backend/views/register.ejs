@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Register - Sendmate</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="icon" href="/images/favicon.ico" type="image/x-icon">
     <style>
         .toggle-password {
             position: absolute;
@@ -32,113 +33,112 @@
 </head>
 
 <body class="bg-gray-100 min-h-screen flex flex-col">
-    <!-- Include Navbar -->
-    <%- include('partials/nav') %>
 
-        <div class="flex-1 flex items-center justify-center py-10"> <!-- Added padding for more space -->
-            <div class="bg-white shadow-lg rounded-lg p-8 w-full max-w-md overflow-hidden">
-                <!-- Added overflow-hidden -->
-                <img src="/images/sendmate-logo.png" alt="Sendmate Logo" class="w-20 h-20 mb-4 mx-auto">
 
-                <h2 class="text-2xl font-bold text-center text-blue-600 mb-6">Register for Sendmate</h2>
+    <div class="flex-1 flex items-center justify-center py-10"> <!-- Added padding for more space -->
+        <div class="bg-white shadow-lg rounded-lg p-8 w-full max-w-md overflow-hidden">
+            <!-- Added overflow-hidden -->
+            <img src="/images/sendmate-logo.png" alt="Sendmate Logo" class="w-20 h-20 mb-4 mx-auto">
 
-                <% if (typeof error !=='undefined' && error) { %>
-                    <p class="text-red-500 text-center mb-4">
-                        <%= error %>
-                    </p>
-                    <% } %>
+            <h2 class="text-2xl font-bold text-center text-blue-600 mb-6">Register for Sendmate</h2>
 
-                        <!-- Registration Form -->
-                        <form action="/api/auth/register" method="POST" class="space-y-4">
-                            <div>
-                                <label for="username" class="block text-gray-700 font-semibold mb-2">Username:</label>
-                                <input type="text" id="username" name="username" required
-                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring focus:ring-blue-200"
-                                    placeholder="Enter your Full Name">
-                            </div>
+            <% if (typeof error !=='undefined' && error) { %>
+                <p class="text-red-500 text-center mb-4">
+                    <%= error %>
+                </p>
+                <% } %>
 
-                            <div>
-                                <label for="email" class="block text-gray-700 font-semibold mb-2">Email:</label>
-                                <input type="email" id="email" name="email" required
-                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring focus:ring-blue-200"
-                                    placeholder="Enter your email">
-                            </div>
-
-                            <div>
-                                <label for="password" class="block text-gray-700 font-semibold mb-2">Password:</label>
-                                <div class="password-container mb-4">
-                                    <input type="password" id="password" name="password" placeholder="Password" required
-                                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring focus:ring-blue-200">
-                                    <span id="togglePassword" class="toggle-password">
-                                        <img src="/images/eye-slash-solid.svg" class="password-eye" alt="Show Password">
-                                    </span>
-                                </div>
-                            </div>
-
-                            <div>
-                                <label for="confirmPassword" class="block text-gray-700 font-semibold mb-2">Confirm
-                                    Password:</label>
-                                <div class="password-container">
-                                    <input type="password" id="confirmPassword" name="confirmPassword"
-                                        placeholder="Password" required
-                                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring focus:ring-blue-200">
-                                    <span id="togglePassword2" class="toggle-password">
-                                        <img src="/images/eye-slash-solid.svg" class="password-eye" alt="Show Password">
-                                    </span>
-                                </div>
-                            </div>
-
-                            <button type="submit"
-                                class="w-full bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-blue-700 transition duration-200">
-                                Register
-                            </button>
-                        </form>
-
-                        <p class="mt-4 text-center text-gray-600">Already have an account? <a href="/login"
-                                class="text-blue-600 hover:underline">Login here</a>.</p>
-
-                        <!-- Google OAuth Registration Button -->
-                        <div class="text-center mt-4">
-                            <a href="/auth/google"
-                                class="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 transition duration-200 inline-block">
-                                Register with Google
-                            </a>
+                    <!-- Registration Form -->
+                    <form action="/api/auth/register" method="POST" class="space-y-4">
+                        <div>
+                            <label for="username" class="block text-gray-700 font-semibold mb-2">Username:</label>
+                            <input type="text" id="username" name="username" required
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring focus:ring-blue-200"
+                                placeholder="Enter your Full Name">
                         </div>
-            </div>
+
+                        <div>
+                            <label for="email" class="block text-gray-700 font-semibold mb-2">Email:</label>
+                            <input type="email" id="email" name="email" required
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring focus:ring-blue-200"
+                                placeholder="Enter your email">
+                        </div>
+
+                        <div>
+                            <label for="password" class="block text-gray-700 font-semibold mb-2">Password:</label>
+                            <div class="password-container mb-4">
+                                <input type="password" id="password" name="password" placeholder="Password" required
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring focus:ring-blue-200">
+                                <span id="togglePassword" class="toggle-password">
+                                    <img src="/images/eye-slash-solid.svg" class="password-eye" alt="Show Password">
+                                </span>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label for="confirmPassword" class="block text-gray-700 font-semibold mb-2">Confirm
+                                Password:</label>
+                            <div class="password-container">
+                                <input type="password" id="confirmPassword" name="confirmPassword"
+                                    placeholder="Password" required
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring focus:ring-blue-200">
+                                <span id="togglePassword2" class="toggle-password">
+                                    <img src="/images/eye-slash-solid.svg" class="password-eye" alt="Show Password">
+                                </span>
+                            </div>
+                        </div>
+
+                        <button type="submit"
+                            class="w-full bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-blue-700 transition duration-200">
+                            Register
+                        </button>
+                    </form>
+
+                    <p class="mt-4 text-center text-gray-600">Already have an account? <a href="/login"
+                            class="text-blue-600 hover:underline">Login here</a>.</p>
+
+                    <!-- Google OAuth Registration Button -->
+                    <div class="text-center mt-4">
+                        <a href="/auth/google"
+                            class="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 transition duration-200 inline-block">
+                            Register with Google
+                        </a>
+                    </div>
         </div>
+    </div>
 
-        <script src="/javascript/script.js"></script>
-        <script>
-            const togglePassword = document.getElementById('togglePassword');
-            const togglePassword2 = document.getElementById('togglePassword2');
-            const passwordInput = document.getElementById('password');
-            const confirmPassword = document.getElementById('confirmPassword');
+    <script src="/javascript/script.js"></script>
+    <script>
+        const togglePassword = document.getElementById('togglePassword');
+        const togglePassword2 = document.getElementById('togglePassword2');
+        const passwordInput = document.getElementById('password');
+        const confirmPassword = document.getElementById('confirmPassword');
 
-            togglePassword.addEventListener('click', () => {
-                const type = passwordInput.type === 'password' ? 'text' : 'password';
-                passwordInput.type = type;
-                togglePassword.innerHTML = type === 'password' ?
-                    '<img src="/images/eye-slash-solid.svg" class="password-eye" alt="Show Password">' :
-                    '<img src="/images/eye-solid.svg" class="password-eye" alt="Show Password">';
-            });
+        togglePassword.addEventListener('click', () => {
+            const type = passwordInput.type === 'password' ? 'text' : 'password';
+            passwordInput.type = type;
+            togglePassword.innerHTML = type === 'password' ?
+                '<img src="/images/eye-slash-solid.svg" class="password-eye" alt="Show Password">' :
+                '<img src="/images/eye-solid.svg" class="password-eye" alt="Show Password">';
+        });
 
-            togglePassword2.addEventListener('click', () => {
-                const type = confirmPassword.type === 'password' ? 'text' : 'password';
-                confirmPassword.type = type;
-                togglePassword2.innerHTML = type === 'password' ?
-                    '<img src="/images/eye-slash-solid.svg" class="password-eye" alt="Show Password">' :
-                    '<img src="/images/eye-solid.svg" class="password-eye" alt="Show Password">';
-            });
+        togglePassword2.addEventListener('click', () => {
+            const type = confirmPassword.type === 'password' ? 'text' : 'password';
+            confirmPassword.type = type;
+            togglePassword2.innerHTML = type === 'password' ?
+                '<img src="/images/eye-slash-solid.svg" class="password-eye" alt="Show Password">' :
+                '<img src="/images/eye-solid.svg" class="password-eye" alt="Show Password">';
+        });
 
-            // Function to display the error alert if error message is present in the URL
-            window.onload = function () {
-                const urlParams = new URLSearchParams(window.location.search);
-                const errorMessage = urlParams.get("error");
-                if (errorMessage) {
-                    alert(errorMessage); // Display the error message in an alert box
-                }
-            };
-        </script>
+        // Function to display the error alert if error message is present in the URL
+        window.onload = function () {
+            const urlParams = new URLSearchParams(window.location.search);
+            const errorMessage = urlParams.get("error");
+            if (errorMessage) {
+                alert(errorMessage); // Display the error message in an alert box
+            }
+        };
+    </script>
 </body>
 
 </html>
