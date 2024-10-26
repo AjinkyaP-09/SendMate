@@ -24,12 +24,7 @@ const travellerPostSchema = new mongoose.Schema({
   parcelSize: {
     type: String,
     required: true,
-    enum: [
-      "Small (0-5 kg)",
-      "Medium (5-15 kg)",
-      "Large (15-30 kg)",
-      "Extra Large (30+ kg)",
-    ],
+    enum: ["Small", "Medium", "Large", "Extra Large"],
     trim: true,
   },
   busRouteDetails: {

@@ -28,19 +28,21 @@
             <section class="py-12">
                 <div class="container mx-auto max-w-2xl bg-white p-8 rounded-lg shadow-lg"
                     style="max-width: 825px; box-shadow: 0 0 10 rgba(0, 0, 0, 0.1);">
-                    <form id="travelPostForm" action="/submit-travel-post" method="POST" class="space-y-6" novalidate>
+                    <form id="travelEditForm" action="/<%= postType %>/<%= post.id %>?_method=PATCH" method="POST"
+                        class="space-y-6" novalidate>
 
                         <label for="modeOfTravel" class="block font-semibold text-gray-700">Mode of Travel</label>
                         <select id="modeOfTravel" name="modeOfTravel" required
                             class="w-full px-4 py-2 border border-gray-300 rounded-lg" onchange="showTravelDetails()"
                             style="margin-top: 0.7rem">
                             <option value="" disabled selected>Select Mode</option>
-                            <option value="Bus">Bus</option>
-                            <option value="Train">Train</option>
-                            <option value="Airplane">Airplane</option>
-                            <option value="Car">Car</option>
-                            <option value="Bike">Bike</option>
-                            <option value="Other">Other</option>
+                            <option value="Bus" <%=post.modeOfTravel==='Bus' ? 'selected' : '' %>>Bus</option>
+                            <option value="Train" <%=post.modeOfTravel==='Train' ? 'selected' : '' %>>Train</option>
+                            <option value="Airplane" <%=post.modeOfTravel==='Airplane' ? 'selected' : '' %>>Airplane
+                            </option>
+                            <option value="Car" <%=post.modeOfTravel==='Car' ? 'selected' : '' %>>Car</option>
+                            <option value="Bike" <%=post.modeOfTravel==='Bike' ? 'selected' : '' %>>Bike</option>
+                            <option value="Other" <%=post.modeOfTravel==='Other' ? 'selected' : '' %>>Other</option>
                         </select>
                         <div id="modeError" class="text-red-600 hidden">Please select a mode of travel.</div>
 
@@ -50,7 +52,7 @@
                                 Details:</label>
                             <input type="text" id="busRouteDetails" name="busRouteDetails"
                                 class="w-full px-4 py-2 border border-gray-300 rounded-lg"
-                                placeholder="E.g., Bus name, route number, etc.">
+                                placeholder="E.g., Bus name, route number, etc." value="<%= post.busRouteDetails %>">
                             <p id="busRouteError" class="text-red-600 hidden">Please enter bus route details.</p>
                         </div>
 
@@ -59,7 +61,7 @@
                                 Details:</label>
                             <input type="text" id="trainTicketDetails" name="trainTicketDetails"
                                 class="w-full px-4 py-2 border border-gray-300 rounded-lg"
-                                placeholder="E.g., Train name, PNR, etc.">
+                                placeholder="E.g., Train name, PNR, etc." value="<%= post.trainTicketDetails %>">
                             <p id="trainTicketError" class="text-red-600 hidden">Please enter train ticket details.</p>
                         </div>
 
@@ -68,7 +70,8 @@
                                 Details:</label>
                             <input type="text" id="flightDetailsInput" name="flightDetails"
                                 class="w-full px-4 py-2 border border-gray-300 rounded-lg"
-                                placeholder="E.g., Flight number, seat details, etc.">
+                                placeholder="E.g., Flight number, seat details, etc."
+                                value="<%= post.flightDetails %>">
                             <p id="flightDetailsError" class="text-red-600 hidden">Please enter flight details.</p>
                         </div>
 
@@ -76,7 +79,8 @@
                             <label for="carDetailsInput" class="block font-semibold text-gray-700">Car Details:</label>
                             <input type="text" id="carDetailsInput" name="carDetails"
                                 class="w-full px-4 py-2 border border-gray-300 rounded-lg"
-                                placeholder="E.g., Car model, registration number, etc.">
+                                placeholder="E.g., Car model, registration number, etc."
+                                value="<%=post.carDetails%>">
                             <p id="carDetailsError" class="text-red-600 hidden">Please enter car details.</p>
                         </div>
 
@@ -85,7 +89,8 @@
                                 Details:</label>
                             <input type="text" id="bikeDetailsInput" name="bikeDetails"
                                 class="w-full px-4 py-2 border border-gray-300 rounded-lg"
-                                placeholder="E.g., Bike model, registration number, etc.">
+                                placeholder="E.g., Bike model, registration number, etc."
+                                value="<%= post.bikeDetails %>">
                             <p id="bikeDetailsError" class="text-red-600 hidden">Please enter bike details.</p>
                         </div>
 
@@ -94,13 +99,14 @@
                             <div>
                                 <label for="source" class="block font-semibold text-gray-700">Source:</label>
                                 <input type="text" id="source" name="source" required
-                                    class="w-full px-4 border border-gray-300 rounded-lg">
+                                    class="w-full px-4 border border-gray-300 rounded-lg" value="<%= post.source %>">
                                 <p id="sourceError" class="text-red-600 hidden">Please enter a source location.</p>
                             </div>
                             <div>
                                 <label for="destination" class="block font-semibold text-gray-700">Destination:</label>
                                 <input type="text" id="destination" name="destination" required
-                                    class="w-full px-4 border border-gray-300 rounded-lg">
+                                    class="w-full px-4 border border-gray-300 rounded-lg"
+                                    value="<%= post.destination %>">
                                 <p id="destinationError" class="text-red-600 hidden">Please enter a destination
                                     location.</p>
                             </div>
@@ -111,7 +117,8 @@
                             <label for="expectedTime" class="block font-semibold text-gray-700">Expected Time for
                                 Travel:</label>
                             <input type="date" id="expectedTime" name="expectedTime" required
-                                class="w-full px-4 border border-gray-300 rounded-lg">
+                                class="w-full px-4 border border-gray-300 rounded-lg"
+                                value="<%= post.expectedTime ? post.expectedTime.toISOString().split('T')[0] : '' %>">
                             <p id="expectedTimeError" class="text-red-600 hidden">Please select a valid date.</p>
                         </div>
 
@@ -122,10 +129,14 @@
                             <select id="parcelSizeCanCarry" name="parcelSizeCanCarry" required
                                 class="w-full px-4 py-2 border border-gray-300 rounded-lg">
                                 <option value="" disabled selected>Select Size</option>
-                                <option value="Small">Small (0-5 kg)</option>
-                                <option value="Medium">Medium (5-15 kg)</option>
-                                <option value="Large">Large (15-30 kg)</option>
-                                <option value="Extra Large">Extra Large (30+ kg)</option>
+                                <option value="Small" <%=post.parcelSize==='Small' ? 'selected' : '' %>>Small
+                                    (0-5 kg)</option>
+                                <option value="Medium" <%=post.parcelSize==='Medium' ? 'selected' : '' %>>Medium
+                                    (5-15 kg)</option>
+                                <option value="Large" <%=post.parcelSize==='Large' ? 'selected' : '' %>>Large
+                                    (15-30 kg)</option>
+                                <option value="Extra Large" <%=post.parcelSize==='Extra Large' ? 'selected' : '' %>
+                                    >Extra Large (30+ kg)</option>
                             </select>
                             <p id="parcelSizeError" class="text-red-600 hidden">Please select a parcel size.</p>
                         </div>
@@ -136,14 +147,15 @@
                                 (₹):</label>
                             <input type="number" id="expectedAmount" name="expectedAmount" required
                                 class="w-full px-4 border border-gray-300 rounded-lg"
-                                placeholder="Enter your expected amount">
+                                placeholder="Enter your expected amount" value="<%=post.expectedAmount%>">
                             <p id="expectedAmountError" class="text-red-600 hidden">Please enter an expected amount.</p>
                         </div>
 
                         <!-- Agree to Terms and Conditions -->
                         <div>
                             <label class="flex items-center">
-                                <input type="checkbox" id="agreeTerms" name="agreeTerms" required class="mr-2">
+                                <input type="checkbox" id="agreeTerms" name="agreeTerms" required class="mr-2" checked
+                                    disabled>
                                 <a href="#" class="text-blue-600 underline"> I agree to the terms and conditions</a>.
                             </label>
                             <p id="termsError" class="text-red-600 hidden">You must agree to the terms and conditions.
@@ -165,7 +177,7 @@
                         <!-- Submit Button -->
                         <div class="text-center">
                             <button type="submit"
-                                class="bg-blue-600 text-white font-semibold py-2 px-6 rounded-lg hover:bg-blue-700 transition duration-200">Create
+                                class="bg-blue-600 text-white font-semibold py-2 px-6 rounded-lg hover:bg-blue-700 transition duration-200">Edit
                                 Post</button>
                         </div>
 
@@ -208,6 +220,11 @@
                 document.getElementById('bikeDetails').classList.remove('hidden');
             }
         }
+
+        // Call the function on page load to show details for the selected mode
+        window.onload = function () {
+            showTravelDetails(); // Show details according to pre-selected mode
+        };
 
         // Set min date to today for expected time input
         const today = new Date().toISOString().split('T')[0];

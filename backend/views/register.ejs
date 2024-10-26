@@ -138,7 +138,13 @@
                 alert(errorMessage); // Display the error message in an alert box
             }
         };
+        const urlParams = new URLSearchParams(window.location.search);
+        const errorMessage = urlParams.get("error");
+        if (errorMessage) {
+            alert(errorMessage); // Replace with a modern modal for a better UI experience
+        }
     </script>
+
 </body>
 
 </html>

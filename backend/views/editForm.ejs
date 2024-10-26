@@ -31,7 +31,7 @@
         <!-- Main Content -->
         <main class="flex-1 pt-6 pb-12">
             <section class="register-parcel-container mx-auto max-w-4xl bg-white p-8 rounded-lg shadow-lg">
-                <form action="/post/<%= post.id %>?_method=PATCH" method="POST" class="space-y-6"
+                <form action="/<%= postType %>/<%= post.id %>?_method=PATCH" method="POST" class="space-y-6"
                     onsubmit="return validatePaymentRange(event)">
                     <!-- Product Name -->
                     <div>
@@ -116,7 +116,7 @@
 
                     <!-- Expected Time for Delivery -->
                     <div>
-                        <label for="expectedTime" class="block font-semibold text-gray-700">Expected Time for
+                        <label for="expectedTime" class="block font-semibold text-gray-700">Expected Date for
                             Delivery:</label>
                         <input type="date" id="expectedTime" name="expectedTime" required
                             value="<%= post.expectedTime ? post.expectedTime.toISOString().split('T')[0] : '' %>"

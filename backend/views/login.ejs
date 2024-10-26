@@ -76,7 +76,13 @@
                     '<img src="/images/eye-slash-solid.svg" class="w-5 h-5" alt="Show Password">' :
                     '<img src="/images/eye-solid.svg" class="w-5 h-5" alt="Hide Password">';
             });
+            const urlParams = new URLSearchParams(window.location.search);
+            const errorMessage = urlParams.get("error");
+            if (errorMessage) {
+                alert(errorMessage); // Replace with a modern modal for a better UI experience
+            }
         </script>
+
 </body>
 
 </html>

@@ -107,7 +107,7 @@ app.get("/dashboard", async (req, res) => {
     }
 
     const posts = await DeliveryPost.find({ userId: req.session.user.id });
-    console.log(posts);
+    // console.log(posts);
 
     // Render the dashboard and pass both user and posts data
     res.render("dashboard", { user: req.session.user, posts });
@@ -121,16 +121,13 @@ app.get("/dashboard", async (req, res) => {
 app.get("/posts/:type", async (req, res) => {
   try {
     const postType = req.params.type;
-    const userId = req.session.userId;
-    // console.log(req.session);
+    // const userId = req.session.userId;
 
     const username = req.session.user.username;
     let posts;
 
     if (postType === "senderPost") {
       posts = await DeliveryPost.find({ username });
-      // console.log(userId);
-      // console.log(posts);
     } else if (postType === "travellerPost") {
       posts = await TravellerPost.find({ username });
     } else {
@@ -348,7 +345,89 @@ app.get("/MyPosts", (req, res) => {
     });
 });
 
-app.delete("/post/:id", async (req, res) => {
+app.delete("/travellerPost/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const userId = req.session.user.id; // Ensure that user ID is available in session
+
+    // Find the post with the matching user ID and post ID
+    const post = await TravellerPost.findOne({ _id: id, userId: userId });
+
+    if (!post) {
+      return res
+        .status(404)
+        .json({ error: "No post found or permission denied." });
+    }
+
+    // Delete the post
+    await TravellerPost.deleteOne({ _id: id });
+    return res.status(200).send({ message: "Post deleted successfully" });
+  } catch (error) {
+    console.error(`Error deleting post: ${error.message}`);
+    res
+      .status(500)
+      .json({ error: "An error occurred while trying to delete the post." });
+  }
+});
+
+app.get("/travellerPost/:id/editForm", async (req, res) => {
+  const { id } = req.params;
+  // console.log(id);
+
+  try {
+    // Retrieve the post from the database by its ID and make sure it belongs to the logged-in user
+    const post = await TravellerPost.findOne({
+      _id: id,
+      userId: req.session.user.id,
+    });
+    const postType = "travellerPost";
+
+    if (!post) {
+      return res
+        .status(404)
+        .send(
+          "Post not found or you do not have permission to edit this post."
+        );
+    }
+
+    // Render the edit form with the post data
+    res.render("travellerEditForm", { post, postType });
+  } catch (error) {
+    console.error(`Error retrieving post for edit: ${error.message}`);
+    res
+      .status(500)
+      .send("An error occurred while fetching the post for editing.");
+  }
+});
+
+app.patch("/travellerPost/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const updatedData = req.body; // Data from the form
+
+    // Find and update the post
+    const post = await TravellerPost.findOneAndUpdate(
+      { _id: id, userId: req.session.user.id }, // Ensure the post belongs to the logged-in user
+      { $set: updatedData }, // Update the fields with form data
+      { new: true } // Return the updated document
+    );
+
+    if (!post) {
+      return res
+        .status(404)
+        .send(
+          "Post not found or you do not have permission to update this post."
+        );
+    }
+
+    res.redirect("/dashboard"); // Redirect to the dashboard or a confirmation page
+  } catch (error) {
+    console.error(`Error updating post: ${error.message}`);
+    res.status(500).send("An error occurred while updating the post.");
+  }
+});
+
+app.delete("/senderPost/:id", async (req, res) => {
   try {
     const { id } = req.params;
     const userId = req.session.user.id; // Ensure that user ID is available in session
@@ -373,7 +452,7 @@ app.delete("/post/:id", async (req, res) => {
   }
 });
 
-app.get("/post/:id/editForm", async (req, res) => {
+app.get("/senderPost/:id/editForm", async (req, res) => {
   const { id } = req.params;
   // console.log(id);
 
@@ -383,6 +462,7 @@ app.get("/post/:id/editForm", async (req, res) => {
       _id: id,
       userId: req.session.user.id,
     });
+    const postType = "senderPost";
 
     if (!post) {
       return res
@@ -393,7 +473,7 @@ app.get("/post/:id/editForm", async (req, res) => {
     }
 
     // Render the edit form with the post data
-    res.render("editForm", { post });
+    res.render("editForm", { post, postType });
   } catch (error) {
     console.error(`Error retrieving post for edit: ${error.message}`);
     res
@@ -402,7 +482,7 @@ app.get("/post/:id/editForm", async (req, res) => {
   }
 });
 
-app.patch("/post/:id", async (req, res) => {
+app.patch("/senderPost/:id", async (req, res) => {
   try {
     const { id } = req.params;
     const updatedData = req.body; // Data from the form
