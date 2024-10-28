@@ -102,22 +102,21 @@ router.get(
   passport.authenticate("google", { failureRedirect: "/login" }),
   async (req, res) => {
     try {
-      const { displayName, emails } = req.user;
-      const email = emails && emails[0]?.value;
+      const userProfile = req.user.toObject(); // Convert Mongoose document to plain object
+      const { username, email, googleId } = userProfile;
 
       if (!email) {
-        return res.redirect("/login?error=No email found.");
+        console.log("No email found, redirecting to login.");
+        return res.redirect("/login?error=No email found from Google.");
       }
 
       let existingUser = await User.findOne({ email });
-
       if (!existingUser) {
-        existingUser = new User({
-          googleId: req.user.id,
-          username: displayName,
-          email,
-        });
+        existingUser = new User({ googleId, username, email });
         await existingUser.save();
+        console.log("New user created:", existingUser);
+      } else {
+        console.log("Existing user found:", existingUser);
       }
 
       req.session.user = {
@@ -125,6 +124,7 @@ router.get(
         username: existingUser.username,
         email: existingUser.email,
       };
+      console.log("Session user data set:", req.session.user);
 
       res.redirect("/dashboard");
     } catch (error) {
@@ -133,6 +133,7 @@ router.get(
     }
   }
 );
+
 
 // Logout Route
 router.get("/logout", (req, res) => {
