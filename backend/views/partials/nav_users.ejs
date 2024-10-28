@@ -10,7 +10,7 @@
 
 <body>
 
-    <nav class="bg-teal-50 text-emerald-700 shadow-md fixed top-0 left-0 w-full z-50">
+    <nav class="bg-[#d9e6f8] text-emerald-700 shadow-md fixed top-0 left-0 w-full z-50">
         <div class="container mx-auto flex justify-between items-center py-3 px-6">
             <a href="/" class="text-2xl font-bold flex items-center text-gray-800">
                 <img src="/images/sendmate-logo.png" alt="Sendmate Logo" class="h-8 w-8 mr-2">Sendmate
@@ -31,12 +31,14 @@
 
             <!-- Menu Links -->
             <ul class="hidden md:flex space-x-10 text-gray-800 font-bold items-center" id="navbar-links">
-                <li><a href="/" class="hover:text-blue-800 transition duration-200">Home</a></li>
+                <li><a href="/home" class="hover:text-blue-800 transition duration-200">
+                        <img src="/images/home.png" class="h-8 w-8" alt="Help Icon">
+                    </a></li>
                 <li>
                     <a href="#"
                         class="relative flex text-gray-800 items-center justify-center hover:text-blue-800 transition duration-200"
                         id="helpDropdownToggle">
-                        <img src="/images/question-solid.svg" class="h-5 w-5" alt="Help Icon">
+                        <img src="/images/question.png" class="h-8 w-8" alt="Help Icon">
                     </a>
                     <div id="helpDropdownMenu"
                         class="hidden absolute bg-white text-gray-800 border border-gray-200 rounded-md shadow-lg mt-2 w-48 max-w-xs top-11 right-0 z-50">
@@ -50,7 +52,7 @@
                     <a href="#"
                         class="relative flex items-center justify-center hover:text-blue-800 transition duration-200"
                         id="addDropdownToggle">
-                        <img src="/images/plus-solid.svg" class="h-5 w-5" alt="Add Post Icon">
+                        <img src="/images/plus.png" class="h-8 w-8" alt="Add Post Icon">
                     </a>
                     <div id="addDropdownMenu"
                         class="hidden absolute bg-white text-gray-800 border border-gray-200 rounded-md shadow-lg mt-2 w-48 max-w-xs top-11 right-0 z-50">
@@ -66,7 +68,7 @@
                     <a href="#"
                         class="relative flex items-center justify-center hover:text-blue-800 transition duration-200"
                         id="dropdownToggle">
-                        <img src="/images/user-solid.svg" class="h-5 w-5" alt="User Icon">
+                        <img src="/images/user.png" class="h-8 w-8" alt="User Icon">
                     </a>
                     <div id="dropdownMenu"
                         class="hidden absolute bg-white text-gray-800 border border-gray-200 rounded-md shadow-lg mt-2 w-48 max-w-xs top-11 right-0 z-50">
@@ -80,9 +82,9 @@
         </div>
 
         <!-- Mobile Dropdown Menu -->
-        <ul class="flex-col space-y-4 bg-teal-50 text-gray-800 text-center font-semibold py-4 hidden md:hidden"
+        <ul class="flex-col space-y-4 bg-[#d9e6f8] text-gray-800 text-center font-semibold py-4 hidden md:hidden"
             id="mobile-dropdown">
-            <li><a href="/" class="block py-2 hover:text-blue-800 transition duration-200">Home</a></li>
+            <li><a href="/home" class="block py-2 hover:text-blue-800 transition duration-200">Home</a></li>
             <li><a href="/information" class="block py-2 hover:text-blue-800 transition duration-200">How it works</a>
             </li>
             <li><a href="/dashboard" class="block py-2 hover:text-blue-800 transition duration-200">Profile</a></li>

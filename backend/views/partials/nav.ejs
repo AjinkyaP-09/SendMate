@@ -1,72 +1,106 @@
-<nav class="bg-teal-50 shadow-sm fixed top-0 left-0 w-full z-50">
-    <div class="container mx-auto flex justify-between items-center py-3 px-6">
-        <a href="/" class="flex items-center text-xl font-semibold text-gray-800 hover:text-blue-700">
-            <img src="/images/sendmate-logo.png" alt="Sendmate Logo" class="h-8 w-8 mr-2">
-            Sendmate
-        </a>
+<!DOCTYPE html>
+<html lang="en">
 
-        <!-- Mobile Menu Button -->
-        <div class="lg:hidden">
-            <button id="mobile-menu-btn" class="text-gray-800 focus:outline-none">
-                <!-- Hamburger Icon -->
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                    xmlns="http://www.w3.org/2000/svg">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16">
-                    </path>
-                </svg>
-            </button>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sendmate Navbar</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body>
+    <nav class="bg-[#d9e6f8] text-emerald-700 shadow-md fixed top-0 left-0 w-full z-50">
+        <div class="container mx-auto flex justify-between items-center py-3 px-6">
+            <a href="/" class="text-2xl font-bold flex items-center text-gray-800">
+                <img src="/images/sendmate-logo.png" alt="Sendmate Logo" class="h-8 w-8 mr-2">Sendmate
+            </a>
+
+            <!-- Mobile Menu Button -->
+            <div class="lg:hidden">
+                <button id="mobile-menu-btn" class="text-gray-800 focus:outline-none">
+                    <!-- Hamburger Icon -->
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M4 6h16M4 12h16M4 18h16">
+                        </path>
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Links -->
+            <ul id="nav-links" class="hidden lg:flex space-x-8 text-gray-800 font-medium">
+                <li><a href="/home" class="hover:text-blue-800 transition duration-200">
+                        <img src="/images/home.png" class="h-8 w-8" alt="Home Icon">
+                    </a></li>
+                <li>
+                    <a href="#"
+                        class="relative flex text-gray-800 items-center justify-center hover:text-blue-800 transition duration-200"
+                        id="helpDropdownToggle">
+                        <img src="/images/question.png" class="h-8 w-8" alt="Help Icon">
+                    </a>
+                    <div id="helpDropdownMenu"
+                        class="hidden absolute bg-white text-gray-800 border border-gray-200 rounded-md shadow-lg mt-2 w-48 max-w-xs top-11 right-0 z-50">
+                        <ul class="py-1">
+                            <li><a href="/information" class="block px-4 py-2 hover:text-blue-800">How-it-works</a></li>
+                            <li><a href="/contact" class="block px-4 py-2 hover:text-blue-800">Contact</a></li>
+                        </ul>
+                    </div>
+                </li>
+                <li>
+                    <a href="/login"
+                        class="border border-emerald-600 bg-blue-500 text-white py-1.5 px-4 rounded-full hover:bg-emerald-700 hover:text-white transition duration-200 flex items-center justify-center">
+                        Log in
+                    </a>
+                </li>
+                <li>
+                    <a href="/register"
+                        class="border border-emerald-60 bg-blue-500 text-white py-1.5 px-4 rounded-full hover:bg-emerald-600 hover:text-white transition duration-200 flex items-center justify-center">
+                        Sign Up
+                    </a>
+                </li>
+
+            </ul>
         </div>
 
-        <!-- Links -->
-        <ul id="nav-links" class="hidden lg:flex space-x-8 text-gray-800 font-medium">
-            <li><a href="/" class="hover:text-blue-700 transition duration-200">Home</a></li>
-            <li>
-                <a href="#" class="relative flex text-blue-700 items-center justify-center hover:text-gray-200"
-                    id="helpDropdownToggle">
-                    <img src="/images/question-solid.svg" class="h-5 w-5" alt="Help Icon">
-                </a>
-                <div id="helpDropdownMenu"
-                    class="bg-teal-50 hidden absolute text-gray-800 border border-gray-200 rounded-md shadow-lg mt-2 w-48 max-w-xs top-11 right-15 z-50">
-                    <ul class="py-1">
-                        <li><a href="/information" class="block px-4 py-2 hover:text-blue-700">How-it-works</a></li>
-                        <li><a href="/contact" class="block px-4 py-2 hover:text-blue-700">Contact</a></li>
-                    </ul>
-                </div>
-            </li>
-            <li>
-                <a href="/login"
-                    class="border border-emerald-600 bg-emerald-600 text-gray-800 py-2 px-4 rounded-full hover:bg-blue-700 hover:text-white transition duration-200">
-                    Login
-                </a>
-            </li>
-            <li>
-                <a href="/register"
-                    class="border border-emerald-600 text-emerald-600 py-2 px-4 rounded-full hover:bg-yellow-300 hover:text-gray-800 transition duration-200">
-                    Sign Up
-                </a>
-            </li>
-        </ul>
-    </div>
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="hidden lg:hidden bg-teal-50 border-t border-gray-200 mt-2 shadow-lg">
+            <ul class="text-gray-800 font-medium text-center py-4 space-y-4">
+                <li><a href="/home" class="block hover:text-blue-700 transition duration-200">Home</a></li>
+                <li><a href="/information" class="block hover:text-blue-700 transition duration-200">How It Works</a>
+                </li>
+                <li><a href="/contact" class="block hover:text-blue-700 transition duration-200">Contact</a></li>
+                <li><a href="/login" class="block hover:text-blue-700 transition duration-200">Login</a></li>
+                <li><a href="/register" class="block hover:text-blue-700 transition duration-200">Register</a></li>
+            </ul>
+        </div>
 
-    <!-- Mobile Menu -->
-    <div id="mobile-menu" class="hidden lg:hidden bg-teal-50 border-t border-gray-200 mt-2 shadow-lg">
-        <ul class="text-gray-800 font-medium text-center py-4 space-y-4">
-            <li><a href="/" class="block hover:text-blue-700 transition duration-200">Home</a></li>
-            <li><a href="/information" class="block hover:text-blue-700 transition duration-200">How It Works</a></li>
-            <li><a href="/login" class="block hover:text-blue-700 transition duration-200">Login</a></li>
-            <li><a href="/register" class="block hover:text-blue-700 transition duration-200">Register</a></li>
-        </ul>
-    </div>
+        <script>
+            // Toggle mobile menu visibility
+            const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+            const mobileMenu = document.getElementById('mobile-menu');
+            const helpDropdownToggle = document.getElementById('helpDropdownToggle');
+            const helpDropdownMenu = document.getElementById('helpDropdownMenu');
 
-    <script>
-        // Toggle mobile menu visibility
-        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
-        const mobileMenu = document.getElementById('mobile-menu');
-        document.getElementById('helpDropdownToggle').addEventListener('click', function (e) {
-            document.getElementById('helpDropdownMenu').classList.toggle('hidden');
-        });
-        mobileMenuBtn.addEventListener('click', () => {
-            mobileMenu.classList.toggle('hidden');
-        });
-    </script>
-</nav>
+            // Mobile menu toggle
+            mobileMenuBtn.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+            });
+
+            // Help dropdown toggle
+            helpDropdownToggle.addEventListener('click', (e) => {
+                e.stopPropagation();
+                helpDropdownMenu.classList.toggle('hidden');
+            });
+
+            // Close dropdown when clicking outside
+            document.addEventListener('click', () => {
+                if (!helpDropdownMenu.classList.contains('hidden')) {
+                    helpDropdownMenu.classList.add('hidden');
+                }
+            });
+        </script>
+    </nav>
+</body>
+
+</html>
