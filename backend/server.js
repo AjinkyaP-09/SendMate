@@ -89,6 +89,18 @@ app.get("/", (req, res) => {
   res.render("index", { user });
 });
 
+// Route to fetch all sender posts for the traveler's home page
+app.get("/home", async (req, res) => {
+  try {
+    const posts = await DeliveryPost.find(); // Fetch all sender posts from your database
+    console.log(posts);
+    res.render("travellerHomePage", { posts }); // Render 'travellerHome' EJS with posts data
+  } catch (error) {
+    console.error("Error fetching posts:", error);
+    res.status(500).send("Error loading posts");
+  }
+});
+
 // Serve the login page
 app.get("/login", (req, res) => {
   res.render("login");
@@ -130,6 +142,29 @@ app.get("/posts/:type", async (req, res) => {
       posts = await DeliveryPost.find({ username });
     } else if (postType === "travellerPost") {
       posts = await TravellerPost.find({ username });
+    } else {
+      return res.status(400).send("Invalid post type");
+    }
+
+    res.json(posts);
+  } catch (error) {
+    console.error("Error fetching posts:", error);
+    res.status(500).send("Server error");
+  }
+});
+
+app.get("/home/posts/:type", async (req, res) => {
+  try {
+    const postType = req.params.type;
+    // const userId = req.session.userId;
+
+    // const username = req.session.user.username;
+    let posts;
+
+    if (postType === "senderPost") {
+      posts = await DeliveryPost.find();
+    } else if (postType === "travellerPost") {
+      posts = await TravellerPost.find();
     } else {
       return res.status(400).send("Invalid post type");
     }
@@ -506,6 +541,17 @@ app.patch("/senderPost/:id", async (req, res) => {
   } catch (error) {
     console.error(`Error updating post: ${error.message}`);
     res.status(500).send("An error occurred while updating the post.");
+  }
+});
+
+app.get("/post/:postType/:id", async (req, res) => {
+  const { id, postType } = req.params;
+  if (postType === "senderPost") {
+    const post = await DeliveryPost.find({ id });
+    res.render('viewPost.ejs', {post});
+  } else {
+    const post = await TravellerPost.find({ id });
+    res.render('viewPost.ejs', {post});
   }
 });
 

@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="/styles.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #d9e6f8;
+            padding: 10px 20px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+        }
+
+        .logo img {
+            width: 40px;
+            margin-right: 10px;
+        }
+
+        .logo span {
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .search-bar {
+            justify-content: space-evenly;
+        }
+
+        .search-bar input {
+            padding: 5px;
+            font-size: 16px;
+            width: 300px;
+            border-radius: 50px;
+            border-width: 0.cap;
+            border-color: rgb(62, 197, 193);
+        }
+
+        .search-bar button {
+            padding: 5px;
+            background-color: #ffffff;
+            /* border: none; */
+            cursor: pointer;
+            border-radius: 50%;
+            border-color: rgb(62, 197, 193);
+        }
+
+        .user-icons img {
+            width: 30px;
+            margin-left: 15px;
+
+        }
+
+        .filter-section {
+            display: flex;
+            justify-content: center;
+            padding: 20px;
+            background-color: #eaf3ff;
+        }
+
+        .filter-section input {
+            padding: 10px;
+            margin: 0 10px;
+            width: 250px;
+            border-width: 0.cap;
+            border-radius: 50px;
+            border-color: rgb(62, 197, 193);
+        }
+
+        .filter-section button {
+            padding: 10px 20px;
+            background-color: #6699cc;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            border-radius: 15px;
+        }
+
+        .item-list {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 20px;
+        }
+
+        #postsContainer {
+            margin-inline: 100px;
+            margin-top: 10px;
+        }
+
+        .item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #fff;
+            padding: 20px;
+            margin-bottom: 10px;
+            width: 70%;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .item-details {
+            flex: 1;
+        }
+
+        .item-price {
+            font-size: 24px;
+            color: #333;
+            font-weight: bold;
+        }
+
+        .item-desc {
+            margin-top: 10px;
+            color: #777;
+        }
+
+        .item-image img {
+            width: 100px;
+            height: 100px;
+        }
+
+        footer {
+            width: 100vw;
+        }
+    </style>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body>
+    <div class="wrapper">
+        <header class="header">
+            <div class="logo">
+                <img src="/images/sendmate-logo.png" alt="SendMate Logo">
+                <span>SendMate</span>
+            </div>
+            <div class="search-bar">
+                <input type="text" placeholder="Search">
+                <button aria-label="Search">🔍</button>
+            </div>
+            <div class="user-icons" style="display: flex; flex-direction: row;">
+                <img src="/images/bookmark-white.png" alt="Bookmarks" aria-label="Bookmarks">
+                <img src="/images/user.png" alt="User Profile" aria-label="User Profile">
+                <img src="/images/notification.png" alt="Notifications" aria-label="Notifications">
+            </div>
+        </header>
+        <main>
+            <div class="container mx-auto text-center bg-white p-8 rounded-lg shadow-lg max-w-5xl w-full">
+                <h2>Name</h2>
+            </div>
+        </main>
+        <footer>
+            <%- include('partials/footer') %>
+        </footer>
+    </div>
+</body>
+
+</html>

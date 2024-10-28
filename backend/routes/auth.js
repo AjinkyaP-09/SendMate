@@ -81,7 +81,7 @@ router.post("/login", async (req, res) => {
         username: user.username,
         email: user.email,
       };
-      res.redirect("/dashboard");
+      res.redirect("/home");
     } else {
       return res.redirect("/login?error=Invalid email or password");
     }

@@ -22,6 +22,8 @@ router.post('/posts', async (req, res) => {
 });
 
 
+
+
 // Get Posts
 router.get('/', async (req, res) => {
     try {

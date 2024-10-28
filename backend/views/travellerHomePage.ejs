@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SendMate</title>
+    <link rel="stylesheet" href="/styles.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #d9e6f8;
+            padding: 10px 20px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+        }
+
+        .logo img {
+            width: 40px;
+            margin-right: 10px;
+        }
+
+        .logo span {
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .search-bar {
+            justify-content: space-evenly;
+        }
+
+        .search-bar input {
+            padding: 5px;
+            font-size: 16px;
+            width: 300px;
+            border-radius: 50px;
+            border-width: 0.cap;
+            border-color: rgb(62, 197, 193);
+        }
+
+        .search-bar button {
+            padding: 5px;
+            background-color: #ffffff;
+            /* border: none; */
+            cursor: pointer;
+            border-radius: 50%;
+            border-color: rgb(62, 197, 193);
+        }
+
+        .user-icons img {
+            width: 30px;
+            margin-left: 15px;
+
+        }
+
+        .filter-section {
+            display: flex;
+            justify-content: center;
+            padding: 20px;
+            background-color: #eaf3ff;
+        }
+
+        .filter-section input {
+            padding: 10px;
+            margin: 0 10px;
+            width: 250px;
+            border-width: 0.cap;
+            border-radius: 50px;
+            border-color: rgb(62, 197, 193);
+        }
+
+        .filter-section button {
+            padding: 10px 20px;
+            background-color: #6699cc;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            border-radius: 15px;
+        }
+
+        .item-list {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 20px;
+        }
+
+        #postsContainer {
+            margin-inline: 100px;
+            margin-top: 10px;
+        }
+
+        .item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #fff;
+            padding: 20px;
+            margin-bottom: 10px;
+            width: 70%;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .item-details {
+            flex: 1;
+        }
+
+        .item-price {
+            font-size: 24px;
+            color: #333;
+            font-weight: bold;
+        }
+
+        .item-desc {
+            margin-top: 10px;
+            color: #777;
+        }
+
+        .item-image img {
+            width: 100px;
+            height: 100px;
+        }
+
+        footer {
+            width: 100vw;
+        }
+    </style>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body>
+    <header class="header">
+        <div class="logo">
+            <img src="/images/sendmate-logo.png" alt="SendMate Logo">
+            <span>SendMate</span>
+        </div>
+        <div class="search-bar">
+            <input type="text" placeholder="Search">
+            <button aria-label="Search">🔍</button>
+        </div>
+        <div class="user-icons" style="display: flex; flex-direction: row;">
+            <img src="/images/bookmark-white.png" alt="Bookmarks" aria-label="Bookmarks">
+            <img src="/images/user.png" alt="User Profile" aria-label="User Profile">
+            <img src="/images/notification.png" alt="Notifications" aria-label="Notifications">
+        </div>
+    </header>
+
+    <main style="margin-top: 0;">
+        <div class="filter-section">
+            <input type="text" placeholder="Choose starting point, or click on the map...">
+            <input type="text" placeholder="Choose destination...">
+            <div>
+                <button>Search</button>
+                <button class="filter-button">Filter</button>
+            </div>
+            <div>
+                <label for="postType" class="sr-only">Select Post Type:</label>
+                <select id="postType" class="border rounded px-4 py-1 w-full md:w-auto cursor-pointer ">
+                    <option class="bg-white text-gray-700 cursor-pointer " value="senderPost">Sender
+                        Post</option>
+                    <option class="bg-white text-gray-700 cursor-pointer " value="travellerPost">Traveller
+                        Post</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Dynamic Posts Container -->
+        <div id="postsContainer" class="space-y-4">
+            <!-- Posts will be loaded here -->
+        </div>
+
+        </div>
+    </main>
+
+    <footer>
+        <%- include('partials/footer') %>
+    </footer>
+    <script>
+        function initialLoad() {
+            const postTypeSelect = document.getElementById("postType");
+            const defaultPostType = postTypeSelect.value;
+            loadPosts(defaultPostType);
+        }
+
+        window.onload = initialLoad;
+
+        function loadPosts(postType) {
+            fetch(`/home/posts/${postType}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok ' + response.statusText);
+                    }
+                    return response.json();
+                })
+                .then(posts => {
+                    displayPosts(posts, postType);
+                })
+                .catch(error => console.error('Error loading posts:', error));
+        }
+
+        document.getElementById("postType").addEventListener("change", function () {
+            const selectedType = this.value;
+            loadPosts(selectedType);
+        });
+
+        function displayPosts(posts, postType) {
+            const postsContainer = document.getElementById('postsContainer');
+            postsContainer.innerHTML = '';
+
+            if (posts && posts.length > 0) {
+                const postList = document.createElement('ul');
+                postList.classList.add('space-y-4');
+
+                posts.forEach(post => {
+                    const formattedDate = new Date(post.expectedTime).toLocaleDateString('en-US', {
+                        weekday: 'long',
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric',
+                    });
+
+                    const postItem = document.createElement('li');
+                    postItem.classList.add('bg-gray-50', 'p-6', 'rounded-lg', 'shadow', 'flex', 'flex-col', 'md:flex-row', 'justify-between', 'items-center');
+
+                    postItem.innerHTML = `
+                    <a href="/post/${postType}/${post._id}" style="width:90%;">
+                        <div class="md:flex-1 md:mr-4" >
+                            <div style="display:flex; justify-content: space-between;">
+                                <h4 class="text-lg font-semibold text-gray-800 mb-2"><b>${postType === 'senderPost' ? 'Name:' : 'Mode of Travel:'}
+             </b > ${post.productName || post.modeOfTravel}</h4 >
+                <p class="text-gray-600"><b> ${post.paymentMin || post.parcelSize} - ${post.paymentMax || post.expectedAmount} </b></p>
+                            </div >
+                            <p class="text-gray-600"><b>From: </b>${post.source || post.startLocation}</p>
+                            <p class="text-gray-600"><b>To: </b>${post.destination || post.endLocation}</p>
+                            <p class="text-gray-600"><b>Expected Date: </b>${formattedDate || 'Not Available'}</p>
+                        </div >
+                    </a >
+                    `;
+                    postList.appendChild(postItem);
+                });
+
+                postsContainer.appendChild(postList);
+            } else {
+                postsContainer.innerHTML = `< p class= "text-gray-600" > You haven't created any posts yet.</p>`;
+            }
+
+            const createPostDiv = document.createElement('div');
+            createPostDiv.classList.add('mt-6');
+
+            if (postType === "senderPost") {
+                createPostDiv.innerHTML = `
+                    <a href="/register-parcel" class="inline-block bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg shadow">
+                        Create Sender Post
+                    </a>
+                `;
+            } else if (postType === "travellerPost") {
+                createPostDiv.innerHTML = `
+                    <a href="/travellerPost" class="inline-block bg-blue-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded-lg shadow">
+                        Create Traveller Post
+                    </a>
+                `;
+            }
+
+            postsContainer.appendChild(createPostDiv);
+        }
+    </script>
+</body>
+
+</html>
