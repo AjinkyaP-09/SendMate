@@ -126,7 +126,7 @@ router.get(
       };
       console.log("Session user data set:", req.session.user);
 
-      res.redirect("/dashboard");
+      res.redirect("/home");
     } catch (error) {
       console.error("Error during Google login callback:", error);
       res.redirect("/login?error=Google login failed. Please try again.");
@@ -140,7 +140,7 @@ router.get("/logout", (req, res) => {
   req.session.destroy((err) => {
     if (err) {
       console.error("Logout error:", err);
-      return res.redirect("/dashboard");
+      return res.redirect("/home");
     }
     res.redirect("/");
   });
