@@ -28,17 +28,21 @@
                 </button>
             </div>
 
-            <!-- Links -->
-            <ul id="nav-links" class="hidden lg:flex space-x-8 text-gray-800 font-medium">
-                <li><a href="/home" class="hover:text-blue-800 transition duration-200">
+            <!-- Links (Desktop and Mobile) -->
+            <ul id="nav-links" class="hidden lg:flex space-x-8 text-gray-800 font-medium lg:flex-row lg:space-x-6">
+                <li>
+                    <a href="<%= user ? '/home' : '/login' %>"
+                        class="relative flex text-gray-800 items-center justify-center hover:text-blue-800 transition duration-200 mt-1">
                         <img src="/images/home.png" class="h-8 w-8" alt="Home Icon">
-                    </a></li>
+                    </a>
+                </li>
                 <li>
                     <a href="#"
-                        class="relative flex text-gray-800 items-center justify-center hover:text-blue-800 transition duration-200"
+                        class="relative flex text-gray-800 items-center justify-center hover:text-blue-800 transition duration-200 mt-1"
                         id="helpDropdownToggle">
                         <img src="/images/question.png" class="h-8 w-8" alt="Help Icon">
                     </a>
+
                     <div id="helpDropdownMenu"
                         class="hidden absolute bg-white text-gray-800 border border-gray-200 rounded-md shadow-lg mt-2 w-48 max-w-xs top-11 right-0 z-50">
                         <ul class="py-1">
@@ -59,14 +63,15 @@
                         Sign Up
                     </a>
                 </li>
-
             </ul>
         </div>
 
-        <!-- Mobile Menu -->
-        <div id="mobile-menu" class="hidden lg:hidden bg-teal-50 border-t border-gray-200 mt-2 shadow-lg">
-            <ul class="text-gray-800 font-medium text-center py-4 space-y-4">
-                <li><a href="/home" class="block hover:text-blue-700 transition duration-200">Home</a></li>
+        <!-- Mobile Menu (Toggle visibility on small screens) -->
+        <div id="mobile-menu"
+            class="lg:hidden flex-col bg-[#d9e6f8] text-gray-800 text-center font-semibold py-4 hidden">
+            <ul class="text-gray-800 font-medium text-center py-2 space-y-4">
+                <li><a href="<%= user ? '/home' : '/login' %>"
+                        class="block hover:text-blue-700 transition duration-200">Home</a></li>
                 <li><a href="/information" class="block hover:text-blue-700 transition duration-200">How It Works</a>
                 </li>
                 <li><a href="/contact" class="block hover:text-blue-700 transition duration-200">Contact</a></li>

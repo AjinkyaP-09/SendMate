@@ -5,193 +5,65 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SendMate</title>
-    <link rel="stylesheet" href="/styles.css">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f5f5f5;
-        }
-
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background-color: #d9e6f8;
-            padding: 10px 20px;
-        }
-
-        .logo {
-            display: flex;
-            align-items: center;
-        }
-
-        .logo img {
-            width: 40px;
-            margin-right: 10px;
-        }
-
-        .logo span {
-            font-size: 24px;
-            font-weight: bold;
-        }
-
-        .search-bar {
-            justify-content: space-evenly;
-        }
-
-        .search-bar input {
-            padding: 5px;
-            font-size: 16px;
-            width: 300px;
-            border-radius: 50px;
-            border-width: 0.cap;
-            border-color: rgb(62, 197, 193);
-        }
-
-        .search-bar button {
-            padding: 5px;
-            background-color: #ffffff;
-            /* border: none; */
-            cursor: pointer;
-            border-radius: 50%;
-            border-color: rgb(62, 197, 193);
-        }
-
-        .user-icons img {
-            width: 30px;
-            margin-left: 15px;
-
-        }
-
-        .filter-section {
-            display: flex;
-            justify-content: center;
-            padding: 20px;
-            background-color: #eaf3ff;
-        }
-
-        .filter-section input {
-            padding: 10px;
-            margin: 0 10px;
-            width: 250px;
-            border-width: 0.cap;
-            border-radius: 50px;
-            border-color: rgb(62, 197, 193);
-        }
-
-        .filter-section button {
-            padding: 10px 20px;
-            background-color: #6699cc;
-            color: #fff;
-            border: none;
-            cursor: pointer;
-            border-radius: 15px;
-        }
-
-        .item-list {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            margin-top: 20px;
-        }
-
-        #postsContainer {
-            margin-inline: 100px;
-            margin-top: 10px;
-        }
-
-        .item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background-color: #fff;
-            padding: 20px;
-            margin-bottom: 10px;
-            width: 70%;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-        }
-
-        .item-details {
-            flex: 1;
-        }
-
-        .item-price {
-            font-size: 24px;
-            color: #333;
-            font-weight: bold;
-        }
-
-        .item-desc {
-            margin-top: 10px;
-            color: #777;
-        }
-
-        .item-image img {
-            width: 100px;
-            height: 100px;
-        }
-
-        footer {
-            width: 100vw;
-        }
-    </style>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 
-<body>
-    <header class="header">
-        <div class="logo">
-            <img src="/images/sendmate-logo.png" alt="SendMate Logo">
-            <span>SendMate</span>
-        </div>
-        <div class="search-bar">
-            <input type="text" placeholder="Search">
-            <button aria-label="Search">🔍</button>
-        </div>
-        <div class="user-icons" style="display: flex; flex-direction: row;">
-            <img src="/images/bookmark-white.png" alt="Bookmarks" aria-label="Bookmarks">
-            <img src="/images/user.png" alt="User Profile" aria-label="User Profile">
-            <img src="/images/notification.png" alt="Notifications" aria-label="Notifications">
-        </div>
+<body class="bg-gray-100 font-sans">
+    <!-- Fixed Header to stay on top of the page -->
+    <header class="bg-white shadow fixed top-0 w-full z-10">
+        <% if (!user) { %>
+            <%- include('partials/nav') %> <!-- Nav for guests -->
+                <% } else { %>
+                    <%- include('partials/nav_users') %> <!-- Nav for logged-in users -->
+                        <% } %>
     </header>
 
-    <main style="margin-top: 0;">
-        <div class="filter-section">
-            <input type="text" placeholder="Choose starting point, or click on the map...">
-            <input type="text" placeholder="Choose destination...">
-            <div>
-                <button>Search</button>
-                <button class="filter-button">Filter</button>
+    <!-- Main section with top padding to prevent overlap with the fixed header -->
+    <main class="pt-16 sm:pt-16 lg:pt-16">
+        <!-- Search bar and filter buttons with responsive design -->
+        <div class="flex flex-wrap justify-center py-6 bg-blue-100">
+            <input type="text" id="sourceInput" placeholder="Choose starting point, or click on the map..."
+                class="px-4 py-2 mx-2 w-full sm:w-64 rounded-full border border-teal-500 focus:outline-none">
+            <input type="text" id="destinationInput" placeholder="Choose destination..."
+                class="px-4 py-2 mx-2 w-full sm:w-64 rounded-full border border-teal-500 focus:outline-none">
+            <button id="searchButton"
+                class="bg-blue-500 text-white font-semibold py-2 px-4 rounded-md shadow hover:bg-blue-600 mx-2 mt-2 sm:mt-0">
+                Search
+            </button>
+            <button id="filterButton"
+                class="bg-blue-500 text-white font-semibold py-2 px-4 rounded-md shadow hover:bg-blue-600 mx-2 mt-2 sm:mt-0">
+                Filter
+            </button>
+        </div>
+
+        <!-- Sidebar Filter Panel with transition effect for mobile -->
+        <div id="filterSidebar"
+            class="fixed top-0 right-0 w-80 h-full bg-white shadow-lg transform translate-x-full transition-transform duration-300 ease-in-out z-50">
+            <div class="flex justify-between items-center px-4 py-4 border-b">
+                <h2 class="text-lg font-semibold">Filter Options</h2>
+                <button id="closeSidebar" class="text-gray-500 hover:text-gray-800">&times;</button>
             </div>
-            <div>
-                <label for="postType" class="sr-only">Select Post Type:</label>
-                <select id="postType" class="border rounded px-4 py-1 w-full md:w-auto cursor-pointer ">
-                    <option class="bg-white text-gray-700 cursor-pointer " value="senderPost">Sender
-                        Post</option>
-                    <option class="bg-white text-gray-700 cursor-pointer " value="travellerPost">Traveller
-                        Post</option>
+            <div class="px-4 py-6">
+                <label for="postType" class="block text-gray-700 mb-2">Select Post Type:</label>
+                <select id="postType" class="border rounded px-4 py-2 w-full cursor-pointer">
+                    <option value="senderPost">Sender Post</option>
+                    <option value="travellerPost">Traveller Post</option>
                 </select>
             </div>
         </div>
 
         <!-- Dynamic Posts Container -->
-        <div id="postsContainer" class="space-y-4">
-            <!-- Posts will be loaded here -->
-        </div>
-
+        <div id="postsContainer" class="space-y-4 mx-4 sm:mx-12 md:mx-24 mt-4">
+            <!-- Posts will be dynamically loaded here -->
         </div>
     </main>
 
-    <footer>
+    <!-- Footer -->
+    <footer class="bg-white mt-8 py-4 shadow">
         <%- include('partials/footer') %>
     </footer>
+
+    <!-- JavaScript functionality for loading and displaying posts -->
     <script>
         function initialLoad() {
             const postTypeSelect = document.getElementById("postType");
@@ -241,24 +113,24 @@
 
                     postItem.innerHTML = `
                     <a href="/post/${postType}/${post._id}" style="width:90%;">
-                        <div class="md:flex-1 md:mr-4" >
-                            <div style="display:flex; justify-content: space-between;">
+                        <div class="md:flex-1 md:mr-4">
+                            <div class="flex justify-between">
                                 <h4 class="text-lg font-semibold text-gray-800 mb-2"><b>${postType === 'senderPost' ? 'Name:' : 'Mode of Travel:'}
-             </b > ${post.productName || post.modeOfTravel}</h4 >
-                <p class="text-gray-600"><b> ${post.paymentMin || post.parcelSize} - ${post.paymentMax || post.expectedAmount} </b></p>
-                            </div >
+                                </b> ${post.productName || post.modeOfTravel}</h4>
+                                <p class="text-gray-600"><b> ${post.paymentMin || post.parcelSize} - ${post.paymentMax || post.expectedAmount} </b></p>
+                            </div>
                             <p class="text-gray-600"><b>From: </b>${post.source || post.startLocation}</p>
                             <p class="text-gray-600"><b>To: </b>${post.destination || post.endLocation}</p>
                             <p class="text-gray-600"><b>Expected Date: </b>${formattedDate || 'Not Available'}</p>
-                        </div >
-                    </a >
+                        </div>
+                    </a>
                     `;
                     postList.appendChild(postItem);
                 });
 
                 postsContainer.appendChild(postList);
             } else {
-                postsContainer.innerHTML = `< p class= "text-gray-600" > You haven't created any posts yet.</p>`;
+                postsContainer.innerHTML = `<p class="text-gray-600">You haven't created any posts yet.</p>`;
             }
 
             const createPostDiv = document.createElement('div');
@@ -280,6 +152,16 @@
 
             postsContainer.appendChild(createPostDiv);
         }
+
+        document.getElementById("filterButton").addEventListener("click", function () {
+            const sidebar = document.getElementById("filterSidebar");
+            sidebar.classList.toggle("translate-x-full");
+        });
+
+        document.getElementById("closeSidebar").addEventListener("click", function () {
+            const sidebar = document.getElementById("filterSidebar");
+            sidebar.classList.add("translate-x-full");
+        });
     </script>
 </body>
 
