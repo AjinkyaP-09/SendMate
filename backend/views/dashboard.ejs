@@ -161,36 +161,26 @@
                             alert("Post deleted successfully!");
                             const postItem = btnElement.closest('li');
                             postItem.remove();
-                            showNotification("Post deleted successfully.", "success");
+                            // showNotification();
                         } else {
-                            alert("Failed to delete post. Please try again.");
+                            // showNotification();
                         }
                     })
                     .catch(error => {
                         console.error("Error deleting post:", error);
-                        alert("An error occurred. Please try again later.");
+                        // showNotification();
                     });
             } else {
                 alert("Deletion cancelled.");
             }
         }
 
-        // function showNotification(message, type) {
-        //     const notificationDiv = document.createElement('div');
-        //     notificationDiv.classList.add('notification', type === 'success' ? 'bg-green-500' : 'bg-red-500');
-        //     notificationDiv.textContent = message;
-
-        //     document.body.prepend(notificationDiv);
-
-        //     setTimeout(() => {
-        //         notificationDiv.remove();
-        //     }, 3000);
-        // }
         const urlParams = new URLSearchParams(window.location.search);
-            const errorMessage = urlParams.get("error");
-            if (errorMessage) {
-                alert(errorMessage); // Replace with a modern modal for a better UI experience
-            }
+        const errorMessage = urlParams.get("error");
+        if (errorMessage) {
+            alert(errorMessage); // Replace with a modern modal for a better UI experience
+
+        }
     </script>
 </body>
 

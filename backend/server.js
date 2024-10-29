@@ -93,7 +93,7 @@ app.get("/", (req, res) => {
 app.get("/home", async (req, res) => {
   try {
     const posts = await DeliveryPost.find(); // Fetch all sender posts from your database
-    console.log(posts);
+    // console.log(posts);
     res.render("travellerHomePage", { posts }); // Render 'travellerHome' EJS with posts data
   } catch (error) {
     console.error("Error fetching posts:", error);
@@ -403,6 +403,8 @@ app.delete("/travellerPost/:id", async (req, res) => {
       .redirect("/dashboard?error=Post deleted successfully" );
   } catch (error) {
     console.error(`Error deleting post: ${error.message}`);
+    console.log(error+ '   '  + error.message);
+    
     res
       .status(500)
       .redirect("/dashboard?error=An error occurred while trying to delete the post." );
@@ -489,6 +491,7 @@ app.delete("/senderPost/:id", async (req, res) => {
     return res.status(200).redirect("/dashboard?error=Post deleted successfully" );
   } catch (error) {
     console.error(`Error deleting post: ${error.message}`);
+    console.log(error + "   " + error.message);
     res
       .status(500)
       .redirect("/dashboard?error=An error occurred while trying to delete the post." );
