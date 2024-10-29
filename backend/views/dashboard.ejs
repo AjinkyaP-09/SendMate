@@ -175,17 +175,22 @@
             }
         }
 
-        function showNotification(message, type) {
-            const notificationDiv = document.createElement('div');
-            notificationDiv.classList.add('notification', type === 'success' ? 'bg-green-500' : 'bg-red-500');
-            notificationDiv.textContent = message;
+        // function showNotification(message, type) {
+        //     const notificationDiv = document.createElement('div');
+        //     notificationDiv.classList.add('notification', type === 'success' ? 'bg-green-500' : 'bg-red-500');
+        //     notificationDiv.textContent = message;
 
-            document.body.prepend(notificationDiv);
+        //     document.body.prepend(notificationDiv);
 
-            setTimeout(() => {
-                notificationDiv.remove();
-            }, 3000);
-        }
+        //     setTimeout(() => {
+        //         notificationDiv.remove();
+        //     }, 3000);
+        // }
+        const urlParams = new URLSearchParams(window.location.search);
+            const errorMessage = urlParams.get("error");
+            if (errorMessage) {
+                alert(errorMessage); // Replace with a modern modal for a better UI experience
+            }
     </script>
 </body>
 

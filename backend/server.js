@@ -364,7 +364,9 @@ app.post("/sender-post", async (req, res) => {
     await newPost.save();
     res.status(200).redirect("/dashboard");
   } catch (error) {
-    res.status(500).send("Error creating post: " + error.message);
+    res
+      .status(500)
+      .redirect("/dashboard?error=Error creating post");
   }
 });
 
@@ -376,7 +378,7 @@ app.get("/MyPosts", (req, res) => {
     })
     .catch((err) => {
       console.error(err);
-      res.status(500).send("Error retrieving posts");
+      res.status(500).redirect("/dashboard?error=Error retrieving posts");
     });
 });
 
@@ -391,17 +393,19 @@ app.delete("/travellerPost/:id", async (req, res) => {
     if (!post) {
       return res
         .status(404)
-        .json({ error: "No post found or permission denied." });
+        .redirect( "/dashboard?error=No post found or permission denied." );
     }
 
     // Delete the post
     await TravellerPost.deleteOne({ _id: id });
-    return res.status(200).send({ message: "Post deleted successfully" });
+    return res
+      .status(200)
+      .redirect("/dashboard?error=Post deleted successfully" );
   } catch (error) {
     console.error(`Error deleting post: ${error.message}`);
     res
       .status(500)
-      .json({ error: "An error occurred while trying to delete the post." });
+      .redirect("/dashboard?error=An error occurred while trying to delete the post." );
   }
 });
 
@@ -420,8 +424,8 @@ app.get("/travellerPost/:id/editForm", async (req, res) => {
     if (!post) {
       return res
         .status(404)
-        .send(
-          "Post not found or you do not have permission to edit this post."
+        .redirect(
+          "/dashboard?error=Post not found or you do not have permission to edit this post."
         );
     }
 
@@ -431,7 +435,9 @@ app.get("/travellerPost/:id/editForm", async (req, res) => {
     console.error(`Error retrieving post for edit: ${error.message}`);
     res
       .status(500)
-      .send("An error occurred while fetching the post for editing.");
+      .redirect(
+        "/dashboard?error=An error occurred while fetching the post for editing."
+      );
   }
 });
 
@@ -450,15 +456,17 @@ app.patch("/travellerPost/:id", async (req, res) => {
     if (!post) {
       return res
         .status(404)
-        .send(
-          "Post not found or you do not have permission to update this post."
+        .redirect(
+          "/dashboard?error=Post not found or you do not have permission to update this post."
         );
     }
 
     res.redirect("/dashboard"); // Redirect to the dashboard or a confirmation page
   } catch (error) {
     console.error(`Error updating post: ${error.message}`);
-    res.status(500).send("An error occurred while updating the post.");
+    res
+      .status(500)
+      .redirect("/dashboard?error=An error occurred while updating the post.");
   }
 });
 
@@ -473,17 +481,17 @@ app.delete("/senderPost/:id", async (req, res) => {
     if (!post) {
       return res
         .status(404)
-        .json({ error: "No post found or permission denied." });
+        .redirect("/dashboard?error=No post found or permission denied." );
     }
 
     // Delete the post
     await DeliveryPost.deleteOne({ _id: id });
-    return res.status(200).json({ message: "Post deleted successfully" });
+    return res.status(200).redirect("/dashboard?error=Post deleted successfully" );
   } catch (error) {
     console.error(`Error deleting post: ${error.message}`);
     res
       .status(500)
-      .json({ error: "An error occurred while trying to delete the post." });
+      .redirect("/dashboard?error=An error occurred while trying to delete the post." );
   }
 });
 
@@ -502,8 +510,8 @@ app.get("/senderPost/:id/editForm", async (req, res) => {
     if (!post) {
       return res
         .status(404)
-        .send(
-          "Post not found or you do not have permission to edit this post."
+        .redirect(
+          "/dashboard?error=Post not found or you do not have permission to edit this post."
         );
     }
 
@@ -513,7 +521,7 @@ app.get("/senderPost/:id/editForm", async (req, res) => {
     console.error(`Error retrieving post for edit: ${error.message}`);
     res
       .status(500)
-      .send("An error occurred while fetching the post for editing.");
+      .redirect("/dashboard?error=An error occurred while fetching the post for editing.");
   }
 });
 
@@ -532,15 +540,15 @@ app.patch("/senderPost/:id", async (req, res) => {
     if (!post) {
       return res
         .status(404)
-        .send(
-          "Post not found or you do not have permission to update this post."
+        .redirect(
+          "/dashboard?error=Post not found or you do not have permission to update this post."
         );
     }
 
-    res.redirect("/dashboard"); // Redirect to the dashboard or a confirmation page
+    res.redirect("/dashboard?error= Post Updated Sucessfully"); // Redirect to the dashboard or a confirmation page
   } catch (error) {
     console.error(`Error updating post: ${error.message}`);
-    res.status(500).send("An error occurred while updating the post.");
+    res.status(500).redirect("/dashboard?error=An error occurred while updating the post.");
   }
 });
 
