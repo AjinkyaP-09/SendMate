@@ -8,9 +8,7 @@ const postSchema = new mongoose.Schema({
     description: { type: String },
     status: { type: String, default: 'active' },
     createdAt: { type: Date, default: Date.now },
-    imageUrl: {
-        type: String
-    }
+    
     
 });
 

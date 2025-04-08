@@ -30,7 +30,9 @@
         <!-- Main Content -->
         <main class="flex-1 pt-6 pb-12">
             <section class="register-parcel-container mx-auto max-w-3xl bg-white p-8 rounded-lg shadow-lg">
-                <form id="deliveryPostForm" action="/sender-post" method="POST" class="space-y-6" novalidate
+                <form id="deliveryPostForm" action="/sender-post" method="POST" class="space-y-6" novalidate <form
+                    action="/posts/create" method="POST" enctype="multipart/form-data">
+
                     onsubmit="return validatePaymentRange(event)">
                     <!-- Product Name -->
                     <div>

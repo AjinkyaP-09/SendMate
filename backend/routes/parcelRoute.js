@@ -1,6 +1,7 @@
 const express = require("express");
 const Parcel = require("../models/Parcel"); // Make sure this points to your Parcel model
 const router = express.Router();
+const upload = require("../middleware/upload"); // <-- your multer-s3 middleware
 
 // Render the parcel registration page
 router.get("/registerParcel", (req, res) => {
@@ -18,6 +19,8 @@ router.post("/registerParcel", async (req, res) => {
     specialInstructions,
   } = req.body;
   try {
+    const imageUrl = req.file?.location || null;
+
     const newParcel = new Parcel({
       senderName,
       senderEmail,
@@ -25,6 +28,7 @@ router.post("/registerParcel", async (req, res) => {
       dimensions,
       destination,
       specialInstructions,
+      imageUrl,
     });
     await newParcel.save();
     res.redirect("/success"); // Redirect to a success page after registration
