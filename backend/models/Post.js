@@ -7,7 +7,11 @@ const postSchema = new mongoose.Schema({
     destination: { type: String, required: true },
     description: { type: String },
     status: { type: String, default: 'active' },
-    createdAt: { type: Date, default: Date.now }
+    createdAt: { type: Date, default: Date.now },
+    imageUrl: {
+        type: String
+    }
+    
 });
 
 const Post = mongoose.model('Post', postSchema);
