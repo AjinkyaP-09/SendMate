@@ -11,7 +11,7 @@
 
 <body class="bg-gray-100">
 
-    
+
     <header class="bg-blue-600 text-white py-4">
         <div class="container mx-auto text-center">
             <h1 class="text-3xl font-bold">Create Your Delivery Post</h1>
@@ -112,6 +112,16 @@
                     <textarea id="additionalDetails" name="additionalDetails" rows="4"
                         class="w-full p-3 border border-gray-300 rounded-lg"
                         placeholder="Any other details..."></textarea>
+                </div>
+                <!-- Upload Image -->
+                <div>
+                    <label for="imageupload" class="block font-semibold text-gray-700 mb-2">Upload Image:</label>
+                    <label for="imageupload"
+                        class="cursor-pointer inline-block bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition duration-200">
+                        Choose Image
+                    </label>
+                    <input type="file" id="imageupload" name="image" accept="image/*" required class="hidden">
+                    <p id="file-name" class="mt-2 text-gray-600 text-sm"></p>
                 </div>
 
                 <!-- Submit Button -->
