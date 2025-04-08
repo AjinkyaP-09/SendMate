@@ -366,7 +366,8 @@ app.post("/sender-post", async (req, res) => {
   } catch (error) {
     res
       .status(500)
-      .redirect("/dashboard?error=Error creating post");
+      .redirect(`/dashboard?error=Error creating post: ${error}`);
+    console.log(error);
   }
 });
 

@@ -113,13 +113,14 @@
                             <p class="text-gray-600"><b>Expected Date: </b>${formattedDate || 'Not Available'}</p>
                         </div>
                         <div class="flex flex-col space-y-2 md:flex-row md:space-y-0 md:space-x-2 mt-4 md:mt-0">
-                            <form action="/${postType}/${post._id}?_method=DELETE" method="post">
-                                <button class="delete-btn bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded" onclick="deletePost('${post._id}', this)">DELETE</button>
-                            </form>
-                            <form action="/${postType}/${post._id}/editForm" method="get">
-                                <button class="edit-btn bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded">EDIT</button>
-                            </form>
-                        </div>
+    <form action="/${postType}/${post._id}?_method=DELETE" method="post">
+        <button class="delete-btn bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded w-full md:w-24" onclick="deletePost('${post._id}', this)">DELETE</button>
+    </form>
+    <form action="/${postType}/${post._id}/editForm" method="get">
+        <button class="edit-btn bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded w-full md:w-24">EDIT</button>
+    </form>
+</div>
+
                     `;
                     postList.appendChild(postItem);
                 });
@@ -134,17 +135,18 @@
 
             if (postType === "senderPost") {
                 createPostDiv.innerHTML = `
-                    <a href="/register-parcel" class="inline-block bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg shadow">
-                        Create Sender Post
-                    </a>
-                `;
+        <a href="/register-parcel" class="inline-block bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg shadow w-full sm:w-auto mx-auto sm:mx-0 text-center">
+            Create Sender Post
+        </a>
+    `;
             } else if (postType === "travellerPost") {
                 createPostDiv.innerHTML = `
-                    <a href="/travellerPost" class="inline-block bg-blue-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded-lg shadow">
-                        Create Traveller Post
-                    </a>
-                `;
+        <a href="/travellerPost" class="inline-block bg-blue-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded-lg shadow w-full sm:w-auto mx-auto sm:mx-0 text-center">
+            Create Traveller Post
+        </a>
+    `;
             }
+
 
             postsContainer.appendChild(createPostDiv);
         }

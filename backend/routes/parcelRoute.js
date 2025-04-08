@@ -11,12 +11,23 @@ router.get("/registerParcel", (req, res) => {
 // Handle parcel registration
 router.post("/registerParcel", upload.single('imageupload'), async (req, res) => {
   const {
-    senderName,
-    senderEmail,
-    weight,
-    dimensions,
+    productName,
+    productWeight,
+    length,
+    breadth,
+    height,
+    isFragile,
+    source,
     destination,
-    specialInstructions,
+    receiverDetails,
+    expectedTime,
+    paymentMin,
+    paymentMax,
+    category,
+    additionalDetails,
+    userId,
+    username,
+    email,
   } = req.body;
   try {
     console.log("Received form data:", req.body);
@@ -24,12 +35,23 @@ router.post("/registerParcel", upload.single('imageupload'), async (req, res) =>
     const imageUrl = req.file?.location || null;
 
     const newParcel = new Parcel({
-      senderName,
-      senderEmail,
-      weight,
-      dimensions,
+      productName,
+      productWeight,
+      length,
+      breadth,
+      height,
+      isFragile,
+      source,
       destination,
-      specialInstructions,
+      receiverDetails,
+      expectedTime,
+      paymentMin,
+      paymentMax,
+      category,
+      additionalDetails,
+      userId,
+      username,
+      email,
       imageUrl,
     });
 
