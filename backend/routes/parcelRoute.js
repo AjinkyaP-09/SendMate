@@ -1,7 +1,7 @@
 const express = require("express");
 const Parcel = require("../models/Parcel"); // Make sure this points to your Parcel model
 const router = express.Router();
-const upload = require("../middleware/upload"); // <-- your multer-s3 middleware
+const upload = require("../middleware/uploads3"); // <-- your multer-s3 middleware
 
 // Render the parcel registration page
 router.get("/registerParcel", (req, res) => {
