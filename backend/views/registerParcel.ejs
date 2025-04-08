@@ -164,6 +164,16 @@
                             placeholder="Any other details..."></textarea>
                     </div>
 
+                    <div>
+                        <label for="imageupload" class="block font-semibold text-gray-700 mb-2">Upload Image:</label>
+                        <label for="imageupload"
+                            class="cursor-pointer inline-block bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition duration-200">
+                            Choose Image
+                        </label>
+                        <input type="file" id="imageupload" name="image" accept="image/*" required class="hidden">
+                        <p id="file-name" class="mt-2 text-gray-600 text-sm"></p>
+                    </div>
+
                     <input type="hidden" name="userId" value="<%= user.id %>">
                     <input type="hidden" name="username" value="<%= user.username %>">
                     <input type="hidden" name="email" value="<%= user.email %>">
