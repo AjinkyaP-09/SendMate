@@ -61,14 +61,17 @@ router.post("/registerParcel", upload.single('imageupload'), async (req, res) =>
 
     console.log("Parcel saved successfully");
 
-    res.redirect("/success"); // Redirect to a success page after registration
+    res.redirect("/dashboard"); // Redirect to a success page after registration
   } catch (err) {
     console.error("❌ Parcel creation error:",err);
 
     res.status(500).send("❌ Error creating post: " + err.message);
+    console.log("req.file = ", req.file);
+
     // Pass the error message to the view
     res.render("registerParcel", {
       error: "Error registering the parcel. Please try again.",
+      user: req.user,
     });
   }
 });
