@@ -113,19 +113,26 @@
                     postItem.classList.add('bg-gray-50', 'p-6', 'rounded-lg', 'shadow', 'flex', 'flex-col', 'md:flex-row', 'justify-between', 'items-center');
 
                     postItem.innerHTML = `
-                    <a href="/post/${postType}/${post._id}" style="width:90%;">
-                        <div class="md:flex-1 md:mr-4">
-                            <div class="flex justify-between">
-                                <h4 class="text-lg font-semibold text-gray-800 mb-2"><b>${postType === 'senderPost' ? 'Name:' : 'Mode of Travel:'}
-                                </b> ${post.productName || post.modeOfTravel}</h4>
-                                <p class="text-gray-600"><b> ${post.paymentMin || post.parcelSize} - ${post.paymentMax || post.expectedAmount} </b></p>
-                            </div>
-                            <p class="text-gray-600"><b>From: </b>${post.source || post.startLocation}</p>
-                            <p class="text-gray-600"><b>To: </b>${post.destination || post.endLocation}</p>
-                            <p class="text-gray-600"><b>Expected Date: </b>${formattedDate || 'Not Available'}</p>
-                        </div>
-                    </a>
-                    `;
+<a href="/post/${postType}/${post._id}" class="flex flex-col md:flex-row w-full items-start md:items-center gap-4">
+    ${post.imageUrl ? `
+        <img src="${post.imageUrl}" alt="Post Image" class="w-full md:w-40 h-40 object-cover rounded shadow-md">
+    ` : ''}
+    <div class="flex-1">
+        <div class="flex justify-between items-center mb-2">
+            <h4 class="text-lg font-semibold text-gray-800">
+                <b>${postType === 'senderPost' ? 'Name:' : 'Mode of Travel:'}</b> ${post.productName || post.modeOfTravel}
+            </h4>
+            <p class="text-gray-600">
+                <b>${post.paymentMin || post.parcelSize} - ${post.paymentMax || post.expectedAmount}</b>
+            </p>
+        </div>
+        <p class="text-gray-600"><b>From:</b> ${post.source || post.startLocation}</p>
+        <p class="text-gray-600"><b>To:</b> ${post.destination || post.endLocation}</p>
+        <p class="text-gray-600"><b>Expected Date:</b> ${formattedDate || 'Not Available'}</p>
+    </div>
+</a>
+`;
+
                     postList.appendChild(postItem);
                 });
 
