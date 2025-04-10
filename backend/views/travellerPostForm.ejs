@@ -28,9 +28,10 @@
             <section class="py-12">
                 <div class="container mx-auto max-w-2xl bg-white p-8 rounded-lg shadow-lg"
                     style="max-width: 825px; box-shadow: 0 0 10 rgba(0, 0, 0, 0.1);">
-                    <form id="travelPostForm" action="/submit-travel-post" method="POST" <form action="/posts/create"
-                        method="POST">
-                        class=" space-y-6" novalidate>
+                    <form id="travelPostForm" action="/submit-travel-post" method="POST" class=" space-y-6" novalidate>
+
+
+
 
                         <label for="modeOfTravel" class="block font-semibold text-gray-700">Mode of Travel</label>
                         <select id="modeOfTravel" name="modeOfTravel" required
@@ -143,14 +144,55 @@
                         </div>
 
                         <!-- Agree to Terms and Conditions -->
+                        <!-- Consent Checkbox and Link -->
                         <div>
-                            <label class="flex items-center">
-                                <input type="checkbox" id="agreeTerms" name="agreeTerms" required class="mr-2">
-                                <a href="#" class="text-blue-600 underline"> I agree to the terms and conditions</a>.
+                            <label class="flex items-start gap-2 items-center">
+                                <input type="checkbox" id="agreeTerms" name="agreeTerms" class="mt-1" required>
+                                <span>
+                                    I agree to the
+                                    <button type="button" onclick="openModal()" class="text-blue-600 underline">
+                                        traveler terms and conditions
+                                    </button>.
+                                </span>
                             </label>
                             <p id="termsError" class="text-red-600 hidden">You must agree to the terms and conditions.
                             </p>
                         </div>
+
+                        <!-- Terms Modal -->
+                        <!-- Terms Modal -->
+                        <div id="termsModal"
+                            class="fixed inset-0 bg-black bg-opacity-40 hidden z-50 flex justify-center items-center">
+                            <div
+                                class="bg-white rounded-lg p-6 w-[95%] sm:w-[80%] md:w-[70%] lg:w-[60%] xl:w-[50%] max-h-[90vh] overflow-y-auto shadow-2xl relative">
+                                <h2 class="text-xl font-bold mb-4">Traveler Terms and Conditions</h2>
+                                <p class="mb-4">
+                                    By participating as a traveler on SendMate, you agree to the following:
+                                </p>
+                                <ul class="list-disc ml-5 space-y-2 text-sm text-gray-700">
+                                    <li>You are responsible for ensuring that any parcel you agree to carry is legal and
+                                        safe.</li>
+                                    <li>You must verify the contents of any parcel before accepting it.</li>
+                                    <li>SendMate is not liable for any issues related to customs, law enforcement, or
+                                        lost/damaged items.</li>
+                                    <li>You agree to deliver the parcel as per the commitment made to the sender.</li>
+                                    <li>SendMate reserves the right to deactivate your account for any suspicious or
+                                        non-compliant behavior.</li>
+                                    <li>Personal information shared on the platform must remain confidential.</li>
+                                    <li>Payments should only be made through official channels as directed.</li>
+                                </ul>
+                                <p class="mt-4 text-sm text-gray-500">
+                                    These terms may be updated at any time. Continued use implies acceptance.
+                                </p>
+                                <div class="flex justify-end mt-6">
+                                    <button onclick="closeModal()"
+                                        class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+                                        Close
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
 
                         <!-- Additional Details -->
                         <div>
@@ -306,6 +348,27 @@
             // Prevent form submission if not valid
             if (!isValid) {
                 e.preventDefault();
+            }
+        });
+
+        function openModal() {
+            document.getElementById("termsModal").classList.remove("hidden");
+        }
+
+        function closeModal() {
+            document.getElementById("termsModal").classList.add("hidden");
+        }
+
+        // Optional JS error check on submit
+        document.getElementById("travelEditForm")?.addEventListener("submit", function (e) {
+            const checkbox = document.getElementById("agreeTerms");
+            const errorMsg = document.getElementById("termsError");
+
+            if (!checkbox.checked) {
+                e.preventDefault();
+                errorMsg.classList.remove("hidden");
+            } else {
+                errorMsg.classList.add("hidden");
             }
         });
     </script>
