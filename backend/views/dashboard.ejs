@@ -106,6 +106,7 @@
                     postItem.classList.add('bg-gray-50', 'p-6', 'rounded-lg', 'shadow', 'flex', 'flex-col', 'md:flex-row', 'justify-between', 'items-center');
 
                     postItem.innerHTML = `
+                    <a href="/dashboard/${post._id}/responses"
     <div class="md:flex-1 md:mr-4">
         <h4 class="text-lg font-semibold text-gray-800 mb-2"><b>Name: </b>${post.productName || post.modeOfTravel}</h4>
         <p class="text-gray-600"><b>From: </b>${post.source || post.startLocation}</p>
@@ -120,7 +121,7 @@
         <form action="/${postType}/${post._id}/editForm" method="get">
             <button class="edit-btn bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded w-full md:w-24">EDIT</button>
         </form>
-    </div>
+    </div></a>
 `;
 
                     postList.appendChild(postItem);

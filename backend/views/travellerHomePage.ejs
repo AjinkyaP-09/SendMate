@@ -5,11 +5,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Home | SendMate</title>
+    <!-- <link rel="stylesheet" href="/styles.css"> -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="icon" href="/images/favicon.ico" type="image/x-icon">
 </head>
 
-<body class="bg-gray-100 font-sans">
+<body class="bg-gray-100 font-sans flex flex-col " style="min-height: 100vh;">  
     <!-- Fixed Header to stay on top of the page -->
     <header class="bg-white shadow fixed top-0 w-full z-10">
         <% if (!user) { %>
@@ -20,7 +21,7 @@
     </header>
 
     <!-- Main section with top padding to prevent overlap with the fixed header -->
-    <main class="pt-16 sm:pt-16 lg:pt-16">
+    <main class="pt-16 sm:pt-16 lg:pt- flex-grow">
         <!-- Search bar and filter buttons with responsive design -->
         <div class="flex flex-wrap justify-center py-6 bg-blue-100">
             <input type="text" id="sourceInput" placeholder="Choose starting point, or click on the map..."
@@ -53,66 +54,88 @@
             </div>
         </div>
 
-        <!-- Dynamic Posts Container -->
-        <div id="postsContainer" class="space-y-4 mx-4 sm:mx-12 md:mx-24 mt-4">
-            <!-- Posts will be dynamically loaded here -->
-        </div>
+        <% if (msg) { %>
+            <div id="toast"
+                class="fixed top-10 right-5 z-50 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded shadow-lg flex items-center space-x-2 max-w-sm animate-fadeIn transition duration-300">
+
+                <span class="flex-1 text-sm">
+                    <%= msg %>
+                </span>
+
+                <button onclick="document.getElementById('toast').style.display='none'"
+                    class="text-green-700 hover:text-green-900 font-bold text-lg">&times;</button>
+            </div>
+            <% } %>
+
+
+
+                <!-- Dynamic Posts Container -->
+                <div id="postsContainer" class="space-y-4 mx-4 sm:mx-12 md:mx-24 mt-4">
+                    <!-- Posts will be dynamically loaded here -->
+                </div>
     </main>
 
     <!-- Footer -->
-    <footer class="bg-white mt-8 py-4 shadow">
-        <%- include('partials/footer') %>
-    </footer>
+    <%- include('partials/footer') %>
 
-    <!-- JavaScript functionality for loading and displaying posts -->
-    <script>
-        function initialLoad() {
-            const postTypeSelect = document.getElementById("postType");
-            const defaultPostType = postTypeSelect.value;
-            loadPosts(defaultPostType);
-        }
 
-        window.onload = initialLoad;
+        <!-- JavaScript functionality for loading and displaying posts -->
+        <script>
+            setTimeout(() => {
+                const alert = document.querySelector(".bg-green-100");
+                if (alert) {
+                    alert.style.display = "none";
+                }
+            }, 3000); // 3 seconds
 
-        function loadPosts(postType) {
-            fetch(`/home/posts/${postType}`)
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Network response was not ok ' + response.statusText);
-                    }
-                    return response.json();
-                })
-                .then(posts => {
-                    displayPosts(posts, postType);
-                })
-                .catch(error => console.error('Error loading posts:', error));
-        }
 
-        document.getElementById("postType").addEventListener("change", function () {
-            const selectedType = this.value;
-            loadPosts(selectedType);
-        });
+            function initialLoad() {
+                const postTypeSelect = document.getElementById("postType");
+                const defaultPostType = postTypeSelect.value;
+                loadPosts(defaultPostType);
+            }
 
-        function displayPosts(posts, postType) {
-            const postsContainer = document.getElementById('postsContainer');
-            postsContainer.innerHTML = '';
+            window.onload = initialLoad;
 
-            if (posts && posts.length > 0) {
-                const postList = document.createElement('ul');
-                postList.classList.add('space-y-4');
+            function loadPosts(postType) {
+                fetch(`/home/posts/${postType}`)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok ' + response.statusText);
+                        }
+                        return response.json();
+                    })
+                    .then(posts => {
+                        displayPosts(posts, postType);
+                    })
+                    .catch(error => console.error('Error loading posts:', error));
+            }
 
-                posts.forEach(post => {
-                    const formattedDate = new Date(post.expectedTime).toLocaleDateString('en-US', {
-                        weekday: 'long',
-                        year: 'numeric',
-                        month: 'long',
-                        day: 'numeric',
-                    });
+            document.getElementById("postType").addEventListener("change", function () {
+                const selectedType = this.value;
+                loadPosts(selectedType);
+            });
 
-                    const postItem = document.createElement('li');
-                    postItem.classList.add('bg-gray-50', 'p-6', 'rounded-lg', 'shadow', 'flex', 'flex-col', 'md:flex-row', 'justify-between', 'items-center');
+            function displayPosts(posts, postType) {
+                const postsContainer = document.getElementById('postsContainer');
+                postsContainer.innerHTML = '';
 
-                    postItem.innerHTML = `
+                if (posts && posts.length > 0) {
+                    const postList = document.createElement('ul');
+                    postList.classList.add('space-y-4');
+
+                    posts.forEach(post => {
+                        const formattedDate = new Date(post.expectedTime).toLocaleDateString('en-US', {
+                            weekday: 'long',
+                            year: 'numeric',
+                            month: 'long',
+                            day: 'numeric',
+                        });
+
+                        const postItem = document.createElement('li');
+                        postItem.classList.add('bg-gray-50', 'p-6', 'rounded-lg', 'shadow', 'flex', 'flex-col', 'md:flex-row', 'justify-between', 'items-center');
+
+                        postItem.innerHTML = `
 <a href="/post/${postType}/${post._id}" class="flex flex-col md:flex-row w-full items-start md:items-center gap-4">
     ${post.imageUrl ? `
         <img src="${post.imageUrl}" alt="Post Image" class="w-full md:w-40 h-40 object-cover rounded shadow-md">
@@ -133,44 +156,44 @@
 </a>
 `;
 
-                    postList.appendChild(postItem);
-                });
+                        postList.appendChild(postItem);
+                    });
 
-                postsContainer.appendChild(postList);
-            } else {
-                postsContainer.innerHTML = `<p class="text-gray-600">You haven't created any posts yet.</p>`;
+                    postsContainer.appendChild(postList);
+                } else {
+                    postsContainer.innerHTML = `<p class="text-gray-600">You haven't created any posts yet.</p>`;
+                }
+
+                // const createPostDiv = document.createElement('div');
+                // createPostDiv.classList.add('mt-6');
+
+                // if (postType === "senderPost") {
+                //     createPostDiv.innerHTML = `
+                //         <a href="/register-parcel" class="inline-block bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg shadow">
+                //             Create Sender Post
+                //         </a>
+                //     `;
+                // } else if (postType === "travellerPost") {
+                //     createPostDiv.innerHTML = `
+                //         <a href="/travellerPost" class="inline-block bg-blue-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded-lg shadow">
+                //             Create Traveller Post
+                //         </a>
+                //     `;
+                // }
+
+                // postsContainer.appendChild(createPostDiv);
             }
 
-            // const createPostDiv = document.createElement('div');
-            // createPostDiv.classList.add('mt-6');
+            document.getElementById("filterButton").addEventListener("click", function () {
+                const sidebar = document.getElementById("filterSidebar");
+                sidebar.classList.toggle("translate-x-full");
+            });
 
-            // if (postType === "senderPost") {
-            //     createPostDiv.innerHTML = `
-            //         <a href="/register-parcel" class="inline-block bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg shadow">
-            //             Create Sender Post
-            //         </a>
-            //     `;
-            // } else if (postType === "travellerPost") {
-            //     createPostDiv.innerHTML = `
-            //         <a href="/travellerPost" class="inline-block bg-blue-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded-lg shadow">
-            //             Create Traveller Post
-            //         </a>
-            //     `;
-            // }
-
-            // postsContainer.appendChild(createPostDiv);
-        }
-
-        document.getElementById("filterButton").addEventListener("click", function () {
-            const sidebar = document.getElementById("filterSidebar");
-            sidebar.classList.toggle("translate-x-full");
-        });
-
-        document.getElementById("closeSidebar").addEventListener("click", function () {
-            const sidebar = document.getElementById("filterSidebar");
-            sidebar.classList.add("translate-x-full");
-        });
-    </script>
+            document.getElementById("closeSidebar").addEventListener("click", function () {
+                const sidebar = document.getElementById("filterSidebar");
+                sidebar.classList.add("translate-x-full");
+            });
+        </script>
 </body>
 
 </html>

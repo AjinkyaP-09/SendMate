@@ -10,6 +10,7 @@ const methodOverride = require("method-override");
 const User = require("./models/User");
 const ContactMail = require("./models/contact-mail");
 const passport = require("passport");
+const nodemailer = require("nodemailer");
 // Initialize the app
 const app = express();
 dotenv.config();
@@ -57,6 +58,7 @@ const authRoute = require("./routes/auth");
 const postRoute = require("./routes/posts");
 const messageRoute = require("./routes/messages");
 const parcelRoute = require("./routes/parcelRoute");
+const TravellerResponse = require("./models/TravellerResponse.js");
 
 app.use("/api/auth", authRoute);
 app.use("/api/posts", postRoute);
@@ -91,10 +93,11 @@ app.get("/", (req, res) => {
 
 // Route to fetch all sender posts for the traveler's home page
 app.get("/home", async (req, res) => {
+  const msg = req.query.msg || null;
   try {
     const posts = await DeliveryPost.find(); // Fetch all sender posts from your database
     // console.log(posts);
-    res.render("travellerHomePage", { posts }); // Render 'travellerHome' EJS with posts data
+    res.render("travellerHomePage", { posts, msg }); // Render 'travellerHome' EJS with posts data
   } catch (error) {
     console.error("Error fetching posts:", error);
     res.status(500).send("Error loading posts");
@@ -364,9 +367,7 @@ app.post("/sender-post", async (req, res) => {
     await newPost.save();
     res.status(200).redirect("/dashboard");
   } catch (error) {
-    res
-      .status(500)
-      .redirect(`/dashboard?error=Error creating post: ${error}`);
+    res.status(500).redirect(`/dashboard?error=Error creating post: ${error}`);
     console.log(error);
   }
 });
@@ -394,21 +395,23 @@ app.delete("/travellerPost/:id", async (req, res) => {
     if (!post) {
       return res
         .status(404)
-        .redirect( "/dashboard?error=No post found or permission denied." );
+        .redirect("/dashboard?error=No post found or permission denied.");
     }
 
     // Delete the post
     await TravellerPost.deleteOne({ _id: id });
     return res
       .status(200)
-      .redirect("/dashboard?error=Post deleted successfully" );
+      .redirect("/dashboard?error=Post deleted successfully");
   } catch (error) {
     console.error(`Error deleting post: ${error.message}`);
-    console.log(error+ '   '  + error.message);
-    
+    console.log(error + "   " + error.message);
+
     res
       .status(500)
-      .redirect("/dashboard?error=An error occurred while trying to delete the post." );
+      .redirect(
+        "/dashboard?error=An error occurred while trying to delete the post."
+      );
   }
 });
 
@@ -484,18 +487,22 @@ app.delete("/senderPost/:id", async (req, res) => {
     if (!post) {
       return res
         .status(404)
-        .redirect("/dashboard?error=No post found or permission denied." );
+        .redirect("/dashboard?error=No post found or permission denied.");
     }
 
     // Delete the post
     await DeliveryPost.deleteOne({ _id: id });
-    return res.status(200).redirect("/dashboard?error=Post deleted successfully" );
+    return res
+      .status(200)
+      .redirect("/dashboard?error=Post deleted successfully");
   } catch (error) {
     console.error(`Error deleting post: ${error.message}`);
     console.log(error + "   " + error.message);
     res
       .status(500)
-      .redirect("/dashboard?error=An error occurred while trying to delete the post." );
+      .redirect(
+        "/dashboard?error=An error occurred while trying to delete the post."
+      );
   }
 });
 
@@ -525,7 +532,9 @@ app.get("/senderPost/:id/editForm", async (req, res) => {
     console.error(`Error retrieving post for edit: ${error.message}`);
     res
       .status(500)
-      .redirect("/dashboard?error=An error occurred while fetching the post for editing.");
+      .redirect(
+        "/dashboard?error=An error occurred while fetching the post for editing."
+      );
   }
 });
 
@@ -552,18 +561,118 @@ app.patch("/senderPost/:id", async (req, res) => {
     res.redirect("/dashboard?error= Post Updated Sucessfully"); // Redirect to the dashboard or a confirmation page
   } catch (error) {
     console.error(`Error updating post: ${error.message}`);
-    res.status(500).redirect("/dashboard?error=An error occurred while updating the post.");
+    res
+      .status(500)
+      .redirect("/dashboard?error=An error occurred while updating the post.");
   }
 });
 
 app.get("/post/:postType/:id", async (req, res) => {
   const { id, postType } = req.params;
   if (postType === "senderPost") {
-    const post = await DeliveryPost.find({ id });
-    res.render('viewPost.ejs', {post});
+    const post = await DeliveryPost.findById(id);
+    // console.log(post);
+
+    res.render("viewPost.ejs", { post });
   } else {
-    const post = await TravellerPost.find({ id });
-    res.render('viewPost.ejs', {post});
+    const post = await TravellerPost.findById(id);
+    res.render("viewPost.ejs", { post });
+  }
+});
+
+app.get("/responseForm/:postType/:id", async (req, res) => {
+  const { id, postType } = req.params;
+
+  try {
+    let post;
+    if (postType === "senderPost") {
+      post = await DeliveryPost.findById(id);
+    } else if (postType === "travellerPost") {
+      post = await TravellerPost.findById(id);
+    } else {
+      return res.status(400).send("Invalid post type");
+    }
+
+    if (!post) {
+      return res.status(404).send("Post not found");
+    }
+
+    res.render("travellerResponseForm", { post, postType }); // assuming responseForm.ejs
+  } catch (err) {
+    console.error("Error loading post for response form:", err);
+    res.status(500).send("Server error");
+  }
+});
+
+app.post("/submitResponse/:postType/:id", async (req, res) => {
+  try {
+    const { postType, id } = req.params;
+    const { message, estimatedDelivery, priceOffer } = req.body;
+    // console.log(!req.session.user);
+    // console.log(req.session.user.id);
+
+    // console.log(!req.session.user.id);
+
+    if (!req.session.user || !req.session.user.id) {
+      return res.status(401).send("Unauthorized: Please log in");
+    }
+
+    const newResponse = new TravellerResponse({
+      postId: id,
+      postType,
+      travellerId: req.session.user.id,
+      message,
+      estimatedDelivery,
+      priceOffer,
+    });
+
+    await newResponse.save();
+
+    res.redirect("/home?msg=Response submitted successfully");
+  } catch (err) {
+    console.error("Error submitting response:", err);
+    res.status(500).send("Internal Server Error");
+  }
+});
+
+app.get("/dashboard/:id/responses", async (req, res) => {
+  const { id } = req.params;
+  try {
+    const senderId = req.session.user.id;
+    const posts = await DeliveryPost.find({ userId: senderId });
+
+    const postIds = posts.map((post) => post._id);
+    const responses = await TravellerResponse.find({
+      postId: { $in: postIds },
+    }).populate("travellerId", "username email");
+
+    res.render("viewResponses.ejs", { responses });
+  } catch (error) {
+    console.error("Error fetching responses:", error);
+    res.status(500).send("Server Error");
+  }
+});
+
+//Accept the response of any traveller
+app.post("/acceptResponse/:responseId", async (req, res) => {
+  try {
+    const { responseId } = req.params;
+
+    // Set the selected response to accepted
+    await TravellerResponse.findByIdAndUpdate(responseId, { status: "accepted" });
+
+    // Reject other responses to the same post
+    const acceptedResponse = await TravellerResponse.findById(responseId).populate("travellerId");
+    await TravellerResponse.updateMany(
+      { postId: acceptedResponse.postId, _id: { $ne: responseId } },
+      { status: "rejected" }
+    );
+
+
+    res.redirect("/dashboard?msg=Traveller accepted");
+  } catch (error) {
+    console.error("Error updating response status:", error);
+    res.status(500).send("Server Error");
   }
 });
 
@@ -572,3 +681,27 @@ const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+
+
+//Email trial
+
+
+    // // Send email/notification here
+    // const traveller = acceptedResponse.travellerId;
+
+    // const transporter = nodemailer.createTransport({
+    //   service: "gmail",
+    //   auth: {
+    //     user: process.env.EMAIL_USER, // e.g., sendmate.noreply@gmail.com
+    //     pass: process.env.EMAIL_PASS,
+    //   },
+    // });
+
+    // const mailOptions = {
+    //   from: process.env.EMAIL_USER,
+    //   to: traveller.email,
+    //   subject: "Your delivery offer has been accepted!",
+    //   text: `Hi ${traveller.username},\n\nYour offer to deliver the parcel has been accepted by the sender.\n\nThank you!\n\n- Sendmate Team`,
+    // };
+
+    // await transporter.sendMail(mailOptions);
