@@ -134,24 +134,24 @@
                 postsContainer.innerHTML = `<p class="text-gray-600">You haven't created any posts yet.</p>`;
             }
 
-            const createPostDiv = document.createElement('div');
-            createPostDiv.classList.add('mt-6');
+            // const createPostDiv = document.createElement('div');
+            // createPostDiv.classList.add('mt-6');
 
-            if (postType === "senderPost") {
-                createPostDiv.innerHTML = `
-                    <a href="/register-parcel" class="inline-block bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg shadow">
-                        Create Sender Post
-                    </a>
-                `;
-            } else if (postType === "travellerPost") {
-                createPostDiv.innerHTML = `
-                    <a href="/travellerPost" class="inline-block bg-blue-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded-lg shadow">
-                        Create Traveller Post
-                    </a>
-                `;
-            }
+            // if (postType === "senderPost") {
+            //     createPostDiv.innerHTML = `
+            //         <a href="/register-parcel" class="inline-block bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg shadow">
+            //             Create Sender Post
+            //         </a>
+            //     `;
+            // } else if (postType === "travellerPost") {
+            //     createPostDiv.innerHTML = `
+            //         <a href="/travellerPost" class="inline-block bg-blue-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded-lg shadow">
+            //             Create Traveller Post
+            //         </a>
+            //     `;
+            // }
 
-            postsContainer.appendChild(createPostDiv);
+            // postsContainer.appendChild(createPostDiv);
         }
 
         document.getElementById("filterButton").addEventListener("click", function () {
