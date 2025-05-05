@@ -49,3 +49,4 @@ SendMate is a platform that facilitates parcel delivery by connecting senders wi
 │    └── index.ejs
 └── README.md
  
+# Sendmate-2.0
