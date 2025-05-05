@@ -635,16 +635,27 @@ app.post("/submitResponse/:postType/:id", async (req, res) => {
   }
 });
 
-app.get("/dashboard/:id/responses", async (req, res) => {
-  const { id } = req.params;
-  try {
-    const senderId = req.session.user.id;
-    const posts = await DeliveryPost.find({ userId: senderId });
 
-    const postIds = posts.map((post) => post._id);
-    const responses = await TravellerResponse.find({
-      postId: { $in: postIds },
-    }).populate("travellerId", "username email");
+app.get("/dashboard/:postId/responses", async (req, res) => {
+  const { postId } = req.params;
+
+  try {
+    // Optional: Check if the current user owns this post (for security)
+    const post = await DeliveryPost.findOne({
+      _id: postId,
+      userId: req.session.user.id,
+    });
+    if (!post) {
+      return res
+        .status(403)
+        .send("You are not authorized to view responses for this post");
+    }
+
+    // Fetch only responses for the specific post
+    const responses = await TravellerResponse.find({ postId }).populate(
+      "travellerId",
+      "username email"
+    );
 
     res.render("viewResponses.ejs", { responses });
   } catch (error) {
@@ -652,6 +663,7 @@ app.get("/dashboard/:id/responses", async (req, res) => {
     res.status(500).send("Server Error");
   }
 });
+
 
 //Accept the response of any traveller
 app.post("/acceptResponse/:responseId", async (req, res) => {

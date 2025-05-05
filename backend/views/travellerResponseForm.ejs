@@ -38,11 +38,16 @@
                     </div>
 
                     <div>
-                        <label for="priceOffer" class="block text-sm font-semibold text-gray-700">Your Price Offer (in
-                            ₹)</label>
-                        <input type="number" id="priceOffer" name="priceOffer" required min="0"
+                        <label for="priceOffer" class="block text-sm font-semibold text-gray-700">
+                            Your Price Offer (in ₹)
+                        </label>
+                        <input type="number" id="priceOffer" name="priceOffer" required min="<%= post.paymentMin %>" max="<%= post.paymentMax %>"
                             class="w-full p-2 mt-1 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400">
+                        <p class="text-sm text-gray-500 mt-1">
+                            Enter an amount between ₹<%= post.paymentMin %> and ₹<%= post.paymentMax %>
+                        </p>
                     </div>
+
 
                     <div class="text-center">
                         <button type="submit"

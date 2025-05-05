@@ -106,22 +106,30 @@
                     postItem.classList.add('bg-gray-50', 'p-6', 'rounded-lg', 'shadow', 'flex', 'flex-col', 'md:flex-row', 'justify-between', 'items-center');
 
                     postItem.innerHTML = `
-                    <a href="/dashboard/${post._id}/responses"
-    <div class="md:flex-1 md:mr-4">
+                    <div onclick="window.location.href='/dashboard/${post._id}/responses'"
+     class="cursor-pointer w-full  flex items-center justify-around max-w-full border p-4 rounded hover:bg-gray-100 transition">
+                    
+     <div>
+        ${post.imageUrl ? `<img src="${post.imageUrl}" alt="Uploaded Image" class="mt-2 w-40 h-40 object-cover rounded-lg border">` : ''}
+        </div>
+    <div class="md:flex-1 md:mr-4 ml-12">
         <h4 class="text-lg font-semibold text-gray-800 mb-2"><b>Name: </b>${post.productName || post.modeOfTravel}</h4>
         <p class="text-gray-600"><b>From: </b>${post.source || post.startLocation}</p>
         <p class="text-gray-600"><b>To: </b>${post.destination || post.endLocation}</p>
         <p class="text-gray-600"><b>Expected Date: </b>${formattedDate || 'Not Available'}</p>
-        ${post.imageUrl ? `<img src="${post.imageUrl}" alt="Uploaded Image" class="mt-2 w-40 h-40 object-cover rounded-lg border">` : ''}
     </div>
-    <div class="flex flex-col space-y-2 md:flex-row md:space-y-0 md:space-x-2 mt-4 md:mt-0">
-        <form action="/${postType}/${post._id}?_method=DELETE" method="post">
-            <button class="delete-btn bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded w-full md:w-24" onclick="deletePost('${post._id}', this)">DELETE</button>
-        </form>
-        <form action="/${postType}/${post._id}/editForm" method="get">
-            <button class="edit-btn bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded w-full md:w-24">EDIT</button>
-        </form>
-    </div></a>
+
+        <div class="flex flex-col justify-between gap-3 mr-14">
+            <form action="/${postType}/${post._id}?_method=DELETE" method="post" onClick="event.stopPropagation();">
+                <button class="delete-btn bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-6 rounded w-full md:w-24">DELETE</button>
+            </form>
+            <form action="/${postType}/${post._id}/editForm" method="get" onClick="event.stopPropagation();">
+                <button class="edit-btn bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-6 rounded w-full md:w-24">EDIT</button>
+            </form>
+        </div>
+    
+</div>
+
 `;
 
                     postList.appendChild(postItem);

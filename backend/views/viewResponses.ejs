@@ -8,43 +8,76 @@
 </head>
 
 <body class="bg-gray-100">
-    <div class="max-w-4xl mx-auto mt-10 p-6 bg-white shadow-md rounded-lg">
-        <h1 class="text-2xl font-bold text-center mb-6 text-gray-800">Traveller Responses</h1>
-
-        <% if (responses.length===0) { %>
-            <p class="text-center text-gray-500">No responses yet.</p>
-            <% } else { %>
-                <% responses.forEach(response=> { %>
-                    <div class="mb-4 p-4 bg-gray-50 border rounded">
-                        <p><strong>Traveller:</strong>
-                            <%= response.travellerId.username %> (<%= response.travellerId.email %>)
-                        </p>
-                        <p><strong>Message:</strong>
-                            <%= response.message %>
-                        </p>
-                        <p><strong>Proposed Date:</strong>
-                            <%= response.estimatedDelivery?.toLocaleDateString() %>
-                        </p>
-                        <p><strong>Proposed Price:</strong> ₹<%= response.priceOffer %>
-                        </p>
-                        <p><strong>Status:</strong>
-                            <span class="inline-block px-2 py-1 rounded bg-gray-200">
-                                <%= response.status %>
-                            </span>
-                        </p>
-
-                        <% if (response.status==='pending' ) { %>
-                            <form action="/acceptResponse/<%= response._id %>" method="POST" class="mt-2">
-                                <button type="submit"
-                                    class="bg-green-600 text-white py-1 px-4 rounded hover:bg-green-700">Accept</button>
-                            </form>
+    <div class="wrapper min-h-screen flex flex-col">
+        <header class="bg-white shadow fixed top-0 w-full z-10">
+            <% if (!user) { %>
+                <%- include('partials/nav') %> <!-- Nav for guests -->
+                    <% } else { %>
+                        <%- include('partials/nav_users') %> <!-- Nav for logged-in users -->
                             <% } %>
-                            <form action="/chat/<%= response._id %>" method="POST" class="mt-2">
-                                <button type="submit" class="bg-green-600 text-white py-1 px-4 rounded hover:bg-green-700">Chat</button>
-                            </form>
-                    </div>
-                    <% }) %>
-                        <% } %>
+        </header>
+        <main class="flex-grow mt-12 mb-5">
+            <div class="max-w-4xl mx-auto mt-10 p-6 bg-white shadow-md rounded-lg">
+                <h1 class="text-2xl font-bold text-center mb-6 text-gray-800">Traveller Responses</h1>
+
+                <% if (responses.length===0) { %>
+                    <p class="text-center text-gray-500">No responses yet.</p>
+                    <% } else { %>
+                        <% responses.forEach(response=> { %>
+                            <div class="mb-4 p-4 bg-gray-50 border rounded flex justify-between">
+                                <div>
+                                    <p><strong>Traveller:</strong>
+                                        <%= response.travellerId.username %> (<%= response.travellerId.email %>)
+                                    </p>
+                                    <p><strong>Message:</strong>
+                                        <%= response.message %>
+                                    </p>
+                                    <p><strong>Proposed Date:</strong>
+                                        <%= response.estimatedDelivery?.toLocaleDateString() %>
+                                    </p>
+                                    <p><strong>Proposed Price:</strong> ₹<%= response.priceOffer %>
+                                    </p>
+                                    <p><strong>Status:</strong>
+                                        <% let statusClass='' ; if (response.status==='accepted' ) {
+                                            statusClass='bg-green-200 text-green-800' ; } else if
+                                            (response.status==='rejected' ) { statusClass='bg-red-200 text-red-800' ; }
+                                            else if (response.status==='pending' ) {
+                                            statusClass='bg-yellow-200 text-yellow-800' ; } else {
+                                            statusClass='bg-gray-200 text-gray-800' ; } %>
+
+                                            <span
+                                                class="inline-block px-2 py-1 rounded font-semibold <%= statusClass %>">
+                                                <%= response.status %>
+                                            </span>
+
+                                    </p>
+                                </div>
+                                <div class="flex flex-col justify-evenly my-8 mr-12">
+                                    <% if (response.status==='pending' ) { %>
+                                        <form action="/acceptResponse/<%= response._id %>" method="POST" class="mt-2">
+                                            <button type="submit"
+                                                class="bg-green-600 text-white py-1 px-6 rounded hover:bg-green-700">Accept</button>
+                                        </form>
+                                        <form action="/chat/<%= response._id %>" method="POST" class="mt-2">
+                                            <button type="submit"
+                                                class="bg-green-600 text-white py-1 px-8 rounded hover:bg-green-700">Chat</button>
+                                        </form>
+                                        <% } %>
+                                            <% if (response.status==='accepted' ) { %>
+                                                <form action="/chat/<%= response._id %>" method="POST" class="mt-2">
+                                                    <button type="submit"
+                                                        class="bg-green-600 text-white py-1 px-8 rounded hover:bg-green-700">Chat</button>
+                                                </form>
+                                                <% } %>
+                                </div>
+                            </div>
+                            <% }) %>
+                                <% } %>
+            </div>
+        </main>
+        <!-- Footer -->
+        <%- include('partials/footer') %>
+
     </div>
 </body>
 
