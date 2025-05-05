@@ -30,8 +30,11 @@
         <!-- Main Content -->
         <main class="flex-1 pt-6 pb-12">
             <section class="register-parcel-container mx-auto max-w-3xl bg-white p-8 rounded-lg shadow-lg">
-                <form id="deliveryPostForm" action="/sender-post" method="POST" class="space-y-6" novalidate
-                    onsubmit="return validatePaymentRange(event)">
+                <form id="deliveryPostForm" action="/api/parcel/registerParcel" method="POST" class="space-y-6"
+                    novalidate onsubmit="return validatePaymentRange(event)" enctype="multipart/form-data">
+
+
+
                     <!-- Product Name -->
                     <div>
                         <label for="productName" class="block font-semibold text-gray-700">Product Name:</label>
@@ -164,6 +167,16 @@
                             placeholder="Any other details..."></textarea>
                     </div>
 
+                    <div>
+                        <label for="imageupload" class="block font-semibold text-gray-700 mb-2">Upload Image:</label>
+                        <label for="imageupload"
+                            class="cursor-pointer inline-block bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition duration-200">
+                            Choose Image
+                        </label>
+                        <input type="file" id="imageupload" name="imageupload" accept="image/*" required class="hidden">
+                        <p id="file-name" class="mt-2 text-gray-600 text-sm"></p>
+                    </div>
+
                     <input type="hidden" name="userId" value="<%= user.id %>">
                     <input type="hidden" name="username" value="<%= user.username %>">
                     <input type="hidden" name="email" value="<%= user.email %>">
@@ -191,7 +204,7 @@
         function validatePaymentRange(event) {
             const paymentMin = parseFloat(document.getElementById('paymentMin').value);
             const paymentMax = parseFloat(document.getElementById('paymentMax').value);
-
+            console.log("validatePaymentRange called");
             let isValid = true;
 
             // Clear previous error messages
@@ -226,7 +239,11 @@
                     document.getElementById(field.errorId).classList.add('hidden');
                 }
             });
-
+            const fileInput = document.getElementById('imageupload');
+            if (!fileInput.files.length) {
+                alert("Please select an image.");
+                return false;
+            }
             return isValid; // Prevent form submission if invalid
         }
 
@@ -250,6 +267,16 @@
                 }
             });
         });
+
+        document.getElementById("imageupload").addEventListener("change", function () {
+            const fileNameDisplay = document.getElementById("file-name");
+            if (this.files.length > 0) {
+                fileNameDisplay.textContent = `Selected: ${this.files[0].name}`;
+            } else {
+                fileNameDisplay.textContent = "";
+            }
+        });
+
     </script>
 </body>
 

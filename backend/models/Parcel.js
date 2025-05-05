@@ -18,6 +18,7 @@ const deliveryPostSchema = new mongoose.Schema({
   userId: { type: String, required: true },
   username: { type: String, required: true },
   email: { type: String, required: true },
+  imageUrl: { type: String, required: false },
 });
 
 module.exports = mongoose.model("DeliveryPost", deliveryPostSchema);

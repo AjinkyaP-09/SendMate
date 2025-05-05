@@ -4,138 +4,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>
+        <%= post.productName %> | SendMate
+    </title>
     <link rel="stylesheet" href="/styles.css">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f5f5f5;
-        }
-
-
-
-        .logo {
-            display: flex;
-            align-items: center;
-        }
-
-        .logo img {
-            width: 40px;
-            margin-right: 10px;
-        }
-
-        .logo span {
-            font-size: 24px;
-            font-weight: bold;
-        }
-
-        .search-bar {
-            justify-content: space-evenly;
-        }
-
-        .search-bar input {
-            padding: 5px;
-            font-size: 16px;
-            width: 300px;
-            border-radius: 50px;
-            border-width: 0.cap;
-            border-color: rgb(62, 197, 193);
-        }
-
-        .search-bar button {
-            padding: 5px;
-            background-color: #ffffff;
-            /* border: none; */
-            cursor: pointer;
-            border-radius: 50%;
-            border-color: rgb(62, 197, 193);
-        }
-
-        .user-icons img {
-            width: 30px;
-            margin-left: 15px;
-
-        }
-
-        .filter-section {
-            display: flex;
-            justify-content: center;
-            padding: 20px;
-            background-color: #eaf3ff;
-        }
-
-        .filter-section input {
-            padding: 10px;
-            margin: 0 10px;
-            width: 250px;
-            border-width: 0.cap;
-            border-radius: 50px;
-            border-color: rgb(62, 197, 193);
-        }
-
-        .filter-section button {
-            padding: 10px 20px;
-            background-color: #6699cc;
-            color: #fff;
-            border: none;
-            cursor: pointer;
-            border-radius: 15px;
-        }
-
-        .item-list {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            margin-top: 20px;
-        }
-
-        #postsContainer {
-            margin-inline: 100px;
-            margin-top: 10px;
-        }
-
-        .item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background-color: #fff;
-            padding: 20px;
-            margin-bottom: 10px;
-            width: 70%;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-        }
-
-        .item-details {
-            flex: 1;
-        }
-
-        .item-price {
-            font-size: 24px;
-            color: #333;
-            font-weight: bold;
-        }
-
-        .item-desc {
-            margin-top: 10px;
-            color: #777;
-        }
-
-        .item-image img {
-            width: 100px;
-            height: 100px;
-        }
-
-        footer {
-            width: 100vw;
-        }
-    </style>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 
@@ -144,12 +16,59 @@
         <header>
             <%- include('partials/nav_users') %>
         </header>
+
         <main>
-            <div class="container mx-auto text-center bg-white p-8 rounded-lg shadow-lg max-w-5xl w-full">
-                <h2>Name</h2>
+            <div class="container mx-auto bg-white mt-10 p-8 rounded-lg shadow-lg max-w-4xl w-full">
+                <h2 class="text-2xl font-bold text-center mb-6 text-gray-800">
+                    <%= post.productName %>
+                </h2>
+
+                <% if (post.imageUrl) { %>
+                    <div class="flex justify-center mb-6">
+                        <img src="<%= post.imageUrl %>" alt="Post Image"
+                            class="rounded-lg shadow-md max-h-64 object-cover">
+                    </div>
+                    <% } %>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-gray-700">
+                            <div><strong>Source:</strong>
+                                <%= post.source %>
+                            </div>
+                            <div><strong>Destination:</strong>
+                                <%= post.destination %>
+                            </div>
+                            <div><strong>Expected Delivery:</strong>
+                                <%= new Date(post.expectedTime).toLocaleDateString('en-IN', { weekday: 'long' ,
+                                    year: 'numeric' , month: 'long' , day: 'numeric' }) %>
+                            </div>
+                            <div><strong>Payment Range:</strong> ₹<%= post.paymentMin %> - ₹<%= post.paymentMax %>
+                            </div>
+                            <div><strong>Category:</strong>
+                                <%= post.category %>
+                            </div>
+                            <div><strong>Product Weight:</strong>
+                                <%= post.productWeight %> kg
+                            </div>
+                            <div><strong>Dimensions (L×B×H):</strong>
+                                <%= post.length %> x <%= post.breadth %> x <%= post.height %> cm
+                            </div>
+                            <div><strong>Fragile:</strong>
+                                <%= post.isFragile %>
+                            </div>
+                            <div><strong>Receiver Details:</strong>
+                                <%= post.receiverDetails %>
+                            </div>
+                            <div class="md:col-span-2"><strong>Additional Info:</strong>
+                                <%= post.additionalDetails || 'N/A' %>
+                            </div>
+                            <div class="md:col-span-2 text-right text-sm text-gray-500">
+                                Posted by <%= post.username %> (<%= post.email %>)
+                            </div>
+                        </div>
             </div>
         </main>
-        <footer>
+
+        <footer class="mt-10">
             <%- include('partials/footer') %>
         </footer>
     </div>
