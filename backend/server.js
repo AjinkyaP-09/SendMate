@@ -116,9 +116,9 @@ app.get("/home", async (req, res) => {
   }
 
   // Post Type
-  // if (postType) {
-  //   filter.postType = postType;
-  // }
+  if (postType) {
+    filter.postType = postType;
+  }
 
   // Payment Range
   const min = parseInt(paymentMin);
@@ -130,12 +130,10 @@ app.get("/home", async (req, res) => {
       { paymentMax: { $gte: min } },
     ];
   } else if (!isNaN(min)) {
-    filter.$and = [{ paymentMax: { $gte: min } }];
+    filter.paymentMin = { $gte: min }; // Handle case where only min is provided
   } else if (!isNaN(max)) {
-    filter.$and = [{ paymentMin: { $lte: max } }];
+    filter.paymentMax = { $lte: max }; // Handle case where only max is provided
   }
-
-
 
 
   // Date Range
@@ -150,6 +148,7 @@ app.get("/home", async (req, res) => {
   } else if (endDate) {
     filter.expectedTime = { $lte: new Date(endDate) };
   }
+
 
   try {
     const posts = await DeliveryPost.find(filter).sort({ createdAt: -1 });
@@ -219,56 +218,49 @@ app.get("/posts/:type", async (req, res) => {
 app.get("/home/posts/:type", async (req, res) => {
   try {
     const postType = req.params.type;
-    const { search, paymentMin, paymentMax, startDate, endDate } = req.query;
+    const { paymentMin, paymentMax, startDate, endDate, source, destination } =
+      req.query;
 
     let filter = {};
 
-    // Apply search filter
-    if (search) {
-      filter.$or = [
-        { productName: { $regex: search, $options: "i" } },
-        { modeOfTravel: { $regex: search, $options: "i" } },
-        { source: { $regex: search, $options: "i" } },
-        { destination: { $regex: search, $options: "i" } },
-      ];
-    }
-
-    // Apply payment range filter
+    // Payment filter
     if (paymentMin || paymentMax) {
       filter.paymentMin = {};
-      filter.paymentMax = {};
-      if (paymentMin) filter.paymentMin.$gte = parseInt(paymentMin);
-      if (paymentMax) filter.paymentMax.$lte = parseInt(paymentMax);
+      if (paymentMin) filter.paymentMin.$gte = Number(paymentMin);
+      if (paymentMax) filter.paymentMin.$lte = Number(paymentMax);
     }
 
-    // Apply date range filter
+    // Date range filter
     if (startDate || endDate) {
-      const dateFilter = {};
-      if (startDate) dateFilter.$gte = new Date(startDate);
-      if (endDate) dateFilter.$lte = new Date(endDate);
-      filter.expectedTime = dateFilter;
+      filter.expectedTime = {};
+      if (startDate) filter.expectedTime.$gte = new Date(startDate);
+      if (endDate) filter.expectedTime.$lte = new Date(endDate);
     }
+
+    // Optional: add source and destination filters if needed
+    if (source) filter.source = source;
+    if (destination) filter.destination = destination;
 
     let posts;
-
-    // Filter posts based on type and query filters
     if (postType === "senderPost") {
       posts = await DeliveryPost.find(filter).sort({ createdAt: -1 });
+      // console.log(posts);
+      // console.log(filter);
+      
+      
     } else if (postType === "travellerPost") {
       posts = await TravellerPost.find(filter).sort({ createdAt: -1 });
     } else {
       return res.status(400).send("Invalid post type");
     }
-    console.log(posts);
-    console.log(filter);
-    
-    
-    res.json(posts); // Send filtered posts as JSON
+
+    res.json(posts);
   } catch (error) {
     console.error("Error fetching posts:", error);
     res.status(500).send("Server error");
   }
 });
+
 
 
 app.post("/submit-travel-post", async (req, res) => {

@@ -119,6 +119,9 @@
         <!-- JavaScript functionality for loading and displaying posts -->
         <script>
 
+            // const filter = JSON.stringify(filter);
+
+
             const today = new Date().toISOString().split('T')[0];
             const startDateInput = document.querySelector('input[name="startDate"]');
             const endDateInput = document.querySelector('input[name="endDate"]');
@@ -160,23 +163,38 @@
                 const postTypeSelect = document.getElementById("postType");
                 const defaultPostType = postTypeSelect.value;
                 loadPosts(defaultPostType);
+
             }
 
             window.onload = initialLoad;
 
             function loadPosts(postType) {
-                fetch(`/home/posts/${postType}`)
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error('Network response was not ok ' + response.statusText);
-                        }
-                        return response.json();
-                    })
+                const params = new URLSearchParams();
+                console.log(params);
+                
+
+                const search = document.querySelector('[name="search"]').value;
+                const paymentMin = document.querySelector('[name="paymentMin"]').value;
+                const paymentMax = document.querySelector('[name="paymentMax"]').value;
+                const startDate = document.querySelector('[name="startDate"]').value;
+                const endDate = document.querySelector('[name="endDate"]').value;
+
+                if (search) params.append("search", search);
+                if (postType) params.append("postType", postType);
+                if (paymentMin) params.append("paymentMin", paymentMin);
+                if (paymentMax) params.append("paymentMax", paymentMax);
+                if (startDate) params.append("startDate", startDate);
+                if (endDate) params.append("endDate", endDate);
+
+                fetch(`/home/posts/${postType}?${params.toString()}`)
+                    .then(response => response.json())
                     .then(posts => {
                         displayPosts(posts, postType);
                     })
                     .catch(error => console.error('Error loading posts:', error));
             }
+
+
 
             document.getElementById("postType").addEventListener("change", function () {
                 const selectedType = this.value;
