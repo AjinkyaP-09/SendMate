@@ -10,7 +10,7 @@ const methodOverride = require("method-override");
 const User = require("./models/User");
 const ContactMail = require("./models/contact-mail");
 const passport = require("passport");
-const nodemailer = require("nodemailer");
+
 // Initialize the app
 const app = express();
 dotenv.config();
@@ -93,16 +93,76 @@ app.get("/", (req, res) => {
 
 // Route to fetch all sender posts for the traveler's home page
 app.get("/home", async (req, res) => {
-  const msg = req.query.msg || null;
+  const {
+    search,
+    postType,
+    paymentMin,
+    paymentMax,
+    startDate,
+    endDate,
+    msg = null,
+  } = req.query;
+
+  const filter = {};
+
+  // Search fields
+  if (search) {
+    filter.$or = [
+      { productName: { $regex: search, $options: "i" } },
+      { modeOfTravel: { $regex: search, $options: "i" } },
+      { source: { $regex: search, $options: "i" } },
+      { destination: { $regex: search, $options: "i" } },
+    ];
+  }
+
+  // Post Type
+  // if (postType) {
+  //   filter.postType = postType;
+  // }
+
+  // Payment Range
+  const min = parseInt(paymentMin);
+  const max = parseInt(paymentMax);
+
+  if (!isNaN(min) && !isNaN(max)) {
+    filter.$and = [
+      { paymentMin: { $lte: max } },
+      { paymentMax: { $gte: min } },
+    ];
+  } else if (!isNaN(min)) {
+    filter.$and = [{ paymentMax: { $gte: min } }];
+  } else if (!isNaN(max)) {
+    filter.$and = [{ paymentMin: { $lte: max } }];
+  }
+
+
+
+
+  // Date Range
+  if (startDate && endDate) {
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    if (end >= start) {
+      filter.expectedTime = { $gte: start, $lte: end };
+    }
+  } else if (startDate) {
+    filter.expectedTime = { $gte: new Date(startDate) };
+  } else if (endDate) {
+    filter.expectedTime = { $lte: new Date(endDate) };
+  }
+
   try {
-    const posts = await DeliveryPost.find(); // Fetch all sender posts from your database
-    // console.log(posts);
-    res.render("travellerHomePage", { posts, msg }); // Render 'travellerHome' EJS with posts data
-  } catch (error) {
-    console.error("Error fetching posts:", error);
+    const posts = await DeliveryPost.find(filter).sort({ createdAt: -1 });
+    
+    
+    res.render("travellerHomePage", { posts, msg });
+  } catch (err) {
+    console.error("Error fetching posts:", err);
     res.status(500).send("Error loading posts");
   }
 });
+
+
 
 // Serve the login page
 app.get("/login", (req, res) => {
@@ -159,25 +219,57 @@ app.get("/posts/:type", async (req, res) => {
 app.get("/home/posts/:type", async (req, res) => {
   try {
     const postType = req.params.type;
-    // const userId = req.session.userId;
+    const { search, paymentMin, paymentMax, startDate, endDate } = req.query;
 
-    // const username = req.session.user.username;
+    let filter = {};
+
+    // Apply search filter
+    if (search) {
+      filter.$or = [
+        { productName: { $regex: search, $options: "i" } },
+        { modeOfTravel: { $regex: search, $options: "i" } },
+        { source: { $regex: search, $options: "i" } },
+        { destination: { $regex: search, $options: "i" } },
+      ];
+    }
+
+    // Apply payment range filter
+    if (paymentMin || paymentMax) {
+      filter.paymentMin = {};
+      filter.paymentMax = {};
+      if (paymentMin) filter.paymentMin.$gte = parseInt(paymentMin);
+      if (paymentMax) filter.paymentMax.$lte = parseInt(paymentMax);
+    }
+
+    // Apply date range filter
+    if (startDate || endDate) {
+      const dateFilter = {};
+      if (startDate) dateFilter.$gte = new Date(startDate);
+      if (endDate) dateFilter.$lte = new Date(endDate);
+      filter.expectedTime = dateFilter;
+    }
+
     let posts;
 
+    // Filter posts based on type and query filters
     if (postType === "senderPost") {
-      posts = await DeliveryPost.find();
+      posts = await DeliveryPost.find(filter).sort({ createdAt: -1 });
     } else if (postType === "travellerPost") {
-      posts = await TravellerPost.find();
+      posts = await TravellerPost.find(filter).sort({ createdAt: -1 });
     } else {
       return res.status(400).send("Invalid post type");
     }
-
-    res.json(posts);
+    console.log(posts);
+    console.log(filter);
+    
+    
+    res.json(posts); // Send filtered posts as JSON
   } catch (error) {
     console.error("Error fetching posts:", error);
     res.status(500).send("Server error");
   }
 });
+
 
 app.post("/submit-travel-post", async (req, res) => {
   try {
@@ -635,7 +727,6 @@ app.post("/submitResponse/:postType/:id", async (req, res) => {
   }
 });
 
-
 app.get("/dashboard/:postId/responses", async (req, res) => {
   const { postId } = req.params;
 
@@ -664,22 +755,24 @@ app.get("/dashboard/:postId/responses", async (req, res) => {
   }
 });
 
-
 //Accept the response of any traveller
 app.post("/acceptResponse/:responseId", async (req, res) => {
   try {
     const { responseId } = req.params;
 
     // Set the selected response to accepted
-    await TravellerResponse.findByIdAndUpdate(responseId, { status: "accepted" });
+    await TravellerResponse.findByIdAndUpdate(responseId, {
+      status: "accepted",
+    });
 
     // Reject other responses to the same post
-    const acceptedResponse = await TravellerResponse.findById(responseId).populate("travellerId");
+    const acceptedResponse = await TravellerResponse.findById(
+      responseId
+    ).populate("travellerId");
     await TravellerResponse.updateMany(
       { postId: acceptedResponse.postId, _id: { $ne: responseId } },
       { status: "rejected" }
     );
-
 
     res.redirect("/dashboard?msg=Traveller accepted");
   } catch (error) {
@@ -694,26 +787,24 @@ app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
 
-
 //Email trial
 
+// // Send email/notification here
+// const traveller = acceptedResponse.travellerId;
 
-    // // Send email/notification here
-    // const traveller = acceptedResponse.travellerId;
+// const transporter = nodemailer.createTransport({
+//   service: "gmail",
+//   auth: {
+//     user: process.env.EMAIL_USER, // e.g., sendmate.noreply@gmail.com
+//     pass: process.env.EMAIL_PASS,
+//   },
+// });
 
-    // const transporter = nodemailer.createTransport({
-    //   service: "gmail",
-    //   auth: {
-    //     user: process.env.EMAIL_USER, // e.g., sendmate.noreply@gmail.com
-    //     pass: process.env.EMAIL_PASS,
-    //   },
-    // });
+// const mailOptions = {
+//   from: process.env.EMAIL_USER,
+//   to: traveller.email,
+//   subject: "Your delivery offer has been accepted!",
+//   text: `Hi ${traveller.username},\n\nYour offer to deliver the parcel has been accepted by the sender.\n\nThank you!\n\n- Sendmate Team`,
+// };
 
-    // const mailOptions = {
-    //   from: process.env.EMAIL_USER,
-    //   to: traveller.email,
-    //   subject: "Your delivery offer has been accepted!",
-    //   text: `Hi ${traveller.username},\n\nYour offer to deliver the parcel has been accepted by the sender.\n\nThank you!\n\n- Sendmate Team`,
-    // };
-
-    // await transporter.sendMail(mailOptions);
+// await transporter.sendMail(mailOptions);

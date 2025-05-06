@@ -87,6 +87,7 @@ const travellerPostSchema = new mongoose.Schema({
     lowercase: true, // Ensure the email is stored in lowercase
   },
   postType: { type: String, default: "travellerPost" },
+  createdAt: { type: Date, default: Date.now },
 });
 
 const TravellerPost = mongoose.model("TravellerPost", travellerPostSchema);

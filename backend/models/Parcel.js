@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 
 const deliveryPostSchema = new mongoose.Schema({
+  createdAt: { type: Date, default: Date.now },
   productName: { type: String, required: true },
   productWeight: { type: Number, required: true },
   length: { type: Number, required: true },
