@@ -88,12 +88,13 @@ app.use((req, res, next) => {
 io.on("connection", (socket) => {
   console.log("A user connected");
 
-  // Optional: join a room based on user ID for private delivery
+  // Join room for private messaging
   socket.on("join", (userId) => {
     socket.join(userId);
     console.log(`User ${userId} joined their private room`);
   });
 
+  // Listen for incoming chat messages
   socket.on("chatMessage", async (data) => {
     try {
       // Save message to DB
@@ -104,7 +105,7 @@ io.on("connection", (socket) => {
         message: data.message,
       });
 
-      // Emit only to sender and receiver
+      // Emit the message to both sender and receiver using their room IDs
       io.to(data.senderId).emit("chatMessage", newMsg);
       io.to(data.receiverId).emit("chatMessage", newMsg);
     } catch (err) {
@@ -191,7 +192,7 @@ app.get("/home", async (req, res) => {
     const posts = await DeliveryPost.find({ status: "pending" }).sort({
       createdAt: -1,
     });
-    console.log(posts)
+    console.log(posts);
     res.render("travellerHomePage", { posts, msg });
   } catch (err) {
     console.error("Error fetching posts:", err);
@@ -279,7 +280,9 @@ app.get("/home/posts/:type", async (req, res) => {
 
     let posts;
     if (postType === "senderPost") {
-      posts = await DeliveryPost.find({ status: 'pending'}).sort({ createdAt: -1 });
+      posts = await DeliveryPost.find({ status: "pending" }).sort({
+        createdAt: -1,
+      });
       console.log(posts);
       // console.log(filter);
     } else if (postType === "travellerPost") {
@@ -905,6 +908,15 @@ app.get("/messages/chat/:postId/:otherId", async (req, res) => {
       { senderId: otherId, receiverId: userId },
     ],
   }).sort({ createdAt: 1 });
+  await Message.updateMany(
+    {
+      postId,
+      senderId: otherId,
+      receiverId: userId,
+      read: false,
+    },
+    { $set: { read: true } }
+  );
 
   // If there are no messages, initialize a conversation by saving the first message
   if (messages.length === 0) {
@@ -949,6 +961,32 @@ app.get("/messages/chat/:postId/:otherId", async (req, res) => {
         at: { $first: "$createdAt" },
       },
     },
+    {
+      $lookup: {
+        from: "messages",
+        let: { postId: "$_id.postId", otherUser: "$_id.otherUser" },
+        pipeline: [
+          {
+            $match: {
+              $expr: {
+                $and: [
+                  { $eq: ["$postId", "$$postId"] },
+                  { $eq: ["$senderId", "$$otherUser"] },
+                  { $eq: ["$receiverId", userId] },
+                  { $eq: ["$read", false] },
+                ],
+              },
+            },
+          },
+        ],
+        as: "unreadMessages",
+      },
+    },
+    {
+      $addFields: {
+        unreadCount: { $size: "$unreadMessages" },
+      },
+    },
   ]);
 
   const convos = rawConvos.map((c) => ({
@@ -956,6 +994,7 @@ app.get("/messages/chat/:postId/:otherId", async (req, res) => {
     otherId: c._id.otherUser,
     lastMessage: c.lastMessage,
     at: c.at,
+    unreadCount: c.unreadCount || 0,
   }));
 
   // Fetch user details (names) for all participants in the conversations

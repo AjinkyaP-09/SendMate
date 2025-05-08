@@ -1,13 +1,15 @@
 const mongoose = require("mongoose");
 
+// models/Message.js
 const messageSchema = new mongoose.Schema({
-  postId: { type: mongoose.Schema.Types.ObjectId, required: true },
-  senderId: { type: mongoose.Schema.Types.ObjectId, required: true },
-  receiverId: { type: mongoose.Schema.Types.ObjectId, required: true },
-  message: { type: String, required: true },
-  postDetails: { type: Object, required: false }, // New field for post details
+  senderId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  receiverId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  postId: { type: mongoose.Schema.Types.ObjectId, ref: 'DeliveryPost' },
+  message: String,
   createdAt: { type: Date, default: Date.now },
+  read: { type: Boolean, default: false }  // ← NEW
 });
+
 
 
 const Message = mongoose.model("Message", messageSchema)

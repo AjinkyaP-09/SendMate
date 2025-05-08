@@ -27,14 +27,22 @@
                             <li class="border-b last:border-none">
                                 <a href="/messages/chat/<%= c.postId %>/<%= c.otherId %>"
                                     class="block px-4 py-3 hover:bg-gray-50 flex justify-between items-center">
+
                                     <div>
-                                        <p class="font-medium">
+                                        <p class="font-medium flex items-center gap-2">
                                             <%= nameMap[c.otherId] %>
+                                                <% if (c.unreadCount> 0) { %>
+                                                    <span
+                                                        class="ml-1 bg-red-500 text-white text-xs font-semibold px-2 py-0.5 rounded-full">
+                                                        <%= c.unreadCount %>
+                                                    </span>
+                                                    <% } %>
                                         </p>
                                         <p class="text-sm text-gray-600 truncate">
                                             <%= c.lastMessage %>
                                         </p>
                                     </div>
+
                                     <span class="text-xs text-gray-500 whitespace-nowrap">
                                         <%= new Date(c.at).toLocaleTimeString([], { hour: '2-digit' , minute: '2-digit'
                                             }) %>
@@ -42,6 +50,7 @@
                                 </a>
                             </li>
                             <% }); %>
+
                     </ul>
                     <% } %>
         </aside>
@@ -104,6 +113,65 @@
 
     <!-- Footer -->
     <%- include('partials/footer') %>
+        <script src="/socket.io/socket.io.js"></script>
+        <script>
+            const socket = io();
+
+            const userId = "<%= currentUserId %>";
+            const postId = JSON.stringify(typeof postId !== 'undefined' ? postId : null);
+            const otherId = JSON.stringify(typeof otherId !== 'undefined' ? otherId : null);
+            const chatBox = document.querySelector(".overflow-y-auto");
+
+            // Join user's private room
+            socket.emit("join", userId);
+
+            if (postId && otherId) {
+                // Send message
+                const form = document.querySelector("form");
+                const input = document.querySelector("input[name='message']");
+
+                form.addEventListener("submit", function (e) {
+                    e.preventDefault();
+                    const message = input.value;
+
+                    fetch("/messages/send", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                        body: new URLSearchParams({ message, receiverId: otherId, postId })
+                    });
+
+                    socket.emit("chatMessage", {
+                        senderId: userId,
+                        receiverId: otherId,
+                        postId,
+                        message
+                    });
+
+                    input.value = "";
+                });
+
+                // Listen for new messages
+                socket.on("chatMessage", (data) => {
+                    if (data.postId !== postId) return;
+
+                    const isCurrentUser = data.senderId === userId;
+
+                    const div = document.createElement("div");
+                    div.className = isCurrentUser ? "text-right" : "text-left";
+                    div.innerHTML = `
+                <div class="${isCurrentUser ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-800'} inline-block px-4 py-2 rounded-lg">
+                  ${data.message}
+                </div>
+                <div class="text-xs text-gray-400 mt-1">
+                  ${new Date(data.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                </div>
+              `;
+                    chatBox.appendChild(div);
+                    chatBox.scrollTop = chatBox.scrollHeight;
+                });
+            }
+        </script>
+
 </body>
 
 </html>
