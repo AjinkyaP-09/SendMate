@@ -70,21 +70,18 @@
                             </div>
                             <% }) %>
                     </div>
+                    <form action="/messages/send" method="POST" class="p-4 border-t flex items-center gap-2">
+                        <input type="hidden" name="receiverId" value="<%= otherId %>">
+                        <input type="hidden" name="postId" value="<%= postId %>">
+                        <input type="text" name="message" required placeholder="Type your message..."
+                            class="flex-1 px-4 py-2 border rounded-full focus:outline-none focus:ring">
+                        <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded-full hover:bg-blue-600">
+                            Send
+                        </button>
+                    </form>
 
                     <% } %>
-                        <% if (showInputBox !==false) { %>
-                            <!-- Send message form -->
-                            <form action="/messages/send" method="POST" class="p-4 border-t flex items-center gap-2">
-                                <input type="hidden" name="receiverId" value="<%= otherId %>">
-                                <input type="hidden" name="postId" value="<%= postId %>">
-                                <input type="text" name="message" required placeholder="Type your message..."
-                                    class="flex-1 px-4 py-2 border rounded-full focus:outline-none focus:ring">
-                                <button type="submit"
-                                    class="bg-blue-500 text-white px-4 py-2 rounded-full hover:bg-blue-600">
-                                    Send
-                                </button>
-                            </form>
-                            <% } %>
+
         </section>
 
     </main>

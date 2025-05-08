@@ -117,7 +117,6 @@ io.on("connection", (socket) => {
   });
 });
 
-
 function ensureAuthenticated(req, res, next) {
   if (req.session && req.session.user) {
     return next();
@@ -804,128 +803,108 @@ app.post("/acceptResponse/:responseId", async (req, res) => {
   }
 });
 
-
-
 //Message Between Users
 
 // GET /messages — list of all conversations
 // GET /messages
 
-app.get('/messages', async (req, res) => {
-  const userId = req.session.user.id;
+app.get("/messages", async (req, res) => {
+  const userId = new mongoose.Types.ObjectId(req.session.user.id); // ✅ Convert to ObjectId
 
-  // Get latest message per conversation (by postId + otherUser)
   const rawConvos = await Message.aggregate([
     {
       $match: {
-        $or: [
-          { senderId: userId },
-          { receiverId: userId }
-        ]
-      }
+        $or: [{ senderId: userId }, { receiverId: userId }],
+      },
     },
     {
-      $sort: { createdAt: -1 }
+      $sort: { createdAt: -1 },
     },
     {
       $group: {
         _id: {
-          postId: '$postId',
+          postId: "$postId",
           otherUser: {
-            $cond: [
-              { $eq: ['$senderId', userId] },
-              '$receiverId',
-              '$senderId'
-            ]
-          }
+            $cond: [{ $eq: ["$senderId", userId] }, "$receiverId", "$senderId"],
+          },
         },
-        lastMessage: { $first: '$message' },
-        at: { $first: '$createdAt' }
-      }
-    }
+        lastMessage: { $first: "$message" },
+        at: { $first: "$createdAt" },
+      },
+    },
   ]);
+  // console.log(rawConvos);
 
-  // Format for template
-  const convos = rawConvos.map(c => ({
+  const convos = rawConvos.map((c) => ({
     postId: c._id.postId,
     otherId: c._id.otherUser,
     lastMessage: c.lastMessage,
-    at: c.at
+    at: c.at,
   }));
 
-  // Fetch user names
-  const userIds = convos.map(c => c.otherId);
+  const userIds = convos.map((c) => new mongoose.Types.ObjectId(c.otherId)); // ✅ Convert to ObjectId
   const users = await User.find({ _id: { $in: userIds } });
   const nameMap = {};
-  users.forEach(u => nameMap[u._id] = u.name);
+  users.forEach((u) => (nameMap[u._id.toString()] = u.username));
+  // console.log(nameMap);
 
-  
   res.render("conversations", {
     convos,
     nameMap,
     messages: [],
-    currentUserId: userId,
-    showInputBox: false,
+    currentUserId: userId.toString(),
   });
-
 });
-
-
 
 // GET /messages/chat/:postId/:otherUserId
 // GET /messages/chat/:postId/:otherId
-app.get('/messages/chat/:postId/:otherId', async (req, res) => {
-  const userId = req.session.user.id;
+app.get("/messages/chat/:postId/:otherId", async (req, res) => {
+  const userId = new mongoose.Types.ObjectId(req.session.user.id);
   const { postId, otherId } = req.params;
 
   const messages = await Message.find({
     postId,
     $or: [
       { senderId: userId, receiverId: otherId },
-      { senderId: otherId, receiverId: userId }
-    ]
+      { senderId: otherId, receiverId: userId },
+    ],
   }).sort({ createdAt: 1 });
 
   // Also fetch all conversations again for left panel
   const rawConvos = await Message.aggregate([
     {
       $match: {
-        $or: [
-          { senderId: userId },
-          { receiverId: userId }
-        ]
-      }
+        $or: [{ senderId: userId }, { receiverId: userId }],
+      },
     },
     { $sort: { createdAt: -1 } },
     {
       $group: {
         _id: {
-          postId: '$postId',
+          postId: "$postId",
           otherUser: {
-            $cond: [
-              { $eq: ['$senderId', userId] },
-              '$receiverId',
-              '$senderId'
-            ]
-          }
+            $cond: [{ $eq: ["$senderId", userId] }, "$receiverId", "$senderId"],
+          },
         },
-        lastMessage: { $first: '$message' },
-        at: { $first: '$createdAt' }
-      }
-    }
+        lastMessage: { $first: "$message" },
+        at: { $first: "$createdAt" },
+      },
+    },
   ]);
 
-  const convos = rawConvos.map(c => ({
+  console.log(rawConvos);
+  const convos = rawConvos.map((c) => ({
     postId: c._id.postId,
     otherId: c._id.otherUser,
     lastMessage: c.lastMessage,
-    at: c.at
+    at: c.at,
   }));
 
-  const userIds = convos.map(c => c.otherId);
+  const userIds = convos.map((c) => new mongoose.Types.ObjectId(c.otherId));
   const users = await User.find({ _id: { $in: userIds } });
   const nameMap = {};
-  users.forEach(u => nameMap[u._id] = u.name);
+  
+  users.forEach((u) => (nameMap[u._id.toString()] = u.username));
 
   res.render("conversations", {
     convos,
@@ -934,10 +913,8 @@ app.get('/messages/chat/:postId/:otherId', async (req, res) => {
     currentUserId: userId,
     otherId,
     postId,
-    showInputBox: false,
   });
 });
-
 
 // POST /messages/send
 app.post("/messages/send", async (req, res) => {
@@ -949,7 +926,6 @@ app.post("/messages/send", async (req, res) => {
 
   res.redirect(`/messages/chat/${postId}/${receiverId}`);
 });
-
 
 // Start the server
 const PORT = process.env.PORT || 5000;
