@@ -862,6 +862,7 @@ app.get("/messages/chat/:postId/:otherId", async (req, res) => {
   const userId = new mongoose.Types.ObjectId(req.session.user.id);
   const { postId, otherId } = req.params;
 
+  // Fetch all messages between the user and the other user
   const messages = await Message.find({
     postId,
     $or: [
@@ -870,7 +871,30 @@ app.get("/messages/chat/:postId/:otherId", async (req, res) => {
     ],
   }).sort({ createdAt: 1 });
 
-  // Also fetch all conversations again for left panel
+  // If there are no messages, initialize a conversation by saving the first message
+  if (messages.length === 0) {
+    // Optionally, fetch the sender's post details (assuming you have a Post model)
+    const senderPost = await DeliveryPost.findById(postId);
+
+    // Construct the message content with the sender's post details
+    const initialMessage = new Message({
+      postId,
+      senderId: userId,
+      receiverId: otherId,
+      message: "Hello, this is the Post you accepted", // The actual message content
+      postDetails: {
+        postId: senderPost._id,
+        postTitle: senderPost.productName,
+        postSource: senderPost.source,
+        postDestination: senderPost.destination, // Or any other fields from the Post model
+      },
+      createdAt: new Date(),
+    });
+
+    await initialMessage.save();
+  }
+
+  // Fetch all conversations for the left panel (user's conversations)
   const rawConvos = await Message.aggregate([
     {
       $match: {
@@ -892,7 +916,6 @@ app.get("/messages/chat/:postId/:otherId", async (req, res) => {
     },
   ]);
 
-  console.log(rawConvos);
   const convos = rawConvos.map((c) => ({
     postId: c._id.postId,
     otherId: c._id.otherUser,
@@ -900,12 +923,13 @@ app.get("/messages/chat/:postId/:otherId", async (req, res) => {
     at: c.at,
   }));
 
+  // Fetch user details (names) for all participants in the conversations
   const userIds = convos.map((c) => new mongoose.Types.ObjectId(c.otherId));
   const users = await User.find({ _id: { $in: userIds } });
   const nameMap = {};
-  
   users.forEach((u) => (nameMap[u._id.toString()] = u.username));
 
+  // Render the conversation page
   res.render("conversations", {
     convos,
     nameMap,
@@ -913,6 +937,7 @@ app.get("/messages/chat/:postId/:otherId", async (req, res) => {
     currentUserId: userId,
     otherId,
     postId,
+    showInputBox: messages.length === 0, // Show input box if no previous messages exist
   });
 });
 
