@@ -21,6 +21,11 @@ const deliveryPostSchema = new mongoose.Schema({
   email: { type: String, required: true },
   imageUrl: { type: String, required: false },
   postType: { type: String, default: "senderPost" },
+  status: {
+    type: String,
+    enum: ["pending", "accepted", "rejected"],
+    default: "pending",
+  },
 });
 
 module.exports = mongoose.model("DeliveryPost", deliveryPostSchema);

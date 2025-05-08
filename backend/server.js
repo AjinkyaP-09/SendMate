@@ -188,8 +188,10 @@ app.get("/home", async (req, res) => {
   }
 
   try {
-    const posts = await DeliveryPost.find(filter).sort({ createdAt: -1 });
-
+    const posts = await DeliveryPost.find({ status: "pending" }).sort({
+      createdAt: -1,
+    });
+    console.log(posts)
     res.render("travellerHomePage", { posts, msg });
   } catch (err) {
     console.error("Error fetching posts:", err);
@@ -277,8 +279,8 @@ app.get("/home/posts/:type", async (req, res) => {
 
     let posts;
     if (postType === "senderPost") {
-      posts = await DeliveryPost.find(filter).sort({ createdAt: -1 });
-      // console.log(posts);
+      posts = await DeliveryPost.find({ status: 'pending'}).sort({ createdAt: -1 });
+      console.log(posts);
       // console.log(filter);
     } else if (postType === "travellerPost") {
       posts = await TravellerPost.find(filter).sort({ createdAt: -1 });
@@ -717,18 +719,35 @@ app.get("/responseForm/:postType/:id", async (req, res) => {
     res.status(500).send("Server error");
   }
 });
-
 app.post("/submitResponse/:postType/:id", async (req, res) => {
   try {
     const { postType, id } = req.params;
     const { message, estimatedDelivery, priceOffer } = req.body;
-    // console.log(!req.session.user);
-    // console.log(req.session.user.id);
-
-    // console.log(!req.session.user.id);
 
     if (!req.session.user || !req.session.user.id) {
       return res.status(401).redirect("/login");
+    }
+
+    let post;
+    if (postType === "senderPost") {
+      post = await DeliveryPost.findById(id);
+    } else if (postType === "travellerPost") {
+      post = await TravellerPost.findById(id);
+    } else {
+      return res.status(400).send("Invalid post type");
+    }
+
+    if (!post) {
+      return res.status(404).send("Post not found");
+    }
+
+    // Check if the post is already accepted, and prevent further responses
+    if (post.status === "accepted") {
+      return res
+        .status(400)
+        .send(
+          "This post has already been accepted, no further responses allowed."
+        );
     }
 
     const newResponse = new TravellerResponse({
@@ -770,7 +789,7 @@ app.get("/dashboard/:postId/responses", async (req, res) => {
       "username email"
     );
 
-    res.render("viewResponses.ejs", { responses });
+    res.render("viewResponses.ejs", { responses, postId });
   } catch (error) {
     console.error("Error fetching responses:", error);
     res.status(500).send("Server Error");
@@ -778,19 +797,35 @@ app.get("/dashboard/:postId/responses", async (req, res) => {
 });
 
 //Accept the response of any traveller
-app.post("/acceptResponse/:responseId", async (req, res) => {
+app.post("/acceptResponse/:postId/:responseId", async (req, res) => {
   try {
-    const { responseId } = req.params;
+    const { postId, responseId } = req.params;
 
     // Set the selected response to accepted
-    await TravellerResponse.findByIdAndUpdate(responseId, {
-      status: "accepted",
-    });
+    const acceptedResponse = await TravellerResponse.findByIdAndUpdate(
+      responseId,
+      {
+        status: "accepted",
+      }
+    ).populate("travellerId");
+
+    // Find the corresponding post
+    const post = await DeliveryPost.findById(acceptedResponse.postId);
+
+    // If the post has already been accepted, prevent further changes
+    if (post.status === "accepted") {
+      return res
+        .status(400)
+        .send(
+          "This post has already been accepted, no further changes can be made."
+        );
+    }
+
+    // Mark the post as accepted
+    post.status = "accepted";
+    await post.save();
 
     // Reject other responses to the same post
-    const acceptedResponse = await TravellerResponse.findById(
-      responseId
-    ).populate("travellerId");
     await TravellerResponse.updateMany(
       { postId: acceptedResponse.postId, _id: { $ne: responseId } },
       { status: "rejected" }
@@ -881,7 +916,7 @@ app.get("/messages/chat/:postId/:otherId", async (req, res) => {
       postId,
       senderId: userId,
       receiverId: otherId,
-      message: "Hello, this is the Post you accepted", // The actual message content
+      message: "Hello, this is the Post you want to accept", // The actual message content
       postDetails: {
         postId: senderPost._id,
         postTitle: senderPost.productName,

@@ -61,18 +61,25 @@
                             <div class="md:col-span-2"><strong>Additional Info:</strong>
                                 <%= post.additionalDetails || 'N/A' %>
                             </div>
-                            
-                            
+
+
                         </div>
-                        <div class="flex justify-center mt-8">
-                            <a href="/responseForm/<%=post.postType%>/<%= post._id %>"
-                                class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg shadow-md transition duration-300">
-                                Fill Response Form
-                            </a>
-                        </div>
-                        <div class="md:col-span-2 text-right mt-5 text-sm text-gray-500">
-                            Posted by <%= post.username %> (<%= post.email %>)
-                        </div>
+
+                        <% if (post.status==='accepted' ) { %>
+                            <p class="text-gray-500">This post has already been accepted. No further responses can be
+                                submitted.</p>
+                            <% } else { %>
+                                <div class="flex justify-center mt-8">
+                                    <a href="/responseForm/<%=post.postType%>/<%= post._id %>"
+                                        class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg shadow-md transition duration-300">
+                                        Fill Response Form
+                                    </a>
+                                </div>
+                                <% } %>
+
+                                    <div class="md:col-span-2 text-right mt-5 text-sm text-gray-500">
+                                        Posted by <%= post.username %> (<%= post.email %>)
+                                    </div>
             </div>
         </main>
 
