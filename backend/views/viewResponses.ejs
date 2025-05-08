@@ -58,16 +58,21 @@
                                             <button type="submit"
                                                 class="bg-green-600 text-white py-1 px-6 rounded hover:bg-green-700">Accept</button>
                                         </form>
-                                        <form action="/chat/<%= response._id %>" method="POST" class="mt-2">
+                                        <form action="/messages/chat/<%= response.postId %>/<%= response.travellerId._id %>"
+                                            method="GET" class="mt-2">
                                             <button type="submit"
                                                 class="bg-green-600 text-white py-1 px-8 rounded hover:bg-green-700">Chat</button>
                                         </form>
+
                                         <% } %>
                                             <% if (response.status==='accepted' ) { %>
-                                                <form action="/chat/<%= response._id %>" method="POST" class="mt-2">
+                                                <form
+                                                    action="/messages/chat/<%= response.postId %>/<%= response.travellerId._id %>"
+                                                    method="GET" class="mt-2">
                                                     <button type="submit"
                                                         class="bg-green-600 text-white py-1 px-8 rounded hover:bg-green-700">Chat</button>
                                                 </form>
+
                                                 <% } %>
                                 </div>
                             </div>

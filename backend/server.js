@@ -10,6 +10,8 @@ const methodOverride = require("method-override");
 const User = require("./models/User");
 const ContactMail = require("./models/contact-mail");
 const passport = require("passport");
+const http = require("http");
+const socketio = require("socket.io");
 
 // Initialize the app
 const app = express();
@@ -37,6 +39,9 @@ app.use(
   })
 );
 
+const server = http.createServer(app);
+const io = socketio(server);
+
 // Set view engine to EJS
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
@@ -59,6 +64,7 @@ const postRoute = require("./routes/posts");
 const messageRoute = require("./routes/messages");
 const parcelRoute = require("./routes/parcelRoute");
 const TravellerResponse = require("./models/TravellerResponse.js");
+const Message = require("./models/Message.js");
 
 app.use("/api/auth", authRoute);
 app.use("/api/posts", postRoute);
@@ -77,6 +83,40 @@ app.use((req, res, next) => {
   }
   next();
 });
+
+//Websocket Connection
+io.on("connection", (socket) => {
+  console.log("A user connected");
+
+  // Optional: join a room based on user ID for private delivery
+  socket.on("join", (userId) => {
+    socket.join(userId);
+    console.log(`User ${userId} joined their private room`);
+  });
+
+  socket.on("chatMessage", async (data) => {
+    try {
+      // Save message to DB
+      const newMsg = await Message.create({
+        senderId: data.senderId,
+        receiverId: data.receiverId,
+        postId: data.postId,
+        message: data.message,
+      });
+
+      // Emit only to sender and receiver
+      io.to(data.senderId).emit("chatMessage", newMsg);
+      io.to(data.receiverId).emit("chatMessage", newMsg);
+    } catch (err) {
+      console.error("DB Save Error:", err);
+    }
+  });
+
+  socket.on("disconnect", () => {
+    console.log("A user disconnected");
+  });
+});
+
 
 function ensureAuthenticated(req, res, next) {
   if (req.session && req.session.user) {
@@ -135,7 +175,6 @@ app.get("/home", async (req, res) => {
     filter.paymentMax = { $lte: max }; // Handle case where only max is provided
   }
 
-
   // Date Range
   if (startDate && endDate) {
     const start = new Date(startDate);
@@ -149,19 +188,15 @@ app.get("/home", async (req, res) => {
     filter.expectedTime = { $lte: new Date(endDate) };
   }
 
-
   try {
     const posts = await DeliveryPost.find(filter).sort({ createdAt: -1 });
-    
-    
+
     res.render("travellerHomePage", { posts, msg });
   } catch (err) {
     console.error("Error fetching posts:", err);
     res.status(500).send("Error loading posts");
   }
 });
-
-
 
 // Serve the login page
 app.get("/login", (req, res) => {
@@ -246,8 +281,6 @@ app.get("/home/posts/:type", async (req, res) => {
       posts = await DeliveryPost.find(filter).sort({ createdAt: -1 });
       // console.log(posts);
       // console.log(filter);
-      
-      
     } else if (postType === "travellerPost") {
       posts = await TravellerPost.find(filter).sort({ createdAt: -1 });
     } else {
@@ -260,8 +293,6 @@ app.get("/home/posts/:type", async (req, res) => {
     res.status(500).send("Server error");
   }
 });
-
-
 
 app.post("/submit-travel-post", async (req, res) => {
   try {
@@ -698,7 +729,7 @@ app.post("/submitResponse/:postType/:id", async (req, res) => {
     // console.log(!req.session.user.id);
 
     if (!req.session.user || !req.session.user.id) {
-      return res.status(401).send("Unauthorized: Please log in");
+      return res.status(401).redirect("/login");
     }
 
     const newResponse = new TravellerResponse({
@@ -773,9 +804,156 @@ app.post("/acceptResponse/:responseId", async (req, res) => {
   }
 });
 
+
+
+//Message Between Users
+
+// GET /messages — list of all conversations
+// GET /messages
+
+app.get('/messages', async (req, res) => {
+  const userId = req.session.user.id;
+
+  // Get latest message per conversation (by postId + otherUser)
+  const rawConvos = await Message.aggregate([
+    {
+      $match: {
+        $or: [
+          { senderId: userId },
+          { receiverId: userId }
+        ]
+      }
+    },
+    {
+      $sort: { createdAt: -1 }
+    },
+    {
+      $group: {
+        _id: {
+          postId: '$postId',
+          otherUser: {
+            $cond: [
+              { $eq: ['$senderId', userId] },
+              '$receiverId',
+              '$senderId'
+            ]
+          }
+        },
+        lastMessage: { $first: '$message' },
+        at: { $first: '$createdAt' }
+      }
+    }
+  ]);
+
+  // Format for template
+  const convos = rawConvos.map(c => ({
+    postId: c._id.postId,
+    otherId: c._id.otherUser,
+    lastMessage: c.lastMessage,
+    at: c.at
+  }));
+
+  // Fetch user names
+  const userIds = convos.map(c => c.otherId);
+  const users = await User.find({ _id: { $in: userIds } });
+  const nameMap = {};
+  users.forEach(u => nameMap[u._id] = u.name);
+
+  
+  res.render("conversations", {
+    convos,
+    nameMap,
+    messages: [],
+    currentUserId: userId,
+    showInputBox: false,
+  });
+
+});
+
+
+
+// GET /messages/chat/:postId/:otherUserId
+// GET /messages/chat/:postId/:otherId
+app.get('/messages/chat/:postId/:otherId', async (req, res) => {
+  const userId = req.session.user.id;
+  const { postId, otherId } = req.params;
+
+  const messages = await Message.find({
+    postId,
+    $or: [
+      { senderId: userId, receiverId: otherId },
+      { senderId: otherId, receiverId: userId }
+    ]
+  }).sort({ createdAt: 1 });
+
+  // Also fetch all conversations again for left panel
+  const rawConvos = await Message.aggregate([
+    {
+      $match: {
+        $or: [
+          { senderId: userId },
+          { receiverId: userId }
+        ]
+      }
+    },
+    { $sort: { createdAt: -1 } },
+    {
+      $group: {
+        _id: {
+          postId: '$postId',
+          otherUser: {
+            $cond: [
+              { $eq: ['$senderId', userId] },
+              '$receiverId',
+              '$senderId'
+            ]
+          }
+        },
+        lastMessage: { $first: '$message' },
+        at: { $first: '$createdAt' }
+      }
+    }
+  ]);
+
+  const convos = rawConvos.map(c => ({
+    postId: c._id.postId,
+    otherId: c._id.otherUser,
+    lastMessage: c.lastMessage,
+    at: c.at
+  }));
+
+  const userIds = convos.map(c => c.otherId);
+  const users = await User.find({ _id: { $in: userIds } });
+  const nameMap = {};
+  users.forEach(u => nameMap[u._id] = u.name);
+
+  res.render("conversations", {
+    convos,
+    nameMap,
+    messages,
+    currentUserId: userId,
+    otherId,
+    postId,
+    showInputBox: false,
+  });
+});
+
+
+// POST /messages/send
+app.post("/messages/send", async (req, res) => {
+  const senderId = req.session.user.id; // Use session ID
+  const { receiverId, postId, message } = req.body;
+
+  const newMessage = new Message({ senderId, receiverId, postId, message });
+  await newMessage.save();
+
+  res.redirect(`/messages/chat/${postId}/${receiverId}`);
+});
+
+
 // Start the server
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
+server.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
 
