@@ -1,0 +1,63 @@
+<nav class="bg-[#d9e6f8] shadow-md fixed top-0 left-0 w-full z-50 text-gray-800 font-sans">
+    <div class="container mx-auto flex justify-between items-center py-3 px-6">
+        <a href="/" class="text-2xl font-bold flex items-center">
+            <img src="/images/sendmate-logo.png" alt="Sendmate Logo" class="h-8 w-8 mr-2"> SendMate
+        </a>
+
+        <!-- Mobile toggle -->
+        <div class="md:hidden">
+            <button id="mobile-menu-btn" class="focus:outline-none">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+            </button>
+        </div>
+
+        <!-- Desktop links -->
+        <ul class="hidden md:flex space-x-8 items-center font-semibold">
+            <li><a href="/home"><img src="/images/home.png" class="h-8 w-8" alt="Home"></a></li>
+            <li><a href="/messages"><img src="/images/messenger.png" class="h-8 w-8" alt="Messenger"></a></li>
+            <li class="relative group">
+                <a href="#"><img src="/images/question.png" class="h-8 w-8" alt="Help"></a>
+                <ul class="absolute right-0 hidden group-hover:block bg-white border mt-2 rounded shadow-md w-48 z-50">
+                    <li><a href="/information" class="block px-4 py-2 hover:bg-gray-100">How-it-works</a></li>
+                    <li><a href="/contact" class="block px-4 py-2 hover:bg-gray-100">Contact</a></li>
+                </ul>
+            </li>
+            <li class="relative group">
+                <a href="#"><img src="/images/plus.png" class="h-8 w-8" alt="Add"></a>
+                <ul class="absolute right-0 hidden group-hover:block bg-white border mt-2 rounded shadow-md w-48 z-50">
+                    <li><a href="/register-parcel" class="block px-4 py-2 hover:bg-gray-100">Register a Parcel</a></li>
+                    <li><a href="/travellerPost" class="block px-4 py-2 hover:bg-gray-100">Travel Plan</a></li>
+                </ul>
+            </li>
+            <li class="relative group">
+                <a href="#"><img src="/images/user.png" class="h-8 w-8" alt="User"></a>
+                <ul class="absolute right-0 hidden group-hover:block bg-white border mt-2 rounded shadow-md w-48 z-50">
+                    <li><a href="/dashboard" class="block px-4 py-2 hover:bg-gray-100">Profile</a></li>
+                    <li><a href="/logout" class="block px-4 py-2 hover:bg-gray-100">Logout</a></li>
+                </ul>
+            </li>
+        </ul>
+    </div>
+
+    <!-- Mobile menu -->
+    <ul id="mobile-dropdown" class="hidden md:hidden flex flex-col space-y-2 py-3 px-6 font-semibold bg-[#d9e6f8]">
+        <li><a href="/home" class="hover:text-blue-800">Home</a></li>
+        <li><a href="/messages" class="hover:text-blue-800">Messenger</a></li>
+        <li><a href="/information" class="hover:text-blue-800">How-it-works</a></li>
+        <li><a href="/contact" class="hover:text-blue-800">Contact</a></li>
+        <li><a href="/register-parcel" class="hover:text-blue-800">Register a Parcel</a></li>
+        <li><a href="/travellerPost" class="hover:text-blue-800">Travel Plan</a></li>
+        <li><a href="/dashboard" class="hover:text-blue-800">Profile</a></li>
+        <li><a href="/logout" class="hover:text-blue-800">Logout</a></li>
+    </ul>
+</nav>
+
+<script>
+    // Toggle mobile menu
+    document.getElementById('mobile-menu-btn').addEventListener('click', () => {
+        const mobileMenu = document.getElementById('mobile-dropdown');
+        mobileMenu.classList.toggle('hidden');
+    });
+</script>

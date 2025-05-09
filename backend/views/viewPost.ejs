@@ -2,35 +2,40 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>
         <%= post.productName %> | SendMate
     </title>
-    <link rel="stylesheet" href="/styles.css">
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="/styles.css" />
 </head>
 
-<body>
-    <div class="wrapper">
+<body class="font-sans">
+    <div class="wrapper min-h-screen flex flex-col">
+        <!-- Header -->
         <header>
-            <%- include('partials/nav_users') %>
+
+            <%- include('partials/navbar') %>
+
         </header>
 
-        <main>
-            <div class="container mx-auto bg-white mt-10 p-8 rounded-lg shadow-lg max-w-4xl w-full">
-                <h2 class="text-2xl font-bold text-center mb-6 text-gray-800">
+
+        <!-- Main Content -->
+        <main class="flex-grow py-8 px-4">
+            <div class="max-w-4xl mx-auto p-6 bg-white rounded-xl shadow-lg">
+                <h1 class="text-3xl font-bold text-center mb-4">
                     <%= post.productName %>
-                </h2>
+                </h1>
 
                 <% if (post.imageUrl) { %>
                     <div class="flex justify-center mb-6">
-                        <img src="<%= post.imageUrl %>" alt="Post Image"
-                            class="rounded-lg shadow-md max-h-64 object-cover">
+                        <img src="<%= post.imageUrl %>" alt="Product Image"
+                            class="rounded-lg max-h-72 object-cover shadow-md" />
                     </div>
                     <% } %>
 
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-gray-700">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm sm:text-base text-gray-800">
                             <div><strong>Source:</strong>
                                 <%= post.source %>
                             </div>
@@ -41,49 +46,48 @@
                                 <%= new Date(post.expectedTime).toLocaleDateString('en-IN', { weekday: 'long' ,
                                     year: 'numeric' , month: 'long' , day: 'numeric' }) %>
                             </div>
-                            <div><strong>Payment Range:</strong> ₹<%= post.paymentMin %> - ₹<%= post.paymentMax %>
+                            <div><strong>Payment:</strong> ₹<%= post.paymentMin %> – ₹<%= post.paymentMax %>
                             </div>
                             <div><strong>Category:</strong>
                                 <%= post.category %>
                             </div>
-                            <div><strong>Product Weight:</strong>
+                            <div><strong>Weight:</strong>
                                 <%= post.productWeight %> kg
                             </div>
-                            <div><strong>Dimensions (L×B×H):</strong>
+                            <div><strong>Dimensions:</strong>
                                 <%= post.length %> x <%= post.breadth %> x <%= post.height %> cm
                             </div>
                             <div><strong>Fragile:</strong>
-                                <%= post.isFragile %>
+                                <%= post.isFragile ? 'Yes' : 'No' %>
                             </div>
-                            <div><strong>Receiver Details:</strong>
+                            <div class="sm:col-span-2"><strong>Receiver:</strong>
                                 <%= post.receiverDetails %>
                             </div>
-                            <div class="md:col-span-2"><strong>Additional Info:</strong>
+                            <div class="sm:col-span-2"><strong>Additional Info:</strong>
                                 <%= post.additionalDetails || 'N/A' %>
                             </div>
-
-
                         </div>
 
                         <% if (post.status==='accepted' ) { %>
-                            <p class="text-gray-500">This post has already been accepted. No further responses can be
-                                submitted.</p>
+                            <p class="text-red-500 font-medium text-center mt-6">This post has already been accepted.
+                            </p>
                             <% } else { %>
                                 <div class="flex justify-center mt-8">
-                                    <a href="/responseForm/<%=post.postType%>/<%= post._id %>"
-                                        class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg shadow-md transition duration-300">
+                                    <a href="/responseForm/<%= post.postType %>/<%= post._id %>"
+                                        class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-5 rounded-lg shadow transition">
                                         Fill Response Form
                                     </a>
                                 </div>
                                 <% } %>
 
-                                    <div class="md:col-span-2 text-right mt-5 text-sm text-gray-500">
+                                    <div class="mt-6 text-sm text-right text-gray-500">
                                         Posted by <%= post.username %> (<%= post.email %>)
                                     </div>
             </div>
         </main>
 
-        <footer class="mt-10">
+        <!-- Footer -->
+        <footer class="bg-gray-800 text-white text-center text-sm py-4 mt-4">
             <%- include('partials/footer') %>
         </footer>
     </div>
