@@ -15,9 +15,9 @@
 
     <!-- Main Content -->
     <main class="flex flex-col md:flex-row flex-grow mt-16 h-[calc(100vh-4rem)]">
-
         <!-- Sidebar: Conversation List -->
-        <aside class="w-full md:w-1/3 border-r bg-white overflow-y-auto h-1/2 md:h-full">
+        <aside class="w-full md:w-1/3 border-r bg-white overflow-y-auto h-full
+            <%= messages && messages.length > 0 ? 'hidden' : 'block' %> md:block">
             <h2 class="text-lg md:text-xl font-semibold px-4 py-3 border-b">Conversations</h2>
 
             <% if (convos.length===0) { %>
@@ -54,46 +54,40 @@
         </aside>
 
         <!-- Chat Area -->
-        <section class="flex-1 bg-white flex flex-col h-1/2 md:h-full">
+        <section class="flex-1 bg-white flex flex-col h-full 
+    <%= messages && messages.length > 0 ? 'block' : 'hidden' %> md:flex">
+
             <% if (!messages || messages.length===0) { %>
                 <div class="flex-1 flex items-center justify-center text-gray-500 px-4 text-center">
                     Select a conversation to start chatting.
                 </div>
                 <% } else { %>
-                    <div class="flex-1 overflow-y-auto p-4 space-y-4 max-h-full">
+
+                    <!-- Back button for mobile -->
+                    <div class="md:hidden p-2 border-b">
+                        <a href="/messages" class="text-blue-600 hover:underline">← Back to Conversations</a>
+                    </div>
+
+                    <!-- Scrollable messages container -->
+                    <div class="flex-1 overflow-y-auto p-4 space-y-4">
                         <% messages.forEach(m=> { %>
                             <div
                                 class="<%= m.senderId.toString() === currentUserId.toString() ? 'text-right' : 'text-left' %>">
                                 <div class="inline-block max-w-full md:max-w-[75%] px-4 py-2 rounded-lg 
-                                <%= m.senderId.toString() === currentUserId.toString() 
-                                    ? 'bg-blue-500 text-white' 
-                                    : 'bg-gray-200 text-gray-800' %>">
+                        <%= m.senderId.toString() === currentUserId.toString()
+                            ? 'bg-blue-500 text-white'
+                            : 'bg-gray-200 text-gray-800' %>">
                                     <%= m.message %>
                                 </div>
-
-                                <% if (m.postDetails) { %>
-                                    <div
-                                        class="mt-2 text-xs text-gray-600 bg-gray-100 p-2 rounded-lg max-w-full md:max-w-[75%]">
-                                        <p><strong>Post Title:</strong>
-                                            <%= m.postDetails.postTitle %>
-                                        </p>
-                                        <p><strong>Post Source:</strong>
-                                            <%= m.postDetails.postSource %>
-                                        </p>
-                                        <p><strong>Post Destination:</strong>
-                                            <%= m.postDetails.postDestination %>
-                                        </p>
-                                    </div>
-                                    <% } %>
-
-                                        <div class="text-xs text-gray-400 mt-1">
-                                            <%= new Date(m.createdAt).toLocaleTimeString([], { hour: '2-digit' ,
-                                                minute: '2-digit' }) %>
-                                        </div>
+                                <div class="text-xs text-gray-400 mt-1">
+                                    <%= new Date(m.createdAt).toLocaleTimeString([], { hour: '2-digit' ,
+                                        minute: '2-digit' }) %>
+                                </div>
                             </div>
                             <% }) %>
                     </div>
 
+                    <!-- Message input fixed at bottom of chat section -->
                     <form action="/messages/send" method="POST" class="p-4 border-t flex items-center gap-2">
                         <input type="hidden" name="receiverId" value="<%= otherId %>">
                         <input type="hidden" name="postId" value="<%= postId %>">
@@ -104,57 +98,58 @@
                             Send
                         </button>
                     </form>
+
                     <% } %>
         </section>
 
     </main>
 
     <!-- Footer -->
-    <%- include('partials/footer') %>
+    <!-- <%- include('partials/footer') %> -->
 
-        <!-- Socket.IO -->
-        <script src="/socket.io/socket.io.js"></script>
-        <script>
-            const socket = io();
-            const userId = "<%= currentUserId %>";
-            const postId = JSON.stringify(typeof postId !== 'undefined' ? postId : null);
-            const otherId = JSON.stringify(typeof otherId !== 'undefined' ? otherId : null);
-            const chatBox = document.querySelector(".overflow-y-auto");
+    <!-- Socket.IO -->
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const socket = io();
+        const userId = "<%= currentUserId %>";
+        const postId = JSON.stringify(typeof postId !== 'undefined' ? postId : null);
+        const otherId = JSON.stringify(typeof otherId !== 'undefined' ? otherId : null);
+        const chatBox = document.querySelector(".overflow-y-auto");
 
-            socket.emit("join", userId);
+        socket.emit("join", userId);
 
-            if (postId && otherId) {
-                const form = document.querySelector("form");
-                const input = document.querySelector("input[name='message']");
+        if (postId && otherId) {
+            const form = document.querySelector("form");
+            const input = document.querySelector("input[name='message']");
 
-                form.addEventListener("submit", function (e) {
-                    e.preventDefault();
-                    const message = input.value;
+            form.addEventListener("submit", function (e) {
+                e.preventDefault();
+                const message = input.value;
 
-                    fetch("/messages/send", {
-                        method: "POST",
-                        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-                        body: new URLSearchParams({ message, receiverId: otherId, postId })
-                    });
-
-                    socket.emit("chatMessage", {
-                        senderId: userId,
-                        receiverId: otherId,
-                        postId,
-                        message
-                    });
-
-                    input.value = "";
+                fetch("/messages/send", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                    body: new URLSearchParams({ message, receiverId: otherId, postId })
                 });
 
-                socket.on("chatMessage", (data) => {
-                    if (data.postId !== postId) return;
+                socket.emit("chatMessage", {
+                    senderId: userId,
+                    receiverId: otherId,
+                    postId,
+                    message
+                });
 
-                    const isCurrentUser = data.senderId === userId;
+                input.value = "";
+            });
 
-                    const div = document.createElement("div");
-                    div.className = isCurrentUser ? "text-right" : "text-left";
-                    div.innerHTML = `
+            socket.on("chatMessage", (data) => {
+                if (data.postId !== postId) return;
+
+                const isCurrentUser = data.senderId === userId;
+
+                const div = document.createElement("div");
+                div.className = isCurrentUser ? "text-right" : "text-left";
+                div.innerHTML = `
                     <div class="${isCurrentUser ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-800'} inline-block px-4 py-2 rounded-lg max-w-full md:max-w-[75%]">
                         ${data.message}
                     </div>
@@ -162,12 +157,11 @@
                         ${new Date(data.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                     </div>
                 `;
-                    chatBox.appendChild(div);
-                    chatBox.scrollTop = chatBox.scrollHeight;
-                });
-            }
-        </script>
-
+                chatBox.appendChild(div);
+                chatBox.scrollTop = chatBox.scrollHeight;
+            });
+        }
+    </script>
 </body>
 
 </html>

@@ -113,114 +113,114 @@
     </main>
 
     <!-- Footer -->
-    <%- include('partials/footer') %>
+    <!-- <%- include('partials/footer') %> -->
 
 
-        <!-- JavaScript functionality for loading and displaying posts -->
-        <script>
+    <!-- JavaScript functionality for loading and displaying posts -->
+    <script>
 
-            // const filter = JSON.stringify(filter);
-
-
-            const today = new Date().toISOString().split('T')[0];
-            const startDateInput = document.querySelector('input[name="startDate"]');
-            const endDateInput = document.querySelector('input[name="endDate"]');
-
-            if (startDateInput) {
-                startDateInput.setAttribute('min', today);
-                startDateInput.addEventListener('change', () => {
-                    const selectedStart = startDateInput.value;
-                    endDateInput.value = ""; // Reset endDate if already selected
-                    endDateInput.setAttribute('min', selectedStart);
-                });
-            }
-
-            if (endDateInput) {
-                endDateInput.setAttribute('min', today);
-            }
-
-            // Price constraint (paymentMax should not be less than paymentMin)
-            const paymentMinInput = document.querySelector('input[name="paymentMin"]');
-            const paymentMaxInput = document.querySelector('input[name="paymentMax"]');
-
-            if (paymentMinInput && paymentMaxInput) {
-                paymentMinInput.addEventListener('input', () => {
-                    const min = parseInt(paymentMinInput.value);
-                    if (!isNaN(min)) {
-                        paymentMaxInput.setAttribute('min', min);
-                    }
-                });
-            }
-
-            setTimeout(() => {
-                const alert = document.querySelector(".bg-green-100");
-                if (alert) {
-                    alert.style.display = "none";
-                }
-            }, 3000); // 3 seconds
-
-            function initialLoad() {
-                const postTypeSelect = document.getElementById("postType");
-                const defaultPostType = postTypeSelect.value;
-                loadPosts(defaultPostType);
-
-            }
-
-            window.onload = initialLoad;
-
-            function loadPosts(postType) {
-                const params = new URLSearchParams();
-                console.log(params);
-                
-
-                const search = document.querySelector('[name="search"]').value;
-                const paymentMin = document.querySelector('[name="paymentMin"]').value;
-                const paymentMax = document.querySelector('[name="paymentMax"]').value;
-                const startDate = document.querySelector('[name="startDate"]').value;
-                const endDate = document.querySelector('[name="endDate"]').value;
-
-                if (search) params.append("search", search);
-                if (postType) params.append("postType", postType);
-                if (paymentMin) params.append("paymentMin", paymentMin);
-                if (paymentMax) params.append("paymentMax", paymentMax);
-                if (startDate) params.append("startDate", startDate);
-                if (endDate) params.append("endDate", endDate);
-
-                fetch(`/home/posts/${postType}?${params.toString()}`)
-                    .then(response => response.json())
-                    .then(posts => {
-                        displayPosts(posts, postType);
-                    })
-                    .catch(error => console.error('Error loading posts:', error));
-            }
+        // const filter = JSON.stringify(filter);
 
 
+        const today = new Date().toISOString().split('T')[0];
+        const startDateInput = document.querySelector('input[name="startDate"]');
+        const endDateInput = document.querySelector('input[name="endDate"]');
 
-            document.getElementById("postType").addEventListener("change", function () {
-                const selectedType = this.value;
-                loadPosts(selectedType);
+        if (startDateInput) {
+            startDateInput.setAttribute('min', today);
+            startDateInput.addEventListener('change', () => {
+                const selectedStart = startDateInput.value;
+                endDateInput.value = ""; // Reset endDate if already selected
+                endDateInput.setAttribute('min', selectedStart);
             });
+        }
 
-            function displayPosts(posts, postType) {
-                const postsContainer = document.getElementById('postsContainer');
-                postsContainer.innerHTML = '';
+        if (endDateInput) {
+            endDateInput.setAttribute('min', today);
+        }
 
-                if (posts && posts.length > 0) {
-                    const postList = document.createElement('ul');
-                    postList.classList.add('space-y-4');
+        // Price constraint (paymentMax should not be less than paymentMin)
+        const paymentMinInput = document.querySelector('input[name="paymentMin"]');
+        const paymentMaxInput = document.querySelector('input[name="paymentMax"]');
 
-                    posts.forEach(post => {
-                        const formattedDate = new Date(post.expectedTime).toLocaleDateString('en-US', {
-                            weekday: 'long',
-                            year: 'numeric',
-                            month: 'long',
-                            day: 'numeric',
-                        });
+        if (paymentMinInput && paymentMaxInput) {
+            paymentMinInput.addEventListener('input', () => {
+                const min = parseInt(paymentMinInput.value);
+                if (!isNaN(min)) {
+                    paymentMaxInput.setAttribute('min', min);
+                }
+            });
+        }
 
-                        const postItem = document.createElement('li');
-                        postItem.classList.add('bg-gray-50', 'p-6', 'rounded-lg', 'shadow', 'flex', 'flex-col', 'md:flex-row', 'justify-between', 'items-center');
+        setTimeout(() => {
+            const alert = document.querySelector(".bg-green-100");
+            if (alert) {
+                alert.style.display = "none";
+            }
+        }, 3000); // 3 seconds
 
-                        postItem.innerHTML = `
+        function initialLoad() {
+            const postTypeSelect = document.getElementById("postType");
+            const defaultPostType = postTypeSelect.value;
+            loadPosts(defaultPostType);
+
+        }
+
+        window.onload = initialLoad;
+
+        function loadPosts(postType) {
+            const params = new URLSearchParams();
+            console.log(params);
+
+
+            const search = document.querySelector('[name="search"]').value;
+            const paymentMin = document.querySelector('[name="paymentMin"]').value;
+            const paymentMax = document.querySelector('[name="paymentMax"]').value;
+            const startDate = document.querySelector('[name="startDate"]').value;
+            const endDate = document.querySelector('[name="endDate"]').value;
+
+            if (search) params.append("search", search);
+            if (postType) params.append("postType", postType);
+            if (paymentMin) params.append("paymentMin", paymentMin);
+            if (paymentMax) params.append("paymentMax", paymentMax);
+            if (startDate) params.append("startDate", startDate);
+            if (endDate) params.append("endDate", endDate);
+
+            fetch(`/home/posts/${postType}?${params.toString()}`)
+                .then(response => response.json())
+                .then(posts => {
+                    displayPosts(posts, postType);
+                })
+                .catch(error => console.error('Error loading posts:', error));
+        }
+
+
+
+        document.getElementById("postType").addEventListener("change", function () {
+            const selectedType = this.value;
+            loadPosts(selectedType);
+        });
+
+        function displayPosts(posts, postType) {
+            const postsContainer = document.getElementById('postsContainer');
+            postsContainer.innerHTML = '';
+
+            if (posts && posts.length > 0) {
+                const postList = document.createElement('ul');
+                postList.classList.add('space-y-4');
+
+                posts.forEach(post => {
+                    const formattedDate = new Date(post.expectedTime).toLocaleDateString('en-US', {
+                        weekday: 'long',
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric',
+                    });
+
+                    const postItem = document.createElement('li');
+                    postItem.classList.add('bg-gray-50', 'p-6', 'rounded-lg', 'shadow', 'flex', 'flex-col', 'md:flex-row', 'justify-between', 'items-center');
+
+                    postItem.innerHTML = `
 <a href="/post/${postType}/${post._id}" class="flex flex-col md:flex-row w-full items-start md:items-center gap-4">
     ${post.imageUrl ? `
         <img src="${post.imageUrl}" alt="Post Image" class="w-full md:w-40 h-40 object-cover rounded shadow-md">
@@ -241,44 +241,44 @@
 </a>
 `;
 
-                        postList.appendChild(postItem);
-                    });
+                    postList.appendChild(postItem);
+                });
 
-                    postsContainer.appendChild(postList);
-                } else {
-                    postsContainer.innerHTML = `<p class="text-gray-600">You haven't created any posts yet.</p>`;
-                }
-
-                // const createPostDiv = document.createElement('div');
-                // createPostDiv.classList.add('mt-6');
-
-                // if (postType === "senderPost") {
-                //     createPostDiv.innerHTML = `
-                //         <a href="/register-parcel" class="inline-block bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg shadow">
-                //             Create Sender Post
-                //         </a>
-                //     `;
-                // } else if (postType === "travellerPost") {
-                //     createPostDiv.innerHTML = `
-                //         <a href="/travellerPost" class="inline-block bg-blue-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded-lg shadow">
-                //             Create Traveller Post
-                //         </a>
-                //     `;
-                // }
-
-                // postsContainer.appendChild(createPostDiv);
+                postsContainer.appendChild(postList);
+            } else {
+                postsContainer.innerHTML = `<p class="text-gray-600">You haven't created any posts yet.</p>`;
             }
 
-            document.getElementById("filterButton").addEventListener("click", function () {
-                const sidebar = document.getElementById("filterSidebar");
-                sidebar.classList.toggle("translate-x-full");
-            });
+            // const createPostDiv = document.createElement('div');
+            // createPostDiv.classList.add('mt-6');
 
-            document.getElementById("closeSidebar").addEventListener("click", function () {
-                const sidebar = document.getElementById("filterSidebar");
-                sidebar.classList.add("translate-x-full");
-            });
-        </script>
+            // if (postType === "senderPost") {
+            //     createPostDiv.innerHTML = `
+            //         <a href="/register-parcel" class="inline-block bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg shadow">
+            //             Create Sender Post
+            //         </a>
+            //     `;
+            // } else if (postType === "travellerPost") {
+            //     createPostDiv.innerHTML = `
+            //         <a href="/travellerPost" class="inline-block bg-blue-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded-lg shadow">
+            //             Create Traveller Post
+            //         </a>
+            //     `;
+            // }
+
+            // postsContainer.appendChild(createPostDiv);
+        }
+
+        document.getElementById("filterButton").addEventListener("click", function () {
+            const sidebar = document.getElementById("filterSidebar");
+            sidebar.classList.toggle("translate-x-full");
+        });
+
+        document.getElementById("closeSidebar").addEventListener("click", function () {
+            const sidebar = document.getElementById("filterSidebar");
+            sidebar.classList.add("translate-x-full");
+        });
+    </script>
 </body>
 
 </html>
