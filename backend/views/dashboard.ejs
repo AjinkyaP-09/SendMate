@@ -53,9 +53,9 @@
                 </div>
             </div>
         </main>
-        <footer>
+        <!-- <footer>
             <%- include('partials/footer') %>
-        </footer>
+        </footer> -->
     </div>
 
     <script>
@@ -106,31 +106,32 @@
                     postItem.classList.add('bg-gray-50', 'p-6', 'rounded-lg', 'shadow', 'flex', 'flex-col', 'md:flex-row', 'justify-between', 'items-center');
 
                     postItem.innerHTML = `
-                    <div onclick="window.location.href='/dashboard/${post._id}/responses'"
-     class="cursor-pointer w-full  flex items-center justify-around max-w-full border p-4 rounded hover:bg-gray-100 transition">
-                    
-     <div>
-        ${post.imageUrl ? `<img src="${post.imageUrl}" alt="Uploaded Image" class="mt-2 w-40 h-40 object-cover rounded-lg border">` : ''}
-        </div>
-    <div class="md:flex-1 md:mr-4 ml-12">
+<div onclick="window.location.href='/dashboard/${post._id}/responses'"
+     class="cursor-pointer w-full flex flex-col md:flex-row gap-4 border p-4 rounded hover:bg-gray-100 transition">
+
+    ${post.imageUrl ? `
+    <div class="w-full md:w-1/3">
+        <img src="${post.imageUrl}" alt="Uploaded Image"
+             class="w-full h-auto max-h-60 object-cover rounded-lg border" />
+    </div>` : ''}
+
+    <div class="flex-1">
         <h4 class="text-lg font-semibold text-gray-800 mb-2"><b>Name: </b>${post.productName || post.modeOfTravel}</h4>
         <p class="text-gray-600"><b>From: </b>${post.source || post.startLocation}</p>
         <p class="text-gray-600"><b>To: </b>${post.destination || post.endLocation}</p>
         <p class="text-gray-600"><b>Expected Date: </b>${formattedDate || 'Not Available'}</p>
     </div>
 
-        <div class="flex flex-col justify-between gap-3 mr-14">
-            <form action="/${postType}/${post._id}?_method=DELETE" method="post" onClick="event.stopPropagation();">
-                <button class="delete-btn bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-6 rounded w-full md:w-24">DELETE</button>
-            </form>
-            <form action="/${postType}/${post._id}/editForm" method="get" onClick="event.stopPropagation();">
-                <button class="edit-btn bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-6 rounded w-full md:w-24">EDIT</button>
-            </form>
-        </div>
-    
-</div>
+    <div class="flex flex-col justify-between gap-2 md:items-end">
+        <form action="/${postType}/${post._id}?_method=DELETE" method="post" onclick="event.stopPropagation();">
+            <button class="bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded w-full md:w-24">DELETE</button>
+        </form>
+        <form action="/${postType}/${post._id}/editForm" method="get" onclick="event.stopPropagation();">
+            <button class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded w-full md:w-24">EDIT</button>
+        </form>
+    </div>
+</div>`;
 
-`;
 
                     postList.appendChild(postItem);
                 });

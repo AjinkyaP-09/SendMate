@@ -2,90 +2,129 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>
-        <%= post.productName %> | SendMate
+        <%= post.productName || post.modeOfTravel %> | SendMate
     </title>
-    <link rel="stylesheet" href="/styles.css">
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="/styles.css" />
 </head>
 
-<body>
-    <div class="wrapper">
+<body class="font-sans">
+    <div class="wrapper min-h-screen flex flex-col">
+        <!-- Header -->
         <header>
-            <%- include('partials/nav_users') %>
+            <%- include('partials/navbar') %>
         </header>
 
-        <main>
-            <div class="container mx-auto bg-white mt-10 p-8 rounded-lg shadow-lg max-w-4xl w-full">
-                <h2 class="text-2xl font-bold text-center mb-6 text-gray-800">
-                    <%= post.productName %>
-                </h2>
+        <!-- Main Content -->
+        <main class="flex-grow py-8 px-4">
+            <div class="max-w-4xl mx-auto p-6 bg-white rounded-xl shadow-lg">
+                <h1 class="text-3xl font-bold text-center mb-4">
+                    <%= post.productName || post.modeOfTravel %>
+                </h1>
 
                 <% if (post.imageUrl) { %>
                     <div class="flex justify-center mb-6">
                         <img src="<%= post.imageUrl %>" alt="Post Image"
-                            class="rounded-lg shadow-md max-h-64 object-cover">
+                            class="rounded-lg max-h-72 object-cover shadow-md" />
                     </div>
                     <% } %>
 
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-gray-700">
-                            <div><strong>Source:</strong>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm sm:text-base text-gray-800">
+                            <div><strong>From:</strong>
                                 <%= post.source %>
                             </div>
-                            <div><strong>Destination:</strong>
+                            <div><strong>To:</strong>
                                 <%= post.destination %>
                             </div>
-                            <div><strong>Expected Delivery:</strong>
+                            <div><strong>Expected Date:</strong>
                                 <%= new Date(post.expectedTime).toLocaleDateString('en-IN', { weekday: 'long' ,
                                     year: 'numeric' , month: 'long' , day: 'numeric' }) %>
                             </div>
-                            <div><strong>Payment Range:</strong> ₹<%= post.paymentMin %> - ₹<%= post.paymentMax %>
-                            </div>
-                            <div><strong>Category:</strong>
-                                <%= post.category %>
-                            </div>
-                            <div><strong>Product Weight:</strong>
-                                <%= post.productWeight %> kg
-                            </div>
-                            <div><strong>Dimensions (L×B×H):</strong>
-                                <%= post.length %> x <%= post.breadth %> x <%= post.height %> cm
-                            </div>
-                            <div><strong>Fragile:</strong>
-                                <%= post.isFragile %>
-                            </div>
-                            <div><strong>Receiver Details:</strong>
-                                <%= post.receiverDetails %>
-                            </div>
-                            <div class="md:col-span-2"><strong>Additional Info:</strong>
-                                <%= post.additionalDetails || 'N/A' %>
-                            </div>
 
+                            <% if (post.postType==='senderPost' ) { %>
+                                <div><strong>Payment:</strong> ₹<%= post.paymentMin %> – ₹<%= post.paymentMax %>
+                                </div>
+                                <div><strong>Category:</strong>
+                                    <%= post.category %>
+                                </div>
+                                <div><strong>Weight:</strong>
+                                    <%= post.productWeight %> kg
+                                </div>
+                                <div><strong>Dimensions:</strong>
+                                    <%= post.length %> x <%= post.breadth %> x <%= post.height %> cm
+                                </div>
+                                <div><strong>Fragile:</strong>
+                                    <%= post.isFragile ? 'Yes' : 'No' %>
+                                </div>
+                                <div class="sm:col-span-2"><strong>Receiver:</strong>
+                                    <%= post.receiverDetails %>
+                                </div>
+                                <% } else if (post.postType==='travellerPost' ) { %>
+                                    <div><strong>Parcel Size:</strong>
+                                        <%= post.parcelSize %>
+                                    </div>
+                                    <div><strong>Expected Reward:</strong> ₹<%= post.expectedAmount %>
+                                    </div>
+                                    <div><strong>Mode of Travel:</strong>
+                                        <%= post.modeOfTravel %>
+                                    </div>
 
+                                    <% if (post.modeOfTravel==='Bus' && post.busRouteDetails) { %>
+                                        <div class="sm:col-span-2"><strong>Bus Route Details:</strong>
+                                            <%= post.busRouteDetails %>
+                                        </div>
+                                        <% } %>
+                                            <% if (post.modeOfTravel==='Train' && post.trainTicketDetails) { %>
+                                                <div class="sm:col-span-2"><strong>Train Ticket Details:</strong>
+                                                    <%= post.trainTicketDetails %>
+                                                </div>
+                                                <% } %>
+                                                    <% if (post.modeOfTravel==='Airplane' && post.flightDetails) { %>
+                                                        <div class="sm:col-span-2"><strong>Flight Details:</strong>
+                                                            <%= post.flightDetails %>
+                                                        </div>
+                                                        <% } %>
+                                                            <% if (post.modeOfTravel==='Car' && post.carDetails) { %>
+                                                                <div class="sm:col-span-2"><strong>Car Details:</strong>
+                                                                    <%= post.carDetails %>
+                                                                </div>
+                                                                <% } %>
+                                                                    <% if (post.modeOfTravel==='Bike' &&
+                                                                        post.bikeDetails) { %>
+                                                                        <div class="sm:col-span-2"><strong>Bike
+                                                                                Details:</strong>
+                                                                            <%= post.bikeDetails %>
+                                                                        </div>
+                                                                        <% } %>
+                                                                            <% } %>
+
+                                                                                <div class="sm:col-span-2">
+                                                                                    <strong>Additional Info:</strong>
+                                                                                    <%= post.additionalDetails || 'N/A'
+                                                                                        %>
+                                                                                </div>
                         </div>
 
                         <% if (post.status==='accepted' ) { %>
-                            <p class="text-gray-500">This post has already been accepted. No further responses can be
-                                submitted.</p>
+                            <p class="text-red-500 font-medium text-center mt-6">This post has already been accepted.
+                            </p>
                             <% } else { %>
                                 <div class="flex justify-center mt-8">
-                                    <a href="/responseForm/<%=post.postType%>/<%= post._id %>"
-                                        class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg shadow-md transition duration-300">
+                                    <a href="/responseForm/<%= post.postType %>/<%= post._id %>"
+                                        class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-5 rounded-lg shadow transition">
                                         Fill Response Form
                                     </a>
                                 </div>
                                 <% } %>
 
-                                    <div class="md:col-span-2 text-right mt-5 text-sm text-gray-500">
+                                    <div class="mt-6 text-sm text-right text-gray-500">
                                         Posted by <%= post.username %> (<%= post.email %>)
                                     </div>
             </div>
         </main>
-
-        <footer class="mt-10">
-            <%- include('partials/footer') %>
-        </footer>
     </div>
 </body>
 

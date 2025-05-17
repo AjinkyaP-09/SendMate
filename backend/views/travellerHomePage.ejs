@@ -2,283 +2,127 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Home | SendMate</title>
-    <!-- <link rel="stylesheet" href="/styles.css"> -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="icon" href="/images/favicon.ico" type="image/x-icon">
+    <link rel="icon" href="/images/favicon.ico" type="image/x-icon" />
 </head>
 
-<body class="bg-gray-100 font-sans flex flex-col " style="min-height: 100vh;">
-    <!-- Fixed Header to stay on top of the page -->
+<body class="bg-slate-100 font-sans flex flex-col min-h-screen text-slate-800">
+    <!-- Header -->
     <header class="bg-white shadow fixed top-0 w-full z-10">
         <% if (!user) { %>
-            <%- include('partials/nav') %> <!-- Nav for guests -->
+            <%- include('partials/nav') %>
                 <% } else { %>
-                    <%- include('partials/nav_users') %> <!-- Nav for logged-in users -->
+                    <%- include('partials/nav_users') %>
                         <% } %>
     </header>
 
-    <!-- Main section with top padding to prevent overlap with the fixed header -->
-    <main class="pt-16 sm:pt-16 lg:pt- flex-grow">
-        <!-- Search bar and filter buttons with responsive design -->
-        <!-- Search & Filter Form -->
-        <form action="/home" id="filterForm" method="GET">
-            <div class="flex flex-wrap justify-center py-6 bg-blue-100">
-                <!-- Source Input -->
-                <input type="text" name="search" placeholder="Search by name or location" class="p-2 border rounded" />
-                <!-- Search Button -->
-                <button type="submit" id="searchButton"
-                    class="bg-blue-500 text-white font-semibold py-2 px-4 rounded-md shadow hover:bg-blue-600 mx-2 mt-2 sm:mt-0">
-                    Search
-                </button>
+    <!-- Main Content -->
+    <main class="pt-20 flex-grow">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-4">
+            <div class="flex flex-col lg:flex-row lg:items-start lg:space-x-6">
 
-                <!-- Filter Toggle Button (opens sidebar) -->
-                <button type="button" id="filterButton"
-                    class="bg-blue-500 text-white font-semibold py-2 px-4 rounded-md shadow hover:bg-blue-600 mx-2 mt-2 sm:mt-0">
-                    Filter
-                </button>
-            </div>
-
-            <!-- Sidebar Filter Panel -->
-            <div id="filterSidebar"
-                class="fixed top-0 right-0 w-80 h-full bg-white shadow-lg transform translate-x-full transition-transform duration-300 ease-in-out z-50">
-                <div class="flex justify-between items-center px-4 py-4 border-b">
-                    <h2 class="text-lg font-semibold">Filter Options</h2>
-                    <button type="button" id="closeSidebar"
-                        class="text-gray-500 hover:text-gray-800 text-2xl font-bold">&times;</button>
-                </div>
-
-                <div class="px-4 py-6 space-y-4">
-                    <!-- Post Type -->
-                    <div>
-                        <label for="postType" class="block text-gray-700 mb-1">Post Type</label>
-                        <select name="postType" id="postType" class="border rounded px-4 py-2 w-full">
-                            <!-- <option value="">All</option> -->
-                            <option value="senderPost" selected>Sender Post</option>
-                            <option value="travellerPost">Traveller Post</option>
+                <!-- Filter Dropdown -->
+                <div class="w-full lg:w-64 flex-shrink-0 mb-4 lg:mb-0">
+                    <div class="sticky lg:top-24 bg-indigo-50 border border-indigo-200 rounded-lg shadow p-4">
+                        <h3 class="text-indigo-700 font-semibold text-lg mb-2">Filter Posts</h3>
+                        <label for="postTypeSelect" class="block text-sm font-medium text-slate-700 mb-1">Select Post
+                            Type:</label>
+                        <select id="postTypeSelect"
+                            class="w-full text-sm border border-slate-300 rounded px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-indigo-400">
+                            <option value="senderPost">Sender Posts</option>
+                            <option value="travellerPost">Traveller Posts</option>
                         </select>
                     </div>
-
-                    <!-- Date Range -->
-                    <div>
-                        <label class="block text-gray-700 mb-1">Date Range</label>
-                        <div class="flex space-x-2">
-                            <input type="date" name="startDate" class="w-1/2 border px-2 py-2 rounded" />
-                            <input type="date" name="endDate" class="w-1/2 border px-2 py-2 rounded" />
-                        </div>
-                    </div>
-
-                    <!-- Price Range -->
-                    <div>
-                        <label class="block text-gray-700 mb-1">Price Range (₹)</label>
-                        <div class="flex space-x-2">
-                            <input type="number" name="paymentMin" placeholder="Min"
-                                class="w-1/2 border px-2 py-2 rounded" />
-                            <input type="number" name="paymentMax" placeholder="Max"
-                                class="w-1/2 border px-2 py-2 rounded" />
-                        </div>
-                    </div>
-
-                    <!-- Apply Filter Button -->
-                    <button type="submit"
-                        class="bg-green-500 w-full mt-4 text-white font-semibold py-2 px-4 rounded-md hover:bg-green-600">
-                        Apply Filters
-                    </button>
                 </div>
+
+                <!-- Posts Section -->
+                <div class="flex-1" id="postsContainer"></div>
             </div>
-        </form>
-
-
-        <% if (msg) { %>
-            <div id="toast"
-                class="fixed top-10 right-5 z-50 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded shadow-lg flex items-center space-x-2 max-w-sm animate-fadeIn transition duration-300">
-
-                <span class="flex-1 text-sm">
-                    <%= msg %>
-                </span>
-
-                <button onclick="document.getElementById('toast').style.display='none'"
-                    class="text-green-700 hover:text-green-900 font-bold text-lg">&times;</button>
-            </div>
-            <% } %>
-
-
-
-                <!-- Dynamic Posts Container -->
-                <div id="postsContainer" class="space-y-4 mx-4 sm:mx-12 md:mx-24 mt-4">
-                    <!-- Posts will be dynamically loaded here -->
-                </div>
+        </div>
     </main>
 
-    <!-- Footer -->
-    <%- include('partials/footer') %>
+    <!-- Scripts -->
+    <script>
+        let currentPostType = 'senderPost';
 
+        function loadPosts(postType) {
+            fetch(`/home/posts/${postType}`)
+                .then(res => res.json())
+                .then(posts => displayPosts(posts, postType))
+                .catch(err => console.error('Failed to fetch posts', err));
+        }
 
-        <!-- JavaScript functionality for loading and displaying posts -->
-        <script>
+        function displayPosts(posts, postType) {
+            const container = document.getElementById('postsContainer');
+            container.innerHTML = '';
 
-            // const filter = JSON.stringify(filter);
+            if (posts.length === 0) {
+                container.innerHTML = '<p class="text-slate-600 text-center">No posts found.</p>';
+                return;
+            }
 
+            const ul = document.createElement('ul');
+            ul.className = 'space-y-4';
 
-            const today = new Date().toISOString().split('T')[0];
-            const startDateInput = document.querySelector('input[name="startDate"]');
-            const endDateInput = document.querySelector('input[name="endDate"]');
-
-            if (startDateInput) {
-                startDateInput.setAttribute('min', today);
-                startDateInput.addEventListener('change', () => {
-                    const selectedStart = startDateInput.value;
-                    endDateInput.value = ""; // Reset endDate if already selected
-                    endDateInput.setAttribute('min', selectedStart);
+            posts.forEach(post => {
+                const formattedDate = new Date(post.expectedTime).toLocaleDateString('en-US', {
+                    weekday: 'short', year: 'numeric', month: 'short', day: 'numeric'
                 });
-            }
 
-            if (endDateInput) {
-                endDateInput.setAttribute('min', today);
-            }
+                const li = document.createElement('li');
+                li.className = 'bg-white p-4 rounded-lg shadow flex flex-row items-start gap-4 max-w-5xl';
 
-            // Price constraint (paymentMax should not be less than paymentMin)
-            const paymentMinInput = document.querySelector('input[name="paymentMin"]');
-            const paymentMaxInput = document.querySelector('input[name="paymentMax"]');
-
-            if (paymentMinInput && paymentMaxInput) {
-                paymentMinInput.addEventListener('input', () => {
-                    const min = parseInt(paymentMinInput.value);
-                    if (!isNaN(min)) {
-                        paymentMaxInput.setAttribute('min', min);
+                li.innerHTML = `
+          <a href="/post/${postType}/${post._id}" class="flex flex-row w-full gap-4 items-start">
+            ${postType === 'senderPost'
+                        ? (
+                            post.imageUrl
+                                ? `<img src="${post.imageUrl}" class="w-32 h-32 object-cover rounded-lg border border-slate-200 shadow-sm" alt="Post Image" />`
+                                : `<div class="w-32 h-32 bg-slate-200 rounded-lg flex items-center justify-center text-slate-500 text-sm">No Image</div>`
+                        )
+                        : ''
                     }
-                });
-            }
 
-            setTimeout(() => {
-                const alert = document.querySelector(".bg-green-100");
-                if (alert) {
-                    alert.style.display = "none";
-                }
-            }, 3000); // 3 seconds
+            <div class="flex-1 w-full">
+              <div class="flex flex-col md:flex-row justify-between w-full">
+                <div class="space-y-1 text-sm sm:text-base">
+                  <p><span class="font-semibold text-slate-700">Name:</span> ${post.productName || post.modeOfTravel}</p>
+                  <p><span class="font-semibold text-slate-700">From:</span> ${post.source || post.startLocation}</p>
+                  <p><span class="font-semibold text-slate-700">To:</span> ${post.destination || post.endLocation}</p>
+                  <p><span class="font-semibold text-slate-700">Expected Date:</span> ${formattedDate}</p>
+                </div>
+                <div class="mt-2 md:mt-0 text-right font-medium text-indigo-600 text-sm sm:text-base">
+  ${postType === 'senderPost'
+                        ? `₹${post.paymentMin} - ₹${post.paymentMax}`
+                        : `Size: ${post.parcelSize}<br/>Expt. Amount: ₹${post.expectedAmount}`
+                    }
+</div>
 
-            function initialLoad() {
-                const postTypeSelect = document.getElementById("postType");
-                const defaultPostType = postTypeSelect.value;
-                loadPosts(defaultPostType);
+              </div>
+            </div>
+          </a>
+        `;
 
-            }
-
-            window.onload = initialLoad;
-
-            function loadPosts(postType) {
-                const params = new URLSearchParams();
-                console.log(params);
-                
-
-                const search = document.querySelector('[name="search"]').value;
-                const paymentMin = document.querySelector('[name="paymentMin"]').value;
-                const paymentMax = document.querySelector('[name="paymentMax"]').value;
-                const startDate = document.querySelector('[name="startDate"]').value;
-                const endDate = document.querySelector('[name="endDate"]').value;
-
-                if (search) params.append("search", search);
-                if (postType) params.append("postType", postType);
-                if (paymentMin) params.append("paymentMin", paymentMin);
-                if (paymentMax) params.append("paymentMax", paymentMax);
-                if (startDate) params.append("startDate", startDate);
-                if (endDate) params.append("endDate", endDate);
-
-                fetch(`/home/posts/${postType}?${params.toString()}`)
-                    .then(response => response.json())
-                    .then(posts => {
-                        displayPosts(posts, postType);
-                    })
-                    .catch(error => console.error('Error loading posts:', error));
-            }
-
-
-
-            document.getElementById("postType").addEventListener("change", function () {
-                const selectedType = this.value;
-                loadPosts(selectedType);
+                ul.appendChild(li);
             });
 
-            function displayPosts(posts, postType) {
-                const postsContainer = document.getElementById('postsContainer');
-                postsContainer.innerHTML = '';
+            container.appendChild(ul);
+        }
 
-                if (posts && posts.length > 0) {
-                    const postList = document.createElement('ul');
-                    postList.classList.add('space-y-4');
+        // Dropdown event listener
+        document.getElementById('postTypeSelect').addEventListener('change', (e) => {
+            currentPostType = e.target.value;
+            loadPosts(currentPostType);
+        });
 
-                    posts.forEach(post => {
-                        const formattedDate = new Date(post.expectedTime).toLocaleDateString('en-US', {
-                            weekday: 'long',
-                            year: 'numeric',
-                            month: 'long',
-                            day: 'numeric',
-                        });
-
-                        const postItem = document.createElement('li');
-                        postItem.classList.add('bg-gray-50', 'p-6', 'rounded-lg', 'shadow', 'flex', 'flex-col', 'md:flex-row', 'justify-between', 'items-center');
-
-                        postItem.innerHTML = `
-<a href="/post/${postType}/${post._id}" class="flex flex-col md:flex-row w-full items-start md:items-center gap-4">
-    ${post.imageUrl ? `
-        <img src="${post.imageUrl}" alt="Post Image" class="w-full md:w-40 h-40 object-cover rounded shadow-md">
-    ` : ''}
-    <div class="flex-1">
-        <div class="flex justify-between items-center mb-2">
-            <h4 class="text-lg font-semibold text-gray-800">
-                <b>${postType === 'senderPost' ? 'Name:' : 'Mode of Travel:'}</b> ${post.productName || post.modeOfTravel}
-            </h4>
-            <p class="text-gray-600">
-                <b>${post.paymentMin || post.parcelSize} - ${post.paymentMax || post.expectedAmount}</b>
-            </p>
-        </div>
-        <p class="text-gray-600"><b>From:</b> ${post.source || post.startLocation}</p>
-        <p class="text-gray-600"><b>To:</b> ${post.destination || post.endLocation}</p>
-        <p class="text-gray-600"><b>Expected Date:</b> ${formattedDate || 'Not Available'}</p>
-    </div>
-</a>
-`;
-
-                        postList.appendChild(postItem);
-                    });
-
-                    postsContainer.appendChild(postList);
-                } else {
-                    postsContainer.innerHTML = `<p class="text-gray-600">You haven't created any posts yet.</p>`;
-                }
-
-                // const createPostDiv = document.createElement('div');
-                // createPostDiv.classList.add('mt-6');
-
-                // if (postType === "senderPost") {
-                //     createPostDiv.innerHTML = `
-                //         <a href="/register-parcel" class="inline-block bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg shadow">
-                //             Create Sender Post
-                //         </a>
-                //     `;
-                // } else if (postType === "travellerPost") {
-                //     createPostDiv.innerHTML = `
-                //         <a href="/travellerPost" class="inline-block bg-blue-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded-lg shadow">
-                //             Create Traveller Post
-                //         </a>
-                //     `;
-                // }
-
-                // postsContainer.appendChild(createPostDiv);
-            }
-
-            document.getElementById("filterButton").addEventListener("click", function () {
-                const sidebar = document.getElementById("filterSidebar");
-                sidebar.classList.toggle("translate-x-full");
-            });
-
-            document.getElementById("closeSidebar").addEventListener("click", function () {
-                const sidebar = document.getElementById("filterSidebar");
-                sidebar.classList.add("translate-x-full");
-            });
-        </script>
+        // Initial load
+        window.onload = () => {
+            loadPosts(currentPostType);
+        };
+    </script>
 </body>
 
 </html>
