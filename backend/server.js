@@ -88,24 +88,28 @@ app.use((req, res, next) => {
 io.on("connection", (socket) => {
   console.log("A user connected");
 
-  // Join room for private messaging
+  // User joins their private room by userId string
   socket.on("join", (userId) => {
     socket.join(userId);
     console.log(`User ${userId} joined their private room`);
   });
 
-  // Listen for incoming chat messages
+  // Listen for chat messages from clients
   socket.on("chatMessage", async (data) => {
     try {
-      // Save message to DB
+      // Convert to ObjectId if needed
+      const senderId = mongoose.Types.ObjectId(data.senderId);
+      const receiverId = mongoose.Types.ObjectId(data.receiverId);
+      const postId = mongoose.Types.ObjectId(data.postId);
+
       const newMsg = await Message.create({
-        senderId: data.senderId,
-        receiverId: data.receiverId,
-        postId: data.postId,
+        senderId,
+        receiverId,
+        postId,
         message: data.message,
       });
 
-      // Emit the message to both sender and receiver using their room IDs
+      // Emit the saved message to sender and receiver rooms
       io.to(data.senderId).emit("chatMessage", newMsg);
       io.to(data.receiverId).emit("chatMessage", newMsg);
     } catch (err) {
@@ -192,7 +196,7 @@ app.get("/home", async (req, res) => {
     const posts = await DeliveryPost.find({ status: "pending" }).sort({
       createdAt: -1,
     });
-    console.log(posts);
+    // console.log(posts);
     res.render("travellerHomePage", { posts, msg });
   } catch (err) {
     console.error("Error fetching posts:", err);
@@ -219,9 +223,12 @@ app.get("/dashboard", async (req, res) => {
 
     const posts = await DeliveryPost.find({ userId: req.session.user.id });
     // console.log(posts);
+    const responses = await Response.find({ userId: req.session.user.id })
+      .populate("postId") // assuming postId is a ref to DeliveryPost
+      .sort({ createdAt: -1 }); // latest responses first
 
     // Render the dashboard and pass both user and posts data
-    res.render("dashboard", { user: req.session.user, posts });
+    res.render("dashboard", { user: req.session.user, posts, responses });
   } catch (err) {
     console.error(err);
     res.redirect("/login");
@@ -283,7 +290,7 @@ app.get("/home/posts/:type", async (req, res) => {
       posts = await DeliveryPost.find({ status: "pending" }).sort({
         createdAt: -1,
       });
-      console.log(posts);
+      // console.log(posts);
       // console.log(filter);
     } else if (postType === "travellerPost") {
       posts = await TravellerPost.find(filter).sort({ createdAt: -1 });
@@ -848,16 +855,13 @@ app.post("/acceptResponse/:postId/:responseId", async (req, res) => {
 
 app.get("/messages", async (req, res) => {
   const userId = new mongoose.Types.ObjectId(req.session.user.id); // ✅ Convert to ObjectId
-
   const rawConvos = await Message.aggregate([
     {
       $match: {
         $or: [{ senderId: userId }, { receiverId: userId }],
       },
     },
-    {
-      $sort: { createdAt: -1 },
-    },
+    { $sort: { createdAt: -1 } }, // Sort messages newest first
     {
       $group: {
         _id: {
@@ -870,7 +874,11 @@ app.get("/messages", async (req, res) => {
         at: { $first: "$createdAt" },
       },
     },
+    {
+      $sort: { at: -1 }, // Sort conversations by last message time descending
+    },
   ]);
+  
   // console.log(rawConvos);
 
   const convos = rawConvos.map((c) => ({
@@ -948,7 +956,7 @@ app.get("/messages/chat/:postId/:otherId", async (req, res) => {
         $or: [{ senderId: userId }, { receiverId: userId }],
       },
     },
-    { $sort: { createdAt: -1 } },
+    { $sort: { createdAt: -1 } }, // Sort messages newest first
     {
       $group: {
         _id: {
@@ -987,7 +995,11 @@ app.get("/messages/chat/:postId/:otherId", async (req, res) => {
         unreadCount: { $size: "$unreadMessages" },
       },
     },
+    {
+      $sort: { at: -1 }, // Sort conversations by last message time descending
+    },
   ]);
+  
 
   const convos = rawConvos.map((c) => ({
     postId: c._id.postId,
@@ -1017,13 +1029,22 @@ app.get("/messages/chat/:postId/:otherId", async (req, res) => {
 
 // POST /messages/send
 app.post("/messages/send", async (req, res) => {
-  const senderId = req.session.user.id; // Use session ID
-  const { receiverId, postId, message } = req.body;
+  try {
+    const senderId = req.session.user.id; // Assumes logged in user session
+    const { receiverId, postId, message } = req.body;
 
-  const newMessage = new Message({ senderId, receiverId, postId, message });
-  await newMessage.save();
-
-  res.redirect(`/messages/chat/${postId}/${receiverId}`);
+    const newMessage = new Message({
+      senderId: new mongoose.Types.ObjectId(senderId),
+      receiverId: new mongoose.Types.ObjectId(receiverId),
+      postId: new mongoose.Types.ObjectId(postId),
+      message,
+    });
+    await newMessage.save();
+    res.redirect(`/messages/chat/${postId}/${receiverId}`);
+  } catch (err) {
+    console.error(err);
+    res.sendStatus(500);
+  }
 });
 
 // Start the server

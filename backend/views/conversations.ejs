@@ -111,57 +111,78 @@
     <script src="/socket.io/socket.io.js"></script>
     <script>
         const socket = io();
-        const userId = "<%= currentUserId %>";
-        const postId = JSON.stringify(typeof postId !== 'undefined' ? postId : null);
-        const otherId = JSON.stringify(typeof otherId !== 'undefined' ? otherId : null);
-        const chatBox = document.querySelector(".overflow-y-auto");
 
+        // These come from your template variables rendered by EJS
+        const userId = "<%= currentUserId %>";
+        const postId = JSON.stringify(postId !== 'undefined' ? postId : null);
+        const otherId = JSON.stringify(otherId !== 'undefined' ? otherId : null);
+        const chatBox = document.querySelector(".overflow-y-auto"); // Your scroll container
+
+        // Join your private room immediately
         socket.emit("join", userId);
 
-        if (postId && otherId) {
-            const form = document.querySelector("form");
-            const input = document.querySelector("input[name='message']");
+        // Sending message without page reload
+        const form = document.querySelector("form");
+        const input = document.querySelector("input[name='message']");
 
-            form.addEventListener("submit", function (e) {
-                e.preventDefault();
-                const message = input.value;
+        form.addEventListener("submit", (e) => {
+            e.preventDefault();
+            const message = input.value.trim();
+            if (!message) return;
 
-                fetch("/messages/send", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/x-www-form-urlencoded" },
-                    body: new URLSearchParams({ message, receiverId: otherId, postId })
-                });
-
-                socket.emit("chatMessage", {
-                    senderId: userId,
+            // Send POST to save message
+            fetch("/messages/send", {
+                method: "POST",
+                headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                body: new URLSearchParams({
+                    message,
                     receiverId: otherId,
-                    postId,
-                    message
-                });
-
-                input.value = "";
+                    postId: postId,
+                }),
+            }).then((res) => {
+                if (res.ok) {
+                    // Emit socket event only after saved to DB
+                    socket.emit("chatMessage", {
+                        senderId: userId,
+                        receiverId: otherId,
+                        postId: postId,
+                        message,
+                    });
+                    input.value = "";
+                }
             });
+        });
 
-            socket.on("chatMessage", (data) => {
-                if (data.postId !== postId) return;
+        // Listen for incoming chat messages
+        socket.on("chatMessage", (data) => {
+            if (data.postId !== postId) return; // Ignore messages for other posts
 
-                const isCurrentUser = data.senderId === userId;
+            const isCurrentUser = data.senderId === userId;
 
-                const div = document.createElement("div");
-                div.className = isCurrentUser ? "text-right" : "text-left";
-                div.innerHTML = `
-                    <div class="${isCurrentUser ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-800'} inline-block px-4 py-2 rounded-lg max-w-full md:max-w-[75%]">
-                        ${data.message}
-                    </div>
-                    <div class="text-xs text-gray-400 mt-1">
-                        ${new Date(data.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                    </div>
-                `;
-                chatBox.appendChild(div);
-                chatBox.scrollTop = chatBox.scrollHeight;
-            });
-        }
+            // Create message div
+            const div = document.createElement("div");
+            div.className = isCurrentUser ? "text-right" : "text-left";
+            div.innerHTML = `
+          <div class="${isCurrentUser ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-800'} inline-block px-4 py-2 rounded-lg max-w-full md:max-w-[75%]">
+            ${data.message}
+          </div>
+          <div class="text-xs text-gray-400 mt-1">
+            ${new Date(data.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+          </div>
+        `;
+
+            chatBox.appendChild(div);
+
+            // Auto-scroll chat box to bottom on new message
+            chatBox.scrollTop = chatBox.scrollHeight;
+        });
+
+        // Optional: Scroll chat box to bottom on page load if messages exist
+        window.onload = () => {
+            chatBox.scrollTop = chatBox.scrollHeight;
+        };
     </script>
+
 </body>
 
 </html>
