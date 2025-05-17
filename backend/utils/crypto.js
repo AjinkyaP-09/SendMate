@@ -3,7 +3,7 @@ const crypto = require("crypto");
 const algorithm = "aes-256-cbc";
 const secretKey = Buffer.from(process.env.CHAT_SECRET_KEY, "hex"); // 32 bytes key
 
-function encryptMessage(message) {
+function encrypt(message) {
   const iv = crypto.randomBytes(16);
   const cipher = crypto.createCipheriv(algorithm, secretKey, iv);
   const encrypted = Buffer.concat([
