@@ -223,7 +223,9 @@ app.get("/dashboard", async (req, res) => {
 
     const posts = await DeliveryPost.find({ userId: req.session.user.id });
     // console.log(posts);
-    const responses = await Response.find({ userId: req.session.user.id })
+    const responses = await TravellerResponse.find({
+      userId: req.session.user.id,
+    })
       .populate("postId") // assuming postId is a ref to DeliveryPost
       .sort({ createdAt: -1 }); // latest responses first
 
@@ -706,6 +708,46 @@ app.get("/post/:postType/:id", async (req, res) => {
   }
 });
 
+//Load responses in Dashboard
+
+const postTypeToModel = {
+  senderPost: DeliveryPost,
+  travellerPost: TravellerPost,
+};
+
+app.get("/responses", ensureAuthenticated, async (req, res) => {
+  try {
+    const userId = new mongoose.Types.ObjectId(req.session.user.id);
+    // console.log(userId);
+
+    // Get all responses made by the current user
+    const responses = await TravellerResponse.find({ travellerId: userId })
+      .sort({ createdAt: -1 })
+      .lean();
+    // console.log(responses);
+
+    // Manually populate postId based on postType
+    const populatedResponses = await Promise.all(
+      responses.map(async (response) => {
+        const Model = postTypeToModel[response.postType];
+        if (!Model) return response;
+
+        const postDetails = await Model.findById(response.postId).lean();
+        return {
+          ...response,
+          postDetails,
+        };
+      })
+    );
+    console.log(populatedResponses);
+
+    res.json(populatedResponses);
+  } catch (error) {
+    console.error("Error fetching responses:", error);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
 app.get("/responseForm/:postType/:id", async (req, res) => {
   const { id, postType } = req.params;
 
@@ -878,7 +920,7 @@ app.get("/messages", async (req, res) => {
       $sort: { at: -1 }, // Sort conversations by last message time descending
     },
   ]);
-  
+
   // console.log(rawConvos);
 
   const convos = rawConvos.map((c) => ({
@@ -999,7 +1041,6 @@ app.get("/messages/chat/:postId/:otherId", async (req, res) => {
       $sort: { at: -1 }, // Sort conversations by last message time descending
     },
   ]);
-  
 
   const convos = rawConvos.map((c) => ({
     postId: c._id.postId,

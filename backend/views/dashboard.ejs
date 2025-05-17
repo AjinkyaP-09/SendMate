@@ -40,6 +40,8 @@
                             <select id="postType" class="border rounded px-4 py-1 w-full md:w-auto cursor-pointer ">
                                 <option class="bg-white text-gray-700 cursor-pointer " value="senderPost">Sender
                                     Post</option>
+                                <option class="bg-white text-gray-700 cursor-pointer " value="Responses">Submitted
+                                    Responses</option>
                                 <option class="bg-white text-gray-700 cursor-pointer " value="travellerPost">Traveller
                                     Post</option>
                             </select>
@@ -57,7 +59,6 @@
             <%- include('partials/footer') %>
         </footer> -->
     </div>
-
     <script>
         function initialLoad() {
             const postTypeSelect = document.getElementById("postType");
@@ -68,15 +69,18 @@
         window.onload = initialLoad;
 
         function loadPosts(postType) {
-            fetch(`/posts/${postType}`)
+            // For 'Responses', fetch from /responses (you'll need to create this backend route)
+            const url = postType === 'Responses' ? '/responses' : `/posts/${postType}`;
+
+            fetch(url)
                 .then(response => {
                     if (!response.ok) {
                         throw new Error('Network response was not ok ' + response.statusText);
                     }
                     return response.json();
                 })
-                .then(posts => {
-                    displayPosts(posts, postType);
+                .then(data => {
+                    displayPosts(data, postType);
                 })
                 .catch(error => console.error('Error loading posts:', error));
         }
@@ -85,116 +89,110 @@
             const selectedType = this.value;
             loadPosts(selectedType);
         });
-
-        function displayPosts(posts, postType) {
+        function displayPosts(items, postType) {
             const postsContainer = document.getElementById('postsContainer');
             postsContainer.innerHTML = '';
 
-            if (posts && posts.length > 0) {
-                const postList = document.createElement('ul');
-                postList.classList.add('space-y-4');
+            if (!items || items.length === 0) {
+                postsContainer.innerHTML = `<p class="text-gray-600">You haven't created any ${postType === 'Responses' ? 'responses' : 'posts'} yet.</p>`;
+                return;
+            }
 
-                posts.forEach(post => {
-                    const formattedDate = new Date(post.expectedTime).toLocaleDateString('en-US', {
+            const list = document.createElement('ul');
+            list.classList.add('space-y-4');
+
+            items.forEach(item => {
+                let postDetails = {};
+                let status = '', formattedDate = '', postName = '', source = '', destination = '', postId = '', priceOffer = '';
+
+                if (postType === 'Responses') {
+                    postDetails = item.postDetails || {};
+                    status = item.status || 'Pending';
+                    formattedDate = new Date(item.createdAt).toLocaleDateString('en-US', {
                         weekday: 'long',
                         year: 'numeric',
                         month: 'long',
                         day: 'numeric',
                     });
 
-                    const postItem = document.createElement('li');
-                    postItem.classList.add('bg-gray-50', 'p-6', 'rounded-lg', 'shadow', 'flex', 'flex-col', 'md:flex-row', 'justify-between', 'items-center');
-
-                    postItem.innerHTML = `
-<div onclick="window.location.href='/dashboard/${post._id}/responses'"
-     class="cursor-pointer w-full flex flex-col md:flex-row gap-4 border p-4 rounded hover:bg-gray-100 transition">
-
-    ${post.imageUrl ? `
-    <div class="w-full md:w-1/3">
-        <img src="${post.imageUrl}" alt="Uploaded Image"
-             class="w-full h-auto max-h-60 object-cover rounded-lg border" />
-    </div>` : ''}
-
-    <div class="flex-1">
-        <h4 class="text-lg font-semibold text-gray-800 mb-2"><b>Name: </b>${post.productName || post.modeOfTravel}</h4>
-        <p class="text-gray-600"><b>From: </b>${post.source || post.startLocation}</p>
-        <p class="text-gray-600"><b>To: </b>${post.destination || post.endLocation}</p>
-        <p class="text-gray-600"><b>Expected Date: </b>${formattedDate || 'Not Available'}</p>
-    </div>
-
-    <div class="flex flex-col justify-between gap-2 md:items-end">
-        <form action="/${postType}/${post._id}?_method=DELETE" method="post" onclick="event.stopPropagation();">
-            <button class="bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded w-full md:w-24">DELETE</button>
-        </form>
-        <form action="/${postType}/${post._id}/editForm" method="get" onclick="event.stopPropagation();">
-            <button class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded w-full md:w-24">EDIT</button>
-        </form>
-    </div>
-</div>`;
-
-
-                    postList.appendChild(postItem);
-                });
-
-                postsContainer.appendChild(postList);
-            } else {
-                postsContainer.innerHTML = `<p class="text-gray-600">You haven't created any posts yet.</p>`;
-            }
-
-            const createPostDiv = document.createElement('div');
-            createPostDiv.classList.add('mt-6');
-
-            if (postType === "senderPost") {
-                createPostDiv.innerHTML = `
-        <a href="/register-parcel" class="inline-block bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg shadow w-full sm:w-auto mx-auto sm:mx-0 text-center">
-            Create Sender Post
-        </a>
-    `;
-            } else if (postType === "travellerPost") {
-                createPostDiv.innerHTML = `
-        <a href="/travellerPost" class="inline-block bg-blue-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded-lg shadow w-full sm:w-auto mx-auto sm:mx-0 text-center">
-            Create Traveller Post
-        </a>
-    `;
-            }
-
-
-            postsContainer.appendChild(createPostDiv);
-        }
-
-        function deletePost(postId, btnElement) {
-            const confirmed = confirm("Are you sure you want to delete this post?");
-            if (confirmed) {
-                fetch(`/post/${postId}`, {
-                    method: 'DELETE',
-                })
-                    .then(response => response.json())
-                    .then(result => {
-                        if (result.message === "Post deleted successfully") {
-                            alert("Post deleted successfully!");
-                            const postItem = btnElement.closest('li');
-                            postItem.remove();
-                            // showNotification();
-                        } else {
-                            // showNotification();
-                        }
-                    })
-                    .catch(error => {
-                        console.error("Error deleting post:", error);
-                        // showNotification();
+                    postName = postDetails.productName || postDetails.modeOfTravel || 'Unknown Post';
+                    source = postDetails.source || postDetails.startLocation || 'Unknown';
+                    destination = postDetails.destination || postDetails.endLocation || 'Unknown';
+                    postId = postDetails._id || '';
+                    priceOffer = item.priceOffer || '';
+                } else {
+                    formattedDate = new Date(item.expectedTime).toLocaleDateString('en-US', {
+                        weekday: 'long',
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric',
                     });
-            } else {
-                alert("Deletion cancelled.");
+                    postName = item.productName || item.modeOfTravel || 'Unnamed Post';
+                    source = item.source || item.startLocation || 'Unknown';
+                    destination = item.destination || item.endLocation || 'Unknown';
+                    postId = item._id;
+                    postDetails = item; // for imageUrl
+                }
+
+                const li = document.createElement('li');
+                li.classList.add('bg-gray-50', 'p-6', 'rounded-lg', 'shadow', 'flex', 'flex-col', 'md:flex-row', 'justify-between', 'items-center');
+
+                li.innerHTML = `
+            <div onclick="window.location.href='/${postType === 'Responses' ? 'dashboard/' + postId + '/responses' : postType + '/' + postId + '/editForm'}'"
+                class="cursor-pointer w-full flex flex-col md:flex-row gap-4 border p-4 rounded hover:bg-gray-100 transition">
+
+                ${postDetails.imageUrl ? `
+                    <div class="w-full md:w-1/3">
+                        <img src="${postDetails.imageUrl}" alt="Uploaded Image"
+                            class="w-full h-auto max-h-60 object-cover rounded-lg border" />
+                    </div>` : ''}
+
+                <div class="flex-1">
+                    <h4 class="text-lg font-semibold text-gray-800 mb-2"><b>Name: </b>${postName}</h4>
+                    <p class="text-gray-600"><b>From: </b>${source}</p>
+                    <p class="text-gray-600"><b>To: </b>${destination}</p>
+                    <p class="text-gray-600"><b>Date: </b>${formattedDate}</p>
+                    ${postType === 'Responses' ? `<p class="text-gray-600"><b>Status: </b>${status}</p>` : ''}
+                    ${postType === 'Responses' ? `<p class="text-gray-600"><b>Price Offer: </b>₹${priceOffer}</p>` : ''}
+                </div>
+
+                <div class="flex flex-col justify-between gap-2 md:items-end">
+                    ${postType !== 'Responses' ? `
+                        <form action="/${postType}/${postId}?_method=DELETE" method="post" onclick="event.stopPropagation();">
+                            <button class="bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded w-full md:w-24">DELETE</button>
+                        </form>
+                        <form action="/${postType}/${postId}/editForm" method="get" onclick="event.stopPropagation();">
+                            <button class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded w-full md:w-24">EDIT</button>
+                        </form>` : ''}
+                </div>
+            </div>
+        `;
+
+                list.appendChild(li);
+            });
+            postsContainer.appendChild(list);
+
+            // Add create post button for senderPost and travellerPost only
+            if (postType === "senderPost" || postType === "travellerPost") {
+                const createPostDiv = document.createElement('div');
+                createPostDiv.classList.add('mt-6');
+
+                if (postType === "senderPost") {
+                    createPostDiv.innerHTML = `
+                            <a href="/register-parcel" class="inline-block bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg shadow w-full sm:w-auto mx-auto sm:mx-0 text-center">
+                                Create Sender Post
+                            </a>`;
+                } else if (postType === "travellerPost") {
+                    createPostDiv.innerHTML = `
+                            <a href="/travellerPost" class="inline-block bg-blue-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded-lg shadow w-full sm:w-auto mx-auto sm:mx-0 text-center">
+                                Create Traveller Post
+                            </a>`;
+                }
+                postsContainer.appendChild(createPostDiv);
             }
-        }
-
-        const urlParams = new URLSearchParams(window.location.search);
-        const errorMessage = urlParams.get("error");
-        if (errorMessage) {
-            alert(errorMessage); // Replace with a modern modal for a better UI experience
-
         }
     </script>
+
 </body>
 
 </html>
