@@ -138,7 +138,7 @@
                 li.classList.add('bg-gray-50', 'p-6', 'rounded-lg', 'shadow', 'flex', 'flex-col', 'md:flex-row', 'justify-between', 'items-center');
 
                 li.innerHTML = `
-            <div onclick="window.location.href='/${postType === 'Responses' ? 'dashboard/' + postId + '/responses' : postType + '/' + postId + '/editForm'}'"
+            <div onclick="window.location.href='/${postType === 'Responses' ? 'dashboard/' + postId + '/responses' : 'dashboard/' + postId + '/responses'}'"
                 class="cursor-pointer w-full flex flex-col md:flex-row gap-4 border p-4 rounded hover:bg-gray-100 transition">
 
                 ${postDetails.imageUrl ? `

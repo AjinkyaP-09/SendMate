@@ -739,7 +739,7 @@ app.get("/responses", ensureAuthenticated, async (req, res) => {
         };
       })
     );
-    console.log(populatedResponses);
+    // console.log(populatedResponses);
 
     res.json(populatedResponses);
   } catch (error) {
