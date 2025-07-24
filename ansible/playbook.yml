@@ -1,0 +1,52 @@
+# ansible/playbook.yml
+
+- name: Configure Server and Deploy Sendmate Container
+  hosts: all
+  become: yes # Execute commands with sudo
+  tasks:
+    - name: Update all system packages
+      yum:
+        name: '*'
+        state: latest
+
+    - name: Install Docker engine
+      yum:
+        name: docker
+        state: present
+
+    - name: Start and enable the Docker service
+      service:
+        name: docker
+        state: started
+        enabled: yes
+
+    - name: Add the ec2-user to the 'docker' group to run docker without sudo
+      user:
+        name: ec2-user
+        groups: docker
+        append: yes
+
+    - name: Pull the latest Sendmate image from Docker Hub
+      community.docker.docker_image:
+        name: "{{ dockerhub_username }}/sendmate:latest"
+        source: pull
+
+    - name: Stop any existing Sendmate container to ensure a fresh start
+      community.docker.docker_container:
+        name: sendmate_app
+        state: absent
+
+    - name: Run the Sendmate container with environment variables
+      community.docker.docker_container:
+        name: sendmate_app
+        image: "{{ dockerhub_username }}/sendmate:latest"
+        state: started
+        restart_policy: always
+        ports:
+          - "80:3000" # Map host port 80 to the container's port 3000
+        env:
+          # These variables are passed from the GitHub Actions workflow
+          MONGO_URL: "{{ mongo_url }}"
+          GOOGLE_CLIENT_ID: "{{ google_client_id }}"
+          GOOGLE_CLIENT_SECRET: "{{ google_client_secret }}"
+          SECRET: "{{ session_secret }}"
