@@ -36,17 +36,21 @@
         name: sendmate_app
         state: absent
 
-    - name: Run the Sendmate container with correct environment variables
+    - name: Run the Sendmate container with all required environment variables
       community.docker.docker_container:
         name: sendmate_app
         image: "{{ dockerhub_username }}/sendmate:latest"
         state: started
         restart_policy: always
         ports:
-          - "80:5000" # CORRECTED: Mapped host port 80 to container port 5000
+          - "80:5000"
         env:
-          # These variable names MUST match what's in your app.js
-          MONGO_URL: "{{ mongo_url }}"
+          # Pass all secrets from Ansible to the container's environment
+          MONGO_URI: "{{ mongo_uri }}"
           GOOGLE_CLIENT_ID: "{{ google_client_id }}"
           GOOGLE_CLIENT_SECRET: "{{ google_client_secret }}"
-          SECRET: "{{ secret }}"
+          AWS_ACCESS_KEY_ID: "{{ aws_access_key_id }}"
+          AWS_SECRET_ACCESS_KEY: "{{ aws_secret_access_key }}"
+          AWS_REGION: "{{ aws_region }}"
+          AWS_BUCKET_NAME: "{{ aws_bucket_name }}"
+          PORT: "5000"
