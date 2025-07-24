@@ -40,8 +40,9 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ap-south-1
 
+      # CORRECTED: Terraform init with backend configuration
       - name: Terraform Init
-        run: terraform init
+        run: terraform init -backend-config="bucket=${{ secrets.TF_STATE_BUCKET }}" -backend-config="key=sendmate/terraform.tfstate" -backend-config="region=ap-south-1" -backend-config="dynamodb_table=${{ secrets.TF_STATE_LOCK_TABLE }}"
         working-directory: ./terraform
 
       - name: Terraform Apply
@@ -50,12 +51,6 @@ jobs:
         working-directory: ./terraform
 
       # STEP 3: Configure and deploy with Ansible
-      - name: Create Ansible Inventory File
-        run: |
-          # CORRECTED: Create the inventory file inside the ansible directory
-          echo "[all]" > ansible/inventory.ini
-          echo "${{ steps.terraform.outputs.public_ip }} ansible_user=ec2-user" >> ansible/inventory.ini
-
       - name: Wait for instance to initialize
         run: sleep 30
       
@@ -65,7 +60,9 @@ jobs:
           playbook: playbook.yml
           directory: ./ansible
           key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
-          # CORRECTED: The inventory file is now in the same directory
-          inventory: inventory.ini
+          # CORRECTED: Pass the IP directly to the inventory parameter
+          inventory: |
+            [all]
+            ${{ steps.terraform.outputs.public_ip }} ansible_user=ec2-user
           options: |
             --extra-vars "dockerhub_username=${{ secrets.DOCKERHUB_USERNAME }} mongo_uri=${{ secrets.MONGO_URI }} google_client_id=${{ secrets.GOOGLE_CLIENT_ID }} google_client_secret=${{ secrets.GOOGLE_CLIENT_SECRET }} aws_access_key_id=${{ secrets.AWS_ACCESS_KEY_ID }} aws_secret_access_key=${{ secrets.AWS_SECRET_ACCESS_KEY }} aws_region=${{ secrets.AWS_REGION }} aws_bucket_name=${{ secrets.AWS_BUCKET_NAME }}"
