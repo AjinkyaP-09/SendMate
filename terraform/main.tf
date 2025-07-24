@@ -1,12 +1,13 @@
 # terraform/main.tf
 
+# This block is the definitive fix. It forces Terraform to use a specific
+# modern version of the AWS provider, ensuring compatibility with your state file.
 terraform {
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = "~> 5.0"
+      version = "~> 5.0" # This locks the provider to the latest 5.x version
     }
-    # Add the 'local' provider to allow writing files
     local = {
       source  = "hashicorp/local"
       version = "~> 2.4"
@@ -51,7 +52,7 @@ resource "aws_security_group" "web_sg" {
 
 # Create an EC2 instance to run the Docker container
 resource "aws_instance" "app_server" {
-  ami           = "ami-0b32d400456908bf9" 
+  ami           = "ami-0f5ee92e2d63afc18" 
   instance_type = "t2.micro"
   key_name      = var.ec2_key_pair_name
   security_groups = [aws_security_group.web_sg.name]
@@ -61,7 +62,7 @@ resource "aws_instance" "app_server" {
   }
 }
 
-# NEW: This resource will create the Ansible inventory file automatically
+# This resource will create the Ansible inventory file automatically
 resource "local_file" "ansible_inventory" {
   content = templatefile("${path.module}/inventory.tpl", {
     ip_address = aws_instance.app_server.public_ip
