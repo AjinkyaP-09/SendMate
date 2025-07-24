@@ -11,7 +11,42 @@ jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
     steps:
-      # ... (steps for checkout, docker build, terraform) ...
+      - name: Checkout Repository Code
+        uses: actions/checkout@v3
+
+      # STEP 1: Build Docker image and push to registry
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v4
+        with:
+          context: ./backend
+          push: true
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/sendmate:latest
+
+      # STEP 2: Provision infrastructure with Terraform
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ap-south-1
+
+      - name: Terraform Init
+        run: terraform init
+        working-directory: ./terraform
+
+      - name: Terraform Apply
+        id: terraform_apply
+        run: terraform apply -auto-approve -var="ec2_key_pair_name=${{ secrets.EC2_KEY_PAIR_NAME }}"
+        working-directory: ./terraform
 
       # STEP 3: Configure and deploy with Ansible
       - name: Run Ansible Playbook
@@ -23,12 +58,6 @@ jobs:
           inventory: |
             [all]
             ${{ steps.terraform_apply.outputs.public_ip }}
-          extra_vars: |
-            dockerhub_username=${{ secrets.DOCKERHUB_USERNAME }}
-            mongo_uri=${{ secrets.MONGO_URI }}
-            google_client_id=${{ secrets.GOOGLE_CLIENT_ID }}
-            google_client_secret=${{ secrets.GOOGLE_CLIENT_SECRET }}
-            aws_access_key_id=${{ secrets.AWS_ACCESS_KEY_ID }}
-            aws_secret_access_key=${{ secrets.AWS_SECRET_ACCESS_KEY }}
-            aws_region=${{ secrets.AWS_REGION }}
-            aws_bucket_name=${{ secrets.AWS_BUCKET_NAME }}
+          # CORRECTED SYNTAX: Use the 'options' parameter to pass extra variables
+          options: |
+            --extra-vars "dockerhub_username=${{ secrets.DOCKERHUB_USERNAME }} mongo_uri=${{ secrets.MONGO_URI }} google_client_id=${{ secrets.GOOGLE_CLIENT_ID }} google_client_secret=${{ secrets.GOOGLE_CLIENT_SECRET }} aws_access_key_id=${{ secrets.AWS_ACCESS_KEY_ID }} aws_secret_access_key=${{ secrets.AWS_SECRET_ACCESS_KEY }} aws_region=${{ secrets.AWS_REGION }} aws_bucket_name=${{ secrets.AWS_BUCKET_NAME }}"
