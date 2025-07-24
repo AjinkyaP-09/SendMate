@@ -25,6 +25,7 @@ jobs:
         uses: docker/build-push-action@v4
         with:
           context: ./backend
+          file: ./Dockerfile # CORRECTED: Explicitly point to the Dockerfile in the root directory
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/sendmate:latest
 
