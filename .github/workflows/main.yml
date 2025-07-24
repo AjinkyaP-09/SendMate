@@ -53,14 +53,24 @@ jobs:
       - name: Create Ansible Inventory File
         run: |
           echo "[all]" > inventory.ini
-          echo "${{ steps.terraform_apply.outputs.public_ip }}" >> inventory.ini
-      
+          echo "${{ steps.terraform_apply.outputs.public_ip }} ansible_user=ec2-user" >> inventory.ini
+
+      # NEW: Wait for the EC2 instance to be ready for SSH connections
+      - name: Wait for SSH
+        uses: lewagon/wait-on-action@v1.3.2
+        with:
+          ref: ${{ github.ref }}
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          wait-on: tcp:${{ steps.terraform_apply.outputs.public_ip }}:22
+          wait-on-timeout: 120
+          timeout: 120
+
       - name: Run Ansible Playbook
         uses: dawidd6/action-ansible-playbook@v2
         with:
           playbook: playbook.yml
           directory: ./ansible
           key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
-          inventory: ../inventory.ini # CORRECTED: Point to the new inventory file
+          inventory: ../inventory.ini # Point to the new inventory file
           options: |
             --extra-vars "dockerhub_username=${{ secrets.DOCKERHUB_USERNAME }} mongo_uri=${{ secrets.MONGO_URI }} google_client_id=${{ secrets.GOOGLE_CLIENT_ID }} google_client_secret=${{ secrets.GOOGLE_CLIENT_SECRET }} aws_access_key_id=${{ secrets.AWS_ACCESS_KEY_ID }} aws_secret_access_key=${{ secrets.AWS_SECRET_ACCESS_KEY }} aws_region=${{ secrets.AWS_REGION }} aws_bucket_name=${{ secrets.AWS_BUCKET_NAME }}"
