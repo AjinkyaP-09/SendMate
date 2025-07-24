@@ -20,7 +20,7 @@
         state: started
         enabled: yes
 
-    - name: Add the ec2-user to the 'docker' group to run docker without sudo
+    - name: Add the ec2-user to the 'docker' group
       user:
         name: ec2-user
         groups: docker
@@ -31,22 +31,22 @@
         name: "{{ dockerhub_username }}/sendmate:latest"
         source: pull
 
-    - name: Stop any existing Sendmate container to ensure a fresh start
+    - name: Stop any existing Sendmate container
       community.docker.docker_container:
         name: sendmate_app
         state: absent
 
-    - name: Run the Sendmate container with environment variables
+    - name: Run the Sendmate container with correct environment variables
       community.docker.docker_container:
         name: sendmate_app
         image: "{{ dockerhub_username }}/sendmate:latest"
         state: started
         restart_policy: always
         ports:
-          - "80:3000" # Map host port 80 to the container's port 3000
+          - "80:5000" # CORRECTED: Mapped host port 80 to container port 5000
         env:
-          # These variables are passed from the GitHub Actions workflow
+          # These variable names MUST match what's in your app.js
           MONGO_URL: "{{ mongo_url }}"
           GOOGLE_CLIENT_ID: "{{ google_client_id }}"
           GOOGLE_CLIENT_SECRET: "{{ google_client_secret }}"
-          SECRET: "{{ session_secret }}"
+          SECRET: "{{ secret }}"
