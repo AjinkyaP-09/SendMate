@@ -32,7 +32,9 @@ jobs:
       # STEP 2: Provision infrastructure and create inventory with Terraform
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v2
-        # The terraform_version is no longer needed here
+        with:
+          # DEFINITIVE FIX 1: Force a specific, modern version of the Terraform binary
+          terraform_version: 1.5.0
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v2
@@ -42,8 +44,11 @@ jobs:
           aws-region: ap-south-1
 
       - name: Terraform Init
-        run: terraform init -upgrade # The -upgrade flag is still good practice
         working-directory: ./terraform
+        run: |
+          # DEFINITIVE FIX 2: Delete any old cached provider files before initializing
+          rm -rf .terraform*
+          terraform init -upgrade
 
       - name: Terraform Apply
         run: terraform apply -auto-approve -var="ec2_key_pair_name=${{ secrets.EC2_KEY_PAIR_NAME }}"
