@@ -55,16 +55,22 @@ jobs:
           echo "[all]" > inventory.ini
           echo "${{ steps.terraform_apply.outputs.public_ip }} ansible_user=ec2-user" >> inventory.ini
 
-      # NEW: Wait for the EC2 instance to be ready for SSH connections
-      - name: Wait for SSH
-        uses: lewagon/wait-on-action@v1.3.2
-        with:
-          ref: ${{ github.ref }}
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
-          wait-on: tcp:${{ steps.terraform_apply.outputs.public_ip }}:22
-          wait-on-timeout: 120
-          timeout: 120
-
+      # CORRECTED: Use a reliable shell loop to wait for the SSH port
+      - name: Wait for SSH port to be open
+        run: |
+          ip=${{ steps.terraform_apply.outputs.public_ip }}
+          echo "Waiting for SSH on $ip..."
+          for i in {1..30}; do
+            if nc -z -w 5 $ip 22; then
+              echo "SSH port is open!"
+              exit 0
+            fi
+            echo "Attempt $i failed. Retrying in 5 seconds..."
+            sleep 5
+          done
+          echo "Timed out waiting for SSH port."
+          exit 1
+      
       - name: Run Ansible Playbook
         uses: dawidd6/action-ansible-playbook@v2
         with:
