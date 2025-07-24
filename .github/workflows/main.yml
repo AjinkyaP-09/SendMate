@@ -41,7 +41,7 @@ jobs:
           aws-region: ap-south-1
 
       - name: Terraform Init
-        run: terraform init
+        run: terraform init -upgrade
         working-directory: ./terraform
 
       - name: Terraform Apply
@@ -50,7 +50,7 @@ jobs:
 
       # STEP 3: Configure and deploy with Ansible
       - name: Wait for instance to initialize
-        run: sleep 15
+        run: sleep 30
       
       - name: Run Ansible Playbook
         uses: dawidd6/action-ansible-playbook@v2
