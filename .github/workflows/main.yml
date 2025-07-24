@@ -45,20 +45,27 @@ jobs:
         working-directory: ./terraform
 
       - name: Terraform Apply
-        id: terraform_apply
         run: terraform apply -auto-approve -var="ec2_key_pair_name=${{ secrets.EC2_KEY_PAIR_NAME }}"
+        working-directory: ./terraform
+
+      # NEW STEP: Reliably get the IP address from Terraform output
+      - name: Get Terraform Outputs
+        id: terraform_outputs
+        run: echo "public_ip=$(terraform output -raw public_ip)" >> $GITHUB_OUTPUT
         working-directory: ./terraform
 
       # STEP 3: Configure and deploy with Ansible
       - name: Create Ansible Inventory File
         run: |
           echo "[all]" > inventory.ini
-          echo "${{ steps.terraform_apply.outputs.public_ip }} ansible_user=ec2-user" >> inventory.ini
+          # CORRECTED: Use the output from the new dedicated step
+          echo "${{ steps.terraform_outputs.outputs.public_ip }} ansible_user=ec2-user" >> inventory.ini
 
       # CORRECTED: Use a reliable shell loop to wait for the SSH port
       - name: Wait for SSH port to be open
         run: |
-          ip=${{ steps.terraform_apply.outputs.public_ip }}
+          # CORRECTED: Use the output from the new dedicated step
+          ip=${{ steps.terraform_outputs.outputs.public_ip }}
           echo "Waiting for SSH on $ip..."
           for i in {1..30}; do
             if nc -z -w 5 $ip 22; then
