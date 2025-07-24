@@ -1,10 +1,24 @@
+# terraform/main.tf
 
-
-provider "aws" {
-  region = "ap-south-1" # You can change this to your preferred AWS region
+terraform {
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 5.0"
+    }
+    # Add the 'local' provider to allow writing files
+    local = {
+      source  = "hashicorp/local"
+      version = "~> 2.4"
+    }
+  }
 }
 
-# Create a security group to allow SSH (for Ansible) and HTTP (for web traffic)
+provider "aws" {
+  region = "ap-south-1"
+}
+
+# Create a security group to allow SSH and HTTP traffic
 resource "aws_security_group" "web_sg" {
   name        = "sendmate-sg"
   description = "Allow SSH and Web traffic for Sendmate"
@@ -13,7 +27,7 @@ resource "aws_security_group" "web_sg" {
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"] # WARNING: Open for SSH. For production, restrict this to your IP.
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
   ingress {
@@ -23,12 +37,6 @@ resource "aws_security_group" "web_sg" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-  ingress {
-    from_port   = 5000
-    to_port     = 5000
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
   egress {
     from_port   = 0
     to_port     = 0
@@ -43,9 +51,8 @@ resource "aws_security_group" "web_sg" {
 
 # Create an EC2 instance to run the Docker container
 resource "aws_instance" "app_server" {
-  # Amazon Linux 2 AMI for ap-south-1. Change if you use a different region.
   ami           = "ami-0b32d400456908bf9" 
-  instance_type = "t2.micro" # Free tier eligible
+  instance_type = "t2.micro"
   key_name      = var.ec2_key_pair_name
   security_groups = [aws_security_group.web_sg.name]
 
@@ -54,3 +61,10 @@ resource "aws_instance" "app_server" {
   }
 }
 
+# NEW: This resource will create the Ansible inventory file automatically
+resource "local_file" "ansible_inventory" {
+  content = templatefile("${path.module}/inventory.tpl", {
+    ip_address = aws_instance.app_server.public_ip
+  })
+  filename = "../ansible/inventory.ini" # Creates the file directly in the ansible folder
+}
