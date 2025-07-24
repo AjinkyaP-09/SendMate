@@ -8,10 +8,6 @@ terraform {
       source  = "hashicorp/aws"
       version = "~> 5.0" # This locks the provider to the latest 5.x version
     }
-    local = {
-      source  = "hashicorp/local"
-      version = "~> 2.4"
-    }
   }
 }
 
@@ -60,12 +56,4 @@ resource "aws_instance" "app_server" {
   tags = {
     Name = "Sendmate-Server"
   }
-}
-
-# This resource will create the Ansible inventory file automatically
-resource "local_file" "ansible_inventory" {
-  content = templatefile("${path.module}/inventory.tpl", {
-    ip_address = aws_instance.app_server.public_ip
-  })
-  filename = "../ansible/inventory.ini" # Creates the file directly in the ansible folder
 }
