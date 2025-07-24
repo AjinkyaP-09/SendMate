@@ -32,7 +32,8 @@ jobs:
       # STEP 2: Provision infrastructure and create inventory with Terraform
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v2
-        # The terraform_version is no longer needed here
+        # Removed previous failed attempts to control version from here.
+        # The version is now correctly controlled by your .tf files.
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v2
@@ -42,7 +43,7 @@ jobs:
           aws-region: ap-south-1
 
       - name: Terraform Init
-        run: terraform init -upgrade # The -upgrade flag is still good practice
+        run: terraform init
         working-directory: ./terraform
 
       - name: Terraform Apply
