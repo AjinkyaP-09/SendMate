@@ -25,7 +25,7 @@ jobs:
         uses: docker/build-push-action@v4
         with:
           context: ./backend
-          file: ./Dockerfile # CORRECTED: Explicitly point to the Dockerfile in the root directory
+          file: ./Dockerfile
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/sendmate:latest
 
@@ -50,15 +50,17 @@ jobs:
         working-directory: ./terraform
 
       # STEP 3: Configure and deploy with Ansible
+      - name: Create Ansible Inventory File
+        run: |
+          echo "[all]" > inventory.ini
+          echo "${{ steps.terraform_apply.outputs.public_ip }}" >> inventory.ini
+      
       - name: Run Ansible Playbook
         uses: dawidd6/action-ansible-playbook@v2
         with:
           playbook: playbook.yml
           directory: ./ansible
           key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
-          inventory: |
-            [all]
-            ${{ steps.terraform_apply.outputs.public_ip }}
-          # CORRECTED SYNTAX: Use the 'options' parameter to pass extra variables
+          inventory: ../inventory.ini # CORRECTED: Point to the new inventory file
           options: |
             --extra-vars "dockerhub_username=${{ secrets.DOCKERHUB_USERNAME }} mongo_uri=${{ secrets.MONGO_URI }} google_client_id=${{ secrets.GOOGLE_CLIENT_ID }} google_client_secret=${{ secrets.GOOGLE_CLIENT_SECRET }} aws_access_key_id=${{ secrets.AWS_ACCESS_KEY_ID }} aws_secret_access_key=${{ secrets.AWS_SECRET_ACCESS_KEY }} aws_region=${{ secrets.AWS_REGION }} aws_bucket_name=${{ secrets.AWS_BUCKET_NAME }}"
