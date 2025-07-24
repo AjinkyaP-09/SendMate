@@ -52,7 +52,7 @@ resource "aws_security_group" "web_sg" {
 
 # Create an EC2 instance to run the Docker container
 resource "aws_instance" "app_server" {
-  ami           = "ami-0f5ee92e2d63afc18" 
+  ami           = "ami-0b32d400456908bf9" 
   instance_type = "t2.micro"
   key_name      = var.ec2_key_pair_name
   security_groups = [aws_security_group.web_sg.name]
