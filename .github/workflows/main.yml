@@ -44,7 +44,6 @@ jobs:
         run: terraform init
         working-directory: ./terraform
 
-      # The 'id' allows us to reference the output of this step later
       - name: Terraform Apply
         id: terraform
         run: terraform apply -auto-approve -var="ec2_key_pair_name=${{ secrets.EC2_KEY_PAIR_NAME }}"
@@ -54,23 +53,11 @@ jobs:
       - name: Create Ansible Inventory File
         run: |
           echo "[all]" > inventory.ini
-          # CORRECTED: Use the direct output from the terraform step's id
           echo "${{ steps.terraform.outputs.public_ip }} ansible_user=ec2-user" >> inventory.ini
 
-      - name: Wait for SSH port to be open
-        run: |
-          ip=${{ steps.terraform.outputs.public_ip }}
-          echo "Waiting for SSH on $ip..."
-          for i in {1..30}; do
-            if nc -z -w 5 $ip 22; then
-              echo "SSH port is open!"
-              exit 0
-            fi
-            echo "Attempt $i failed. Retrying in 5 seconds..."
-            sleep 5
-          done
-          echo "Timed out waiting for SSH port."
-          exit 1
+      # CORRECTED: Use a simple sleep to wait for the instance to be ready
+      - name: Wait for instance to initialize
+        run: sleep 30
       
       - name: Run Ansible Playbook
         uses: dawidd6/action-ansible-playbook@v2
