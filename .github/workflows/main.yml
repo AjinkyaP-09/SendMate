@@ -40,9 +40,9 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ap-south-1
 
-      # CORRECTED: Terraform init with backend configuration
+      # This step now requires the backend.tf file to exist
       - name: Terraform Init
-        run: terraform init -backend-config="bucket=${{ secrets.TF_STATE_BUCKET }}" -backend-config="key=sendmate/terraform.tfstate" -backend-config="region=ap-south-1" -backend-config="dynamodb_table=${{ secrets.TF_STATE_LOCK_TABLE }}"
+        run: terraform init
         working-directory: ./terraform
 
       - name: Terraform Apply
@@ -60,7 +60,7 @@ jobs:
           playbook: playbook.yml
           directory: ./ansible
           key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
-          # CORRECTED: Pass the IP directly to the inventory parameter
+          # CORRECTED: This is the most robust way to pass the inventory
           inventory: |
             [all]
             ${{ steps.terraform.outputs.public_ip }} ansible_user=ec2-user
