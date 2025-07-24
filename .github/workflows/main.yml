@@ -52,10 +52,10 @@ jobs:
       # STEP 3: Configure and deploy with Ansible
       - name: Create Ansible Inventory File
         run: |
-          echo "[all]" > inventory.ini
-          echo "${{ steps.terraform.outputs.public_ip }} ansible_user=ec2-user" >> inventory.ini
+          # CORRECTED: Create the inventory file inside the ansible directory
+          echo "[all]" > ansible/inventory.ini
+          echo "${{ steps.terraform.outputs.public_ip }} ansible_user=ec2-user" >> ansible/inventory.ini
 
-      # CORRECTED: Use a simple sleep to wait for the instance to be ready
       - name: Wait for instance to initialize
         run: sleep 30
       
@@ -65,6 +65,7 @@ jobs:
           playbook: playbook.yml
           directory: ./ansible
           key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
-          inventory: ../inventory.ini
+          # CORRECTED: The inventory file is now in the same directory
+          inventory: inventory.ini
           options: |
             --extra-vars "dockerhub_username=${{ secrets.DOCKERHUB_USERNAME }} mongo_uri=${{ secrets.MONGO_URI }} google_client_id=${{ secrets.GOOGLE_CLIENT_ID }} google_client_secret=${{ secrets.GOOGLE_CLIENT_SECRET }} aws_access_key_id=${{ secrets.AWS_ACCESS_KEY_ID }} aws_secret_access_key=${{ secrets.AWS_SECRET_ACCESS_KEY }} aws_region=${{ secrets.AWS_REGION }} aws_bucket_name=${{ secrets.AWS_BUCKET_NAME }}"
