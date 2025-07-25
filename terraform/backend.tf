@@ -1,12 +1,11 @@
 # terraform/backend.tf
 
-# This file MUST be created. It tells Terraform to store its state file
-# remotely in an S3 bucket, which is essential for CI/CD.
 terraform {
   backend "s3" {
-    bucket         = "ajinkya-sendmate-tfstate-bucket" # e.g., ajinkya-sendmate-tfstate-bucket
-    key            = "sendmate/terraform.tfstate"
+    bucket         = "ajinkya-sendmate-tfstate-bucket"
+    # Use a different key for the master branch
+    key            = "master/terraform.tfstate" # Changed from 'sendmate/...'
     region         = "ap-south-1"
-    dynamodb_table = "sendmate-terraform-locks" # e.g., sendmate-terraform-locks
+    dynamodb_table = "sendmate-terraform-locks"
   }
 }
