@@ -1,85 +1,32 @@
-# .github/workflows/main.yml
+- name: Run Ansible Deployment
+  env:
+    ANSIBLE_PRIVATE_KEY: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
+    ANSIBLE_HOST_KEY_CHECKING: "False"
+  run: |
+    sudo apt-get update
+    sudo apt-get install -y ansible sshpass
 
-name: Build and Deploy Sendmate
+    # Get clean IP address from Terraform output
+    terraform -chdir=terraform output -raw public_ip > ip_address.txt
+    IP_ADDRESS=$(cat ip_address.txt | tr -d '\r' | tr -d '\n' | xargs)
 
-on:
-  push:
-    branches:
-      - main
+    echo "📍 Cleaned IP Address: '$IP_ADDRESS'"
 
-jobs:
-  build-and-deploy:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout Repository Code
-        uses: actions/checkout@v3
+    if [[ ! "$IP_ADDRESS" =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+      echo "❌ Error: Invalid or empty IP address from Terraform output"
+      exit 1
+    fi
 
-      # STEP 1: Build Docker image and push to registry
-      - name: Login to Docker Hub
-        uses: docker/login-action@v2
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
+    echo "$ANSIBLE_PRIVATE_KEY" > private_key.pem
+    chmod 600 private_key.pem
 
-      - name: Build and push Docker image
-        uses: docker/build-push-action@v4
-        with:
-          context: ./backend
-          file: ./Dockerfile
-          push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/sendmate:latest
+    echo "⏳ Waiting for EC2 to be ready..."
+    sleep 30
 
-      # STEP 2: Provision infrastructure with Terraform
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v2
+    ansible-playbook ansible/playbook.yml \
+      --inventory "$IP_ADDRESS," \
+      --private-key private_key.pem \
+      --user ec2-user \
+      --extra-vars "dockerhub_username=${{ secrets.DOCKERHUB_USERNAME }} mongo_uri=${{ secrets.MONGO_URI }} google_client_id=${{ secrets.GOOGLE_CLIENT_ID }} google_client_secret=${{ secrets.GOOGLE_CLIENT_SECRET }} aws_access_key_id=${{ secrets.AWS_ACCESS_KEY_ID }} aws_secret_access_key=${{ secrets.AWS_SECRET_ACCESS_KEY }} aws_region=ap-south-1 aws_bucket_name=${{ secrets.AWS_BUCKET_NAME }}"
 
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v2
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ap-south-1
-
-      - name: Terraform Init
-        run: terraform init
-        working-directory: ./terraform
-
-      - name: Terraform Apply
-        run: terraform apply -auto-approve -var="ec2_key_pair_name=${{ secrets.EC2_KEY_PAIR_NAME }}"
-        working-directory: ./terraform
-
-      # DEFINITIVE FIX: Use an official action to safely parse Terraform output
-      - name: Get Terraform Outputs
-        id: tf_outputs
-        uses: hashicorp/terraform-json@v2
-        with:
-          working_directory: ./terraform
-          command: output
-
-      # STEP 3: Configure and deploy with Ansible
-      - name: Run Ansible Deployment
-        env:
-          ANSIBLE_PRIVATE_KEY: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
-          ANSIBLE_HOST_KEY_CHECKING: "False"
-        run: |
-          # Install Ansible
-          sudo apt-get update
-          sudo apt-get install -y ansible sshpass
-
-          # Use the clean IP address from the dedicated action's output
-          IP_ADDRESS="${{ steps.tf_outputs.outputs.public_ip }}"
-          echo " IP Address validated: $IP_ADDRESS"
-
-          # Write the private key to a file and set correct permissions
-          echo "$ANSIBLE_PRIVATE_KEY" > private_key.pem
-          chmod 600 private_key.pem
-
-          # Add a short wait for the server to be fully ready
-          sleep 20
-
-          # Run the playbook, passing the inventory and the path to the private key file
-          ansible-playbook ansible/playbook.yml \
-            --inventory "$IP_ADDRESS," \
-            --private-key private_key.pem \
-            --user ec2-user \
-            --extra-vars "dockerhub_username=${{ secrets.DOCKERHUB_USERNAME }} mongo_uri=${{ secrets.MONGO_URI }} google_client_id=${{ secrets.GOOGLE_CLIENT_ID }} google_client_secret=${{ secrets.GOOGLE_CLIENT_SECRET }} aws_access_key_id=${{ secrets.AWS_ACCESS_KEY_ID }} aws_secret_access_key=${{ secrets.AWS_SECRET_ACCESS_KEY }} aws_region=${{ secrets.AWS_REGION }} aws_bucket_name=${{ secrets.AWS_BUCKET_NAME }}"
+    rm private_key.pem
