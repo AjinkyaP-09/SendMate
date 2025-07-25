@@ -43,8 +43,9 @@ pipeline {
                 // Use the AWS credentials
                 withCredentials([aws(credentialsId: AWS_CREDENTIALS_ID)]) {
                     dir('terraform') {
-                        sh 'terraform init'
-                        sh 'terraform apply -auto-approve -var="ec2_key_pair_name=demo"' // Replace with your key pair name
+                        // CORRECTED: Initialize Terraform with the S3 backend configuration
+                        sh 'terraform init -backend-config="bucket=ajinkya-sendmate-tfstate-bucket" -backend-config="key=sendmate/terraform.tfstate" -backend-config="region=ap-south-1" -backend-config="dynamodb_table=sendmate-terraform-locks"'
+                        sh 'terraform apply -auto-approve -var="ec2_key_pair_name=demo"'
                     }
                 }
             }
