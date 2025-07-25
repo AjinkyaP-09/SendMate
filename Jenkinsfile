@@ -3,6 +3,12 @@
 pipeline {
     agent any
 
+    options {
+        // DEFINITIVE FIX: Clean the workspace before every build
+        // This ensures the .dockerignore file is always effective
+        cleanWs()
+    }
+
     environment {
         // Define credentials IDs from your Jenkins Credentials Manager
         DOCKERHUB_CREDENTIALS_ID = 'dockerhub-credentials'
@@ -71,7 +77,7 @@ pipeline {
 
                         // Run the Ansible playbook, now with all secrets
                         sh """
-                        ansible-playbook ../ansible/playbook.yml \\
+                        ansible-playbook ansible/playbook.yml \\
                             --inventory "${ipAddress}," \\
                             --private-key ${SSH_KEY_FILE} \\
                             --user ${SSH_USER} \\
