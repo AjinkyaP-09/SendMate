@@ -57,7 +57,7 @@ jobs:
         uses: ./.github/workflows/ansible.yml
         with:
           ip_address: ${{ steps.get_ip.outputs.ip_address }}
-        # DEFINITIVE FIX: Explicitly pass each required secret
+        # DEFINITIVE FIX: The 'secrets' block must be at the same indentation level as 'uses' and 'with'
         secrets:
           EC2_SSH_PRIVATE_KEY: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
           DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
