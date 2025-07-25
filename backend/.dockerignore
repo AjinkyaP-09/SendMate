@@ -1,0 +1,11 @@
+# backend/.dockerignore
+
+# Ignore the node_modules folder, as it will be installed inside the container
+node_modules
+
+# Ignore git files
+.git
+.gitignore
+
+# Ignore local environment files
+.env
