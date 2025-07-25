@@ -52,8 +52,7 @@ jobs:
       - name: Save IP Address to File
         run: terraform -chdir=terraform output -raw public_ip > ip_address.txt
 
-      - name: Read IP Address into Environment Variable
-        run: echo "EC2_IP=$(cat ip_address.txt)" >> $GITHUB_ENV
+      # The failing "Read IP Address into Environment Variable" step has been REMOVED.
 
       # STEP 3: Configure and deploy with Ansible
       - name: Wait for instance to initialize
@@ -65,7 +64,7 @@ jobs:
           playbook: playbook.yml
           directory: ./ansible
           key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
-          # Use the environment variable for the IP address
-          inventory: "${{ env.EC2_IP }},"
+          # CORRECTED: Read the IP directly from the file in this step
+          inventory: "$(cat ip_address.txt),"
           options: |
             --extra-vars "dockerhub_username=${{ secrets.DOCKERHUB_USERNAME }} mongo_uri=${{ secrets.MONGO_URI }} google_client_id=${{ secrets.GOOGLE_CLIENT_ID }} google_client_secret=${{ secrets.GOOGLE_CLIENT_SECRET }} aws_access_key_id=${{ secrets.AWS_ACCESS_KEY_ID }} aws_secret_access_key=${{ secrets.AWS_SECRET_ACCESS_KEY }} aws_region=${{ secrets.AWS_REGION }} aws_bucket_name=${{ secrets.AWS_BUCKET_NAME }}"
