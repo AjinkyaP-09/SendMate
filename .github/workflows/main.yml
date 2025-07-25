@@ -1,11 +1,11 @@
 # .github/workflows/main.yml
 
-name: Build and Deploy Sendmate
+name: Build and Deploy Sendmate (GitHub Actions)
 
 on:
   push:
     branches:
-      - master
+      - master # This workflow now runs on the 'master' branch
 
 jobs:
   build-and-deploy:
@@ -48,26 +48,27 @@ jobs:
         run: terraform apply -auto-approve -var="ec2_key_pair_name=${{ secrets.EC2_KEY_PAIR_NAME }}"
         working-directory: ./terraform
 
-      # DEFINITIVE FIX: Use an official action to safely parse Terraform output
-      - name: Get Terraform Outputs
-        id: tf_outputs
-        uses: hashicorp/terraform-json@v2
-        with:
-          working_directory: ./terraform
-          command: output
-
       # STEP 3: Deploy with Ansible
       - name: Run Ansible Deployment
         env:
           ANSIBLE_PRIVATE_KEY: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
           ANSIBLE_HOST_KEY_CHECKING: "False"
         run: |
+          # Install necessary tools
           sudo apt-get update
-          sudo apt-get install -y ansible sshpass
+          sudo apt-get install -y ansible sshpass jq
 
-          # Use the clean IP address from the dedicated action's output
-          IP_ADDRESS="${{ steps.tf_outputs.outputs.public_ip.value }}"
+          # Get Terraform output as JSON and parse with jq for reliability
+          terraform -chdir=terraform output -json > tf_output.json
+          IP_ADDRESS=$(jq -r '.public_ip.value' tf_output.json)
+          
           echo "✅ Deploying to server at IP: $IP_ADDRESS"
+
+          # Validate the IP address
+          if [[ ! "$IP_ADDRESS" =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "❌ Error: Invalid or empty IP address captured from Terraform."
+            exit 1
+          fi
 
           echo "$ANSIBLE_PRIVATE_KEY" > private_key.pem
           chmod 600 private_key.pem
@@ -79,3 +80,6 @@ jobs:
             --private-key private_key.pem \
             --user ec2-user \
             --extra-vars "dockerhub_username=${{ secrets.DOCKERHUB_USERNAME }} mongo_uri=${{ secrets.MONGO_URI }} google_client_id=${{ secrets.GOOGLE_CLIENT_ID }} google_client_secret=${{ secrets.GOOGLE_CLIENT_SECRET }} aws_access_key_id=${{ secrets.AWS_ACCESS_KEY_ID }} aws_secret_access_key=${{ secrets.AWS_SECRET_ACCESS_KEY }} aws_region=ap-south-1 aws_bucket_name=${{ secrets.AWS_BUCKET_NAME }}"
+          
+          # Clean up the temporary private key file for security
+          rm private_key.pem
