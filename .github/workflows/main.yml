@@ -44,18 +44,16 @@ jobs:
         run: terraform init
         working-directory: ./terraform
 
-      # CORRECTED: Combine Apply and Output into a single, reliable step
-      - name: Terraform Apply and Get Output
-        id: terraform
+      - name: Terraform Apply
+        run: terraform apply -auto-approve -var="ec2_key_pair_name=${{ secrets.EC2_KEY_PAIR_NAME }}"
         working-directory: ./terraform
-        run: |
-          terraform apply -auto-approve -var="ec2_key_pair_name=${{ secrets.EC2_KEY_PAIR_NAME }}"
-          
-          # Get the output after the apply is fully complete
-          ip_address=$(terraform output -raw public_ip)
-          
-          # Save the IP to the step's output
-          echo "ip_address=$ip_address" >> $GITHUB_OUTPUT
+
+      # DEFINITIVE FIX: Use a file to reliably capture the IP address
+      - name: Save IP Address to File
+        run: terraform -chdir=terraform output -raw public_ip > ip_address.txt
+
+      - name: Read IP Address into Environment Variable
+        run: echo "EC2_IP=$(cat ip_address.txt)" >> $GITHUB_ENV
 
       # STEP 3: Configure and deploy with Ansible
       - name: Wait for instance to initialize
@@ -67,7 +65,7 @@ jobs:
           playbook: playbook.yml
           directory: ./ansible
           key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
-          # Use the output from the combined Terraform step
-          inventory: "${{ steps.terraform.outputs.ip_address }},"
+          # Use the environment variable for the IP address
+          inventory: "${{ env.EC2_IP }},"
           options: |
             --extra-vars "dockerhub_username=${{ secrets.DOCKERHUB_USERNAME }} mongo_uri=${{ secrets.MONGO_URI }} google_client_id=${{ secrets.GOOGLE_CLIENT_ID }} google_client_secret=${{ secrets.GOOGLE_CLIENT_SECRET }} aws_access_key_id=${{ secrets.AWS_ACCESS_KEY_ID }} aws_secret_access_key=${{ secrets.AWS_SECRET_ACCESS_KEY }} aws_region=${{ secrets.AWS_REGION }} aws_bucket_name=${{ secrets.AWS_BUCKET_NAME }}"
