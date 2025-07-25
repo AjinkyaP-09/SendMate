@@ -1,12 +1,12 @@
 # terraform/main.tf
 
-# This block is the definitive fix. It forces Terraform to use a specific
-# modern version of the AWS provider, ensuring compatibility with your state file.
+# This block forces Terraform to use a specific modern version of the AWS
+# provider, ensuring compatibility with your state file.
 terraform {
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = "~> 5.0" # This locks the provider to the latest 5.x version
+      version = "~> 5.0"
     }
   }
 }
