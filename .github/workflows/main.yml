@@ -48,13 +48,16 @@ jobs:
         run: terraform apply -auto-approve -var="ec2_key_pair_name=${{ secrets.EC2_KEY_PAIR_NAME }}"
         working-directory: ./terraform
 
-      # DEFINITIVE FIX: Use a file to reliably capture the IP address
       - name: Save IP Address to File
         run: terraform -chdir=terraform output -raw public_ip > ip_address.txt
 
-      # The failing "Read IP Address into Environment Variable" step has been REMOVED.
-
       # STEP 3: Configure and deploy with Ansible
+      # DEFINITIVE FIX: Create a dedicated inventory file for Ansible
+      - name: Create Ansible Inventory
+        run: |
+          echo "[all]" > ansible/inventory.ini
+          echo "$(cat ip_address.txt) ansible_user=ec2-user" >> ansible/inventory.ini
+
       - name: Wait for instance to initialize
         run: sleep 5
 
@@ -64,7 +67,7 @@ jobs:
           playbook: playbook.yml
           directory: ./ansible
           key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
-          # CORRECTED: Read the IP directly from the file in this step
-          inventory: "$(cat ip_address.txt),"
+          # The inventory file is now correctly created in the ansible directory
+          inventory: inventory.ini
           options: |
             --extra-vars "dockerhub_username=${{ secrets.DOCKERHUB_USERNAME }} mongo_uri=${{ secrets.MONGO_URI }} google_client_id=${{ secrets.GOOGLE_CLIENT_ID }} google_client_secret=${{ secrets.GOOGLE_CLIENT_SECRET }} aws_access_key_id=${{ secrets.AWS_ACCESS_KEY_ID }} aws_secret_access_key=${{ secrets.AWS_SECRET_ACCESS_KEY }} aws_region=${{ secrets.AWS_REGION }} aws_bucket_name=${{ secrets.AWS_BUCKET_NAME }}"
