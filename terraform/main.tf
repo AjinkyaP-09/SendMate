@@ -17,7 +17,7 @@ provider "aws" {
 
 # Create a security group to allow SSH and HTTP traffic
 resource "aws_security_group" "web_sg" {
-  name        = "sendmate-sg"
+  name        = "sendmate-sg-master"
   description = "Allow SSH and Web traffic for Sendmate"
 
   ingress {
