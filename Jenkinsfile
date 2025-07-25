@@ -44,7 +44,7 @@ pipeline {
                 withCredentials([aws(credentialsId: AWS_CREDENTIALS_ID)]) {
                     dir('terraform') {
                         sh 'terraform init'
-                        sh 'terraform apply -auto-approve -var="ec2_key_pair_name=your-ec2-key-pair-name"' // Replace with your key pair name
+                        sh 'terraform apply -auto-approve -var="ec2_key_pair_name=demo"' // Replace with your key pair name
                     }
                 }
             }
