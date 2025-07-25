@@ -51,20 +51,23 @@ jobs:
       # STEP 3: Configure and deploy with Ansible in a single, robust step
       - name: Run Ansible Deployment
         env:
-          # Make the private key available as an environment variable
           ANSIBLE_PRIVATE_KEY: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
+          ANSIBLE_HOST_KEY_CHECKING: "False" # Best practice for CI/CD
         run: |
           # Install Ansible
           sudo apt-get update
           sudo apt-get install -y ansible sshpass
 
-          # Get the IP address directly from Terraform state
-          IP_ADDRESS=$(terraform -chdir=terraform output -raw public_ip)
+          # Cleanly extract just the IP, ignoring any debug output
+          IP_ADDRESS=$(terraform -chdir=terraform output -raw public_ip 2>/dev/null | tail -n 1)
           echo "Deploying to server at IP: $IP_ADDRESS"
 
-          # DEFINITIVE FIX: Write the private key to a file and set correct permissions
+          # Write the private key to a file and set correct permissions
           echo "$ANSIBLE_PRIVATE_KEY" > private_key.pem
           chmod 600 private_key.pem
+
+          # Add a short wait for the server to be fully ready
+          sleep 20
 
           # Run the playbook, passing the inventory and the path to the private key file
           ansible-playbook ansible/playbook.yml \
