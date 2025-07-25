@@ -3,11 +3,29 @@
 name: 2. Deploy Application
 
 on:
-  workflow_call: # This allows the workflow to be called directly by another workflow
+  workflow_call:
     inputs:
       ip_address:
         required: true
         type: string
+    # This block declares all the secrets the workflow needs to receive
+    secrets:
+      EC2_SSH_PRIVATE_KEY:
+        required: true
+      DOCKERHUB_USERNAME:
+        required: true
+      MONGO_URI:
+        required: true
+      GOOGLE_CLIENT_ID:
+        required: true
+      GOOGLE_CLIENT_SECRET:
+        required: true
+      AWS_ACCESS_KEY_ID:
+        required: true
+      AWS_SECRET_ACCESS_KEY:
+        required: true
+      AWS_BUCKET_NAME:
+        required: true
 
 jobs:
   deploy:
@@ -18,9 +36,9 @@ jobs:
 
       - name: Run Ansible Deployment
         env:
+          # These secrets are now passed securely from the calling workflow
           ANSIBLE_PRIVATE_KEY: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
           ANSIBLE_HOST_KEY_CHECKING: "False"
-          # Get the IP address from the workflow input
           IP_ADDRESS: ${{ inputs.ip_address }}
         run: |
           # Install necessary tools
