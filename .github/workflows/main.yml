@@ -56,11 +56,10 @@ jobs:
         run: |
           # Install necessary tools
           sudo apt-get update
-          sudo apt-get install -y ansible sshpass jq
+          sudo apt-get install -y ansible sshpass
 
-          # Get Terraform output as JSON and parse with jq for reliability
-          terraform -chdir=terraform output -json > tf_output.json
-          IP_ADDRESS=$(jq -r '.public_ip.value' tf_output.json)
+          # Use 'terraform output -raw' for the cleanest possible output
+          IP_ADDRESS=$(terraform -chdir=terraform output -raw public_ip)
           
           echo "✅ Deploying to server at IP: $IP_ADDRESS"
 
