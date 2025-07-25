@@ -11,9 +11,7 @@ jobs:
   # This is the first job. It builds the infrastructure.
   provision:
     runs-on: ubuntu-latest
-    outputs:
-      # This makes the IP address available to other jobs
-      ip_address: ${{ steps.get_ip.outputs.ip_address }}
+    # This job does not have outputs anymore; it produces an artifact.
     steps:
       - name: Checkout Repository Code
         uses: actions/checkout@v3
@@ -50,10 +48,15 @@ jobs:
         run: terraform apply -auto-approve -var="ec2_key_pair_name=${{ secrets.EC2_KEY_PAIR_NAME }}"
         working-directory: ./terraform
 
-      # This step saves the IP address to an output variable for the next job
-      - name: Get Public IP Address
-        id: get_ip
-        run: echo "ip_address=$(terraform -chdir=terraform output -raw public_ip)" >> $GITHUB_OUTPUT
+      # DEFINITIVE FIX: Save the IP to a file and upload it as an artifact
+      - name: Get Public IP and Save to File
+        run: terraform -chdir=terraform output -raw public_ip > ip_address.txt
+      
+      - name: Upload IP Address Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ec2-ip
+          path: ip_address.txt
 
   # This is the second job. It runs only after the 'provision' job succeeds.
   deploy:
@@ -63,17 +66,23 @@ jobs:
       - name: Checkout Repository Code
         uses: actions/checkout@v3
 
+      # DEFINITIVE FIX: Download the artifact from the previous job
+      - name: Download IP Address Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: ec2-ip
+
       - name: Run Ansible Deployment
         env:
           ANSIBLE_PRIVATE_KEY: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
           ANSIBLE_HOST_KEY_CHECKING: "False"
-          # Get the IP address from the previous job's output
-          IP_ADDRESS: ${{ needs.provision.outputs.ip_address }}
         run: |
           # Install necessary tools
           sudo apt-get update
           sudo apt-get install -y ansible sshpass
           
+          # Read the IP from the downloaded artifact file
+          IP_ADDRESS=$(cat ip_address.txt)
           echo "✅ Deploying to server at IP: $IP_ADDRESS"
 
           # Validate the IP address
