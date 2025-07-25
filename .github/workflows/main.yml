@@ -40,47 +40,26 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ap-south-1
 
-      # NEW: This step will start the EC2 instance if it is stopped
-      - name: Start EC2 Instance if Stopped
-        run: |
-          INSTANCE_ID=$(aws ec2 describe-instances --filters "Name=tag:Name,Values=Sendmate-Server" "Name=instance-state-name,Values=stopped" --query "Reservations[0].Instances[0].InstanceId" --output text)
-          if [ "$INSTANCE_ID" != "None" ]; then
-            echo "Instance $INSTANCE_ID is stopped. Starting it now..."
-            aws ec2 start-instances --instance-ids $INSTANCE_ID
-            echo "Waiting for instance to enter running state..."
-            aws ec2 wait instance-running --instance-ids $INSTANCE_ID
-            echo "Instance is running."
-          else
-            echo "No stopped instance found. Terraform will proceed."
-          fi
-
       - name: Terraform Init
         run: terraform init
         working-directory: ./terraform
 
-      - name: Terraform Apply
-        run: terraform apply -auto-approve -var="ec2_key_pair_name=${{ secrets.EC2_KEY_PAIR_NAME }}"
+      # CORRECTED: Combine Apply and Output into a single, reliable step
+      - name: Terraform Apply and Get Output
+        id: terraform
         working-directory: ./terraform
-
-      # Save Terraform output to a file
-      - name: Save Terraform Output
-        run: terraform output -json > tf_outputs.json
-        working-directory: ./terraform
-
-      # Read the IP address from the file and handle nulls
-      - name: Get IP Address from Output File
-        id: get_ip
         run: |
-          ip=$(jq -r '.public_ip.value' terraform/tf_outputs.json)
-          if [ -z "$ip" ] || [ "$ip" == "null" ]; then
-            echo "Error: EC2 instance has no public IP. It may be stopped."
-            exit 1
-          fi
-          echo "ip_address=$ip" >> $GITHUB_OUTPUT
+          terraform apply -auto-approve -var="ec2_key_pair_name=${{ secrets.EC2_KEY_PAIR_NAME }}"
+          
+          # Get the output after the apply is fully complete
+          ip_address=$(terraform output -raw public_ip)
+          
+          # Save the IP to the step's output
+          echo "ip_address=$ip_address" >> $GITHUB_OUTPUT
 
       # STEP 3: Configure and deploy with Ansible
       - name: Wait for instance to initialize
-        run: sleep 5 # Reduced sleep time as requested
+        run: sleep 5
 
       - name: Run Ansible Playbook
         uses: dawidd6/action-ansible-playbook@v2
@@ -88,7 +67,7 @@ jobs:
           playbook: playbook.yml
           directory: ./ansible
           key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
-          # DEFINITIVE FIX: Use the IP from the dedicated step
-          inventory: "${{ steps.get_ip.outputs.ip_address }},"
+          # Use the output from the combined Terraform step
+          inventory: "${{ steps.terraform.outputs.ip_address }},"
           options: |
             --extra-vars "dockerhub_username=${{ secrets.DOCKERHUB_USERNAME }} mongo_uri=${{ secrets.MONGO_URI }} google_client_id=${{ secrets.GOOGLE_CLIENT_ID }} google_client_secret=${{ secrets.GOOGLE_CLIENT_SECRET }} aws_access_key_id=${{ secrets.AWS_ACCESS_KEY_ID }} aws_secret_access_key=${{ secrets.AWS_SECRET_ACCESS_KEY }} aws_region=${{ secrets.AWS_REGION }} aws_bucket_name=${{ secrets.AWS_BUCKET_NAME }}"
