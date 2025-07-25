@@ -3,11 +3,7 @@
 pipeline {
     agent any
 
-    options {
-        // DEFINITIVE FIX: Clean the workspace before every build
-        // This ensures the .dockerignore file is always effective
-        cleanWs()
-    }
+    // The 'options' block has been removed as it was incorrect.
 
     environment {
         // Define credentials IDs from your Jenkins Credentials Manager
@@ -22,6 +18,14 @@ pipeline {
     }
 
     stages {
+        // DEFINITIVE FIX: Add a dedicated stage to clean the workspace before the build
+        stage('Clean Workspace') {
+            steps {
+                echo 'Cleaning workspace to ensure a fresh build environment...'
+                cleanWs()
+            }
+        }
+
         stage('Checkout Code') {
             steps {
                 git branch: 'main', url: 'https://github.com/AjinkyaP-09/SendMate.git'
@@ -49,7 +53,7 @@ pipeline {
                 // Use the AWS credentials
                 withCredentials([aws(credentialsId: AWS_CREDENTIALS_ID)]) {
                     dir('terraform') {
-                        // CORRECTED: Initialize Terraform with the S3 backend configuration
+                        // Initialize Terraform with the S3 backend configuration
                         sh 'terraform init -backend-config="bucket=ajinkya-sendmate-tfstate-bucket" -backend-config="key=sendmate/terraform.tfstate" -backend-config="region=ap-south-1" -backend-config="dynamodb_table=sendmate-terraform-locks"'
                         sh 'terraform apply -auto-approve -var="ec2_key_pair_name=demo"'
                     }
