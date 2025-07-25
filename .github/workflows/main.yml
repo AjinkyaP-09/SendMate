@@ -1,0 +1,96 @@
+# .github/workflows/main.yml
+
+name: Build and Deploy Sendmate
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  # This is the first job. It builds the infrastructure.
+  provision:
+    runs-on: ubuntu-latest
+    outputs:
+      # This makes the IP address available to other jobs
+      ip_address: ${{ steps.get_ip.outputs.ip_address }}
+    steps:
+      - name: Checkout Repository Code
+        uses: actions/checkout@v3
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v4
+        with:
+          context: ./backend
+          file: ./Dockerfile
+          push: true
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/sendmate:latest
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ap-south-1
+
+      - name: Terraform Init
+        run: terraform init
+        working-directory: ./terraform
+
+      - name: Terraform Apply
+        run: terraform apply -auto-approve -var="ec2_key_pair_name=${{ secrets.EC2_KEY_PAIR_NAME }}"
+        working-directory: ./terraform
+
+      # This step saves the IP address to an output variable for the next job
+      - name: Get Public IP Address
+        id: get_ip
+        run: echo "ip_address=$(terraform -chdir=terraform output -raw public_ip)" >> $GITHUB_OUTPUT
+
+  # This is the second job. It runs only after the 'provision' job succeeds.
+  deploy:
+    runs-on: ubuntu-latest
+    needs: provision # This creates the dependency and the visual link
+    steps:
+      - name: Checkout Repository Code
+        uses: actions/checkout@v3
+
+      - name: Run Ansible Deployment
+        env:
+          ANSIBLE_PRIVATE_KEY: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
+          ANSIBLE_HOST_KEY_CHECKING: "False"
+          # Get the IP address from the previous job's output
+          IP_ADDRESS: ${{ needs.provision.outputs.ip_address }}
+        run: |
+          # Install necessary tools
+          sudo apt-get update
+          sudo apt-get install -y ansible sshpass
+          
+          echo "✅ Deploying to server at IP: $IP_ADDRESS"
+
+          # Validate the IP address
+          if [[ ! "$IP_ADDRESS" =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "❌ Error: Invalid or empty IP address received from provision job."
+            exit 1
+          fi
+
+          echo "$ANSIBLE_PRIVATE_KEY" > private_key.pem
+          chmod 600 private_key.pem
+
+          sleep 30
+
+          ansible-playbook ansible/playbook.yml \
+            --inventory "$IP_ADDRESS," \
+            --private-key private_key.pem \
+            --user ec2-user \
+            --extra-vars "dockerhub_username=${{ secrets.DOCKERHUB_USERNAME }} mongo_uri='${{ secrets.MONGO_URI }}' google_client_id='${{ secrets.GOOGLE_CLIENT_ID }}' google_client_secret='${{ secrets.GOOGLE_CLIENT_SECRET }}' aws_access_key_id='${{ secrets.AWS_ACCESS_KEY_ID }}' aws_secret_access_key='${{ secrets.AWS_SECRET_ACCESS_KEY }}' aws_region='ap-south-1' aws_bucket_name='${{ secrets.AWS_BUCKET_NAME }}'"
+          
+          rm private_key.pem
