@@ -48,27 +48,27 @@ jobs:
         run: terraform apply -auto-approve -var="ec2_key_pair_name=${{ secrets.EC2_KEY_PAIR_NAME }}"
         working-directory: ./terraform
 
-      # DEFINITIVE FIX: Use dedicated steps to reliably get the IP address
-      - name: Save IP Address to File
-        run: terraform -chdir=terraform output -raw public_ip > ip_address.txt
+      # STEP 3: Configure and deploy with Ansible in a single, robust step
+      - name: Run Ansible Deployment
+        env:
+          # Make the private key available as an environment variable
+          ANSIBLE_PRIVATE_KEY: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
+        run: |
+          # Install Ansible
+          sudo apt-get update
+          sudo apt-get install -y ansible sshpass
 
-      - name: Set IP Address as Output
-        id: set_ip
-        run: echo "ip_address=$(cat ip_address.txt)" >> $GITHUB_OUTPUT
+          # Get the IP address directly from Terraform state
+          IP_ADDRESS=$(terraform -chdir=terraform output -raw public_ip)
+          echo "Deploying to server at IP: $IP_ADDRESS"
 
-      # STEP 3: Configure and deploy with Ansible
-      - name: Wait for instance to initialize
-        run: sleep 5
+          # DEFINITIVE FIX: Write the private key to a file and set correct permissions
+          echo "$ANSIBLE_PRIVATE_KEY" > private_key.pem
+          chmod 600 private_key.pem
 
-      - name: Run Ansible Playbook
-        uses: dawidd6/action-ansible-playbook@v2
-        with:
-          playbook: playbook.yml
-          directory: ./ansible
-          key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
-          # Use the output from the dedicated step to build the inventory directly
-          inventory: |
-            [all]
-            ${{ steps.set_ip.outputs.ip_address }} ansible_user=ec2-user
-          options: |
+          # Run the playbook, passing the inventory and the path to the private key file
+          ansible-playbook ansible/playbook.yml \
+            --inventory "$IP_ADDRESS," \
+            --private-key private_key.pem \
+            --user ec2-user \
             --extra-vars "dockerhub_username=${{ secrets.DOCKERHUB_USERNAME }} mongo_uri=${{ secrets.MONGO_URI }} google_client_id=${{ secrets.GOOGLE_CLIENT_ID }} google_client_secret=${{ secrets.GOOGLE_CLIENT_SECRET }} aws_access_key_id=${{ secrets.AWS_ACCESS_KEY_ID }} aws_secret_access_key=${{ secrets.AWS_SECRET_ACCESS_KEY }} aws_region=${{ secrets.AWS_REGION }} aws_bucket_name=${{ secrets.AWS_BUCKET_NAME }}"
