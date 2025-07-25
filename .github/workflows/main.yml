@@ -11,7 +11,6 @@ jobs:
   # This is the first job. It builds the infrastructure.
   provision:
     runs-on: ubuntu-latest
-    # This job does not have outputs anymore; it produces an artifact.
     steps:
       - name: Checkout Repository Code
         uses: actions/checkout@v3
@@ -48,9 +47,10 @@ jobs:
         run: terraform apply -auto-approve -var="ec2_key_pair_name=${{ secrets.EC2_KEY_PAIR_NAME }}"
         working-directory: ./terraform
 
-      # DEFINITIVE FIX: Save the IP to a file and upload it as an artifact
+      # DEFINITIVE FIX: Sanitize the IP address at the source before creating the file
       - name: Get Public IP and Save to File
-        run: terraform -chdir=terraform output -raw public_ip > ip_address.txt
+        run: |
+          terraform -chdir=terraform output -raw public_ip | grep -Eo '([0-9]{1,3}\.){3}[0-9]{1,3}' > ip_address.txt
       
       - name: Upload IP Address Artifact
         uses: actions/upload-artifact@v4
@@ -66,11 +66,16 @@ jobs:
       - name: Checkout Repository Code
         uses: actions/checkout@v3
 
-      # DEFINITIVE FIX: Download the artifact from the previous job
       - name: Download IP Address Artifact
         uses: actions/download-artifact@v4
         with:
           name: ec2-ip
+
+      # NEW: Add a debugging step to verify the artifact's content
+      - name: Show Downloaded IP File Content
+        run: |
+          echo "Contents of ip_address.txt:"
+          cat ip_address.txt
 
       - name: Run Ansible Deployment
         env:
@@ -81,7 +86,7 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y ansible sshpass
           
-          # Read the IP from the downloaded artifact file
+          # Read the now-clean IP from the file
           IP_ADDRESS=$(cat ip_address.txt)
           echo "✅ Deploying to server at IP: $IP_ADDRESS"
 
