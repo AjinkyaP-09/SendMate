@@ -62,6 +62,10 @@ pipeline {
         }
 
         stage('Deploy with Ansible') {
+            // DEFINITIVE FIX: Disable SSH host key checking for this stage
+            environment {
+                ANSIBLE_HOST_KEY_CHECKING = 'False'
+            }
             steps {
                 // Use the SSH key and all application secrets
                 withCredentials([
