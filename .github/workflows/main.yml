@@ -40,6 +40,20 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ap-south-1
 
+      # NEW: This step will start the EC2 instance if it is stopped
+      - name: Start EC2 Instance if Stopped
+        run: |
+          INSTANCE_ID=$(aws ec2 describe-instances --filters "Name=tag:Name,Values=Sendmate-Server" "Name=instance-state-name,Values=stopped" --query "Reservations[0].Instances[0].InstanceId" --output text)
+          if [ "$INSTANCE_ID" != "None" ]; then
+            echo "Instance $INSTANCE_ID is stopped. Starting it now..."
+            aws ec2 start-instances --instance-ids $INSTANCE_ID
+            echo "Waiting for instance to enter running state..."
+            aws ec2 wait instance-running --instance-ids $INSTANCE_ID
+            echo "Instance is running."
+          else
+            echo "No stopped instance found. Terraform will proceed."
+          fi
+
       - name: Terraform Init
         run: terraform init
         working-directory: ./terraform
@@ -48,16 +62,20 @@ jobs:
         run: terraform apply -auto-approve -var="ec2_key_pair_name=${{ secrets.EC2_KEY_PAIR_NAME }}"
         working-directory: ./terraform
 
-      # NEW: Save Terraform output to a file
+      # Save Terraform output to a file
       - name: Save Terraform Output
         run: terraform output -json > tf_outputs.json
         working-directory: ./terraform
 
-      # NEW: Read the IP address from the file
+      # Read the IP address from the file and handle nulls
       - name: Get IP Address from Output File
         id: get_ip
         run: |
           ip=$(jq -r '.public_ip.value' terraform/tf_outputs.json)
+          if [ -z "$ip" ] || [ "$ip" == "null" ]; then
+            echo "Error: EC2 instance has no public IP. It may be stopped."
+            exit 1
+          fi
           echo "ip_address=$ip" >> $GITHUB_OUTPUT
 
       # STEP 3: Configure and deploy with Ansible
