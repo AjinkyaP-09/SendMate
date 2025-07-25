@@ -3,8 +3,11 @@
 name: 2. Deploy Application
 
 on:
-  repository_dispatch:
-    types: [trigger-ansible-deployment] # This must match the event_type from the Terraform workflow
+  workflow_call: # This allows the workflow to be called directly by another workflow
+    inputs:
+      ip_address:
+        required: true
+        type: string
 
 jobs:
   deploy:
@@ -17,8 +20,8 @@ jobs:
         env:
           ANSIBLE_PRIVATE_KEY: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
           ANSIBLE_HOST_KEY_CHECKING: "False"
-          # Get the IP address from the event payload
-          IP_ADDRESS: ${{ github.event.client_payload.ip_address }}
+          # Get the IP address from the workflow input
+          IP_ADDRESS: ${{ inputs.ip_address }}
         run: |
           # Install necessary tools
           sudo apt-get update
