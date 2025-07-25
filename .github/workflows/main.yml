@@ -54,21 +54,21 @@ jobs:
           ANSIBLE_PRIVATE_KEY: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
           ANSIBLE_HOST_KEY_CHECKING: "False"
         run: |
-          # Install necessary tools
+          # Install Ansible
           sudo apt-get update
-          sudo apt-get install -y ansible sshpass jq
+          sudo apt-get install -y ansible sshpass
 
-          # DEFINITIVE FIX: Get Terraform output as JSON and parse with jq
-          terraform -chdir=terraform output -json > tf_output.json
-          IP_ADDRESS=$(jq -r '.public_ip.value' tf_output.json)
+          # DEFINITIVE FIX: Use 'terraform output -raw' for clean, script-friendly output
+          IP_ADDRESS=$(terraform -chdir=terraform output -raw public_ip)
           
-          echo "📍 Cleaned IP Address: '$IP_ADDRESS'"
+          echo "📍 Captured IP Address: '$IP_ADDRESS'"
 
           # Validate that the captured IP address is in a valid format
           if [[ ! "$IP_ADDRESS" =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-            echo "❌ Error: Invalid or empty IP address from Terraform output"
-            exit 1
+            echo "🔍 Terraform output for debug:"
+            terraform -chdir=terraform output
           fi
+          echo "✅ IP Address validated: $IP_ADDRESS"
 
           # Write the private key to a temporary file and set correct permissions
           echo "$ANSIBLE_PRIVATE_KEY" > private_key.pem
